@@ -71,7 +71,9 @@
       editor.setSession(configSession);
 
       var editorOutput = ace.edit("editor-output");
-      editorOutput.setFontSize("10pt");
+      editorOutput.setFontSize("12pt");
+      editorOutput.setReadOnly(true);
+      editorOutput.setHighlightActiveLine(false);
       editorOutput.setTheme("ace/theme/monokai");
       editorOutput.setSession(outputSession);
 
