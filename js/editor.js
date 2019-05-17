@@ -1,24 +1,26 @@
-var configTab, inputTab, outputTab;
+var configTab, inputTab;//, outputTab;
 
 var openConfig = function() {
     configTab.classList.add("openTab");
     inputTab.classList.remove("openTab");
-    outputTab.classList.remove("openTab");
+    // outputTab.classList.remove("openTab");
     editor.setSession(configSession);
 };
 
 var openInput = function() {
     configTab.classList.remove("openTab");
     inputTab.classList.add("openTab");
-    outputTab.classList.remove("openTab");
+    // outputTab.classList.remove("openTab");
     editor.setSession(inputSession);
 };
 
 var openOutput = function() {
+    /*
     configTab.classList.remove("openTab");
     inputTab.classList.remove("openTab");
     outputTab.classList.add("openTab");
     editor.setSession(outputSession);
+    */
 };
 
 var writeOutput = function(value) {
@@ -46,12 +48,12 @@ var clearOutput = function() {
 var initLabControls = function() {
     configTab = document.getElementById("configTab");
     inputTab = document.getElementById("inputTab");
-    outputTab = document.getElementById("outputTab");
+    // outputTab = document.getElementById("outputTab");
     configTab.classList.add("openTab");
 
     configTab.onclick = openConfig;
     inputTab.onclick = openInput;
-    outputTab.onclick = openOutput;
+    // outputTab.onclick = openOutput;
 
     document.getElementById("clearOutputBtn").onclick = clearOutput;
 };

@@ -18,7 +18,7 @@
   <meta name="keywords" content="benthos,stream processor,go,golang">
   <meta name="author" content="Ashley Jeffs">
 
-  <title>Benthos</title>
+  <title>Benthos Lab</title>
 
   <link href="css/main.css" rel="stylesheet">
 
@@ -38,7 +38,7 @@
     <div class="nav-spacer"></div>
     <button id="configTab" class="tab">Config</button>
     <button id="inputTab" class="tab">Input</button>
-    <button id="outputTab" class="tab">Output</button>
+    <!--<button id="outputTab" class="tab">Output</button>-->
     <div class="nav-spacer"></div>
     <button id="compileBtn" class="btn btn-primary">Compile</button>
     <button id="executeBtn" class="btn btn-primary">Execute</button>
@@ -48,6 +48,9 @@
   </nav>
 
   <div id="editor"></div>
+  <div id="editor-output"></div>
+
+  <img class="prof-img" src="img/prof.png"/>
 
   <!-- ACE Editor -->
   <script src="vendor/ace/ace.js" type="text/javascript" charset="utf-8"></script>
@@ -65,8 +68,12 @@
 
       editor.setFontSize("12pt");
       editor.setTheme("ace/theme/monokai");
-
       editor.setSession(configSession);
+
+      var editorOutput = ace.edit("editor-output");
+      editorOutput.setFontSize("10pt");
+      editorOutput.setTheme("ace/theme/monokai");
+      editorOutput.setSession(outputSession);
 
       initLabControls();
   </script>

@@ -16,11 +16,27 @@ body {
   display: inline;
 }
 
+.prof-img {
+  position: absolute;
+  height: 100px;
+  right: 20px;
+  bottom: 20px;
+  z-index: 10;
+}
+
 #editor {
   position: absolute;
   top: 56px;
+  width: 50%;
   bottom: 0px;
   left: 0px;
+}
+
+#editor-output {
+  position: absolute;
+  top: 56px;
+  width: 50%;
+  bottom: 0px;
   right: 0px;
 }
 
