@@ -1,0 +1,83 @@
+body {
+  font-family: "open sans", sans-serif;
+  background-color: #272822;
+  color: #fff;
+  padding: 0px;
+  margin: 0px;
+}
+
+.navbar {
+  height: 36px;
+  padding: 5px 15px;
+  background-color: #33352e;
+}
+
+.navbar > h4 {
+  display: inline;
+}
+
+#editor {
+  position: absolute;
+  top: 56px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+}
+
+button {
+  cursor: pointer;
+}
+
+.tab {
+  background-color: #464740;
+  color: #fff;
+  border: 2px outset #575851;
+  border-bottom: 0px;
+  padding: 8px 8px;
+  border-radius: 6px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  position: relative;
+  bottom: -6px;
+}
+
+.tab:hover {
+  background-color: #272822;
+}
+
+.openTab {
+  background-color: #272822;
+}
+
+.btn {
+  border: 1px;
+  padding: 7px;
+  border-radius: 3px;
+  color: #fff;
+  margin: 0px 2px;
+}
+
+.nav-spacer {
+  width: 40px;
+  display: inline-block;
+}
+
+.btn-primary {
+  background-color: rgb(18, 185, 116) !important;
+  border-color: rgb(18, 185, 116) !important;
+}
+
+.btn-primary:hover {
+  background-color: rgb(18, 151, 96) !important;
+  border-color: rgb(18, 151, 96) !important;
+}
+
+.btn-warning {
+  background-color: rgb(216, 80, 51) !important;
+  border-color: rgb(248, 117, 88) !important;
+}
+
+.btn-warning:hover {
+  background-color: rgb(177, 63, 37) !important;
+  border-color: rgb(216, 80, 51) !important;
+}

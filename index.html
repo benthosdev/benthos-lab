@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!--
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135959729-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-135959729-1');
+  </script>
+  -->
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Benthos is a resilient stream processor for performing common and mundane stream tasks and is able to connect to a wide variety of sources and sinks.">
+  <meta name="keywords" content="benthos,stream processor,go,golang">
+  <meta name="author" content="Ashley Jeffs">
+
+  <title>Benthos</title>
+
+  <link href="css/main.css" rel="stylesheet">
+
+  <script src="js/wasm_exec.js"></script>
+  <script src="js/editor.js"></script>
+
+  <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16" />
+
+</head>
+
+<body class="sea">
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <h4 class="font-weight-bold" href="#">Benthos Lab</h4>
+    <div class="nav-spacer"></div>
+    <button id="configTab" class="tab">Config</button>
+    <button id="inputTab" class="tab">Input</button>
+    <button id="outputTab" class="tab">Output</button>
+    <div class="nav-spacer"></div>
+    <button id="compileBtn" class="btn btn-primary">Compile</button>
+    <button id="executeBtn" class="btn btn-primary">Execute</button>
+    <div class="nav-spacer"></div>
+    <button id="normaliseBtn" class="btn btn-warning">Normalise</button>
+    <button id="clearOutputBtn" class="btn btn-warning">Clear Output</button>
+  </nav>
+
+  <div id="editor"></div>
+
+  <!-- ACE Editor -->
+  <script src="vendor/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+  <script>
+      var editor = ace.edit("editor");
+      var configSession = ace.createEditSession(`pipeline:
+  processors:
+  - type: jmespath
+    jmespath:
+      query: '{ message: @, meta: { link_count: length(links) } }'`, "ace/mode/yaml");
+      configSession.setTabSize(2);
+
+      var inputSession = ace.createEditSession('{"id":"foo","links":["https://github.com/Jeffail/benthos","https://docs.benthos.dev","https://www.benthos.dev"]}', "ace/mode/text");
+      var outputSession = ace.createEditSession("", "ace/mode/text");
+
+      editor.setFontSize("12pt");
+      editor.setTheme("ace/theme/monokai");
+
+      editor.setSession(configSession);
+
+      initLabControls();
+  </script>
+</body>
+
+</html>
