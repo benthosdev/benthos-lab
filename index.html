@@ -58,17 +58,38 @@
       var editor = ace.edit("editor");
       var configSession = ace.createEditSession(`pipeline:
   processors:
-  - type: jmespath
-    jmespath:
+  - jmespath:
       query: '{ message: @, meta: { link_count: length(links) } }'`, "ace/mode/yaml");
       configSession.setTabSize(2);
 
       var inputSession = ace.createEditSession('{"id":"foo","links":["https://github.com/Jeffail/benthos","https://docs.benthos.dev","https://www.benthos.dev"]}', "ace/mode/text");
-      var outputSession = ace.createEditSession("", "ace/mode/text");
+      inputSession.setUseWrapMode(true);
+
+      var welcomeText =
+`Welcome to the Benthos Lab, a place where you can experiment with Benthos
+pipeline configurations and share them with others.
+
+Edit your test pipeline configuration as well as the input test data on the left
+by changing tabs. When you'd like to try your pipeline click 'Compile'.
+
+If your config compiled successfully you can then execute it with your test data
+by clicking 'Execute'.
+
+Some processors are banned from being executed in the lab, if one exists within
+your config then execution will be blocked. However, you can still write,
+compile and normalise configs containing banned processors.
+
+Is your config ugly or incomplete? Click 'Normalise' to have Benthos format it.
+
+`;
+
+      var outputSession = ace.createEditSession(welcomeText, "ace/mode/text");
+      outputSession.setUseWrapMode(true);
 
       editor.setFontSize("12pt");
       editor.setTheme("ace/theme/monokai");
       editor.setSession(configSession);
+      editor.setShowPrintMargin(false);
 
       var editorOutput = ace.edit("editor-output");
       editorOutput.setFontSize("12pt");
@@ -76,6 +97,7 @@
       editorOutput.setHighlightActiveLine(false);
       editorOutput.setTheme("ace/theme/monokai");
       editorOutput.setSession(outputSession);
+      editorOutput.setShowPrintMargin(false);
 
       initLabControls();
   </script>

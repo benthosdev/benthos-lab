@@ -26,7 +26,8 @@ var openOutput = function() {
 var writeOutput = function(value) {
 	var session = outputSession;
     var length = session.getLength();
-	session.insert({row: length, column: 0}, value);
+    session.insert({row: length, column: 0}, value);
+    editorOutput.scrollToLine(length+1);
 	openOutput();
 };
 

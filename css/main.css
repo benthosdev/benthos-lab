@@ -18,9 +18,9 @@ body {
 
 .prof-img {
   position: absolute;
-  height: 100px;
+  height: 36px;
   right: 20px;
-  bottom: 20px;
+  top: 4px;
   z-index: 10;
 }
 

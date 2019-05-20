@@ -52,13 +52,17 @@ var (
 var pipelineLayer types.Pipeline
 var transactionChan chan types.Transaction
 
+func writeOutput(msg string) {
+	js.Global().Call("writeOutput", msg)
+}
+
 func reportErr(msg string, err error) {
-	js.Global().Call("writeOutput", fmt.Sprintf(msg, err))
+	writeOutput(fmt.Sprintf(msg, err))
 }
 
 func reportLints(msg []string) {
 	for _, m := range msg {
-		js.Global().Call("writeOutput", m)
+		writeOutput("Lint: " + m + "\n")
 	}
 }
 
@@ -92,7 +96,8 @@ func compile(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	if pipelineLayer, err = pipeline.New(conf.Pipeline, types.NoopMgr(), log.Noop(), metrics.Noop()); err == nil {
+	logger := log.WrapAtLevel(logWriter{}, log.LogError)
+	if pipelineLayer, err = pipeline.New(conf.Pipeline, types.NoopMgr(), logger, metrics.Noop()); err == nil {
 		err = pipelineLayer.Consume(transactionChan)
 	}
 	if err != nil {
@@ -109,7 +114,7 @@ func compile(this js.Value, args []js.Value) interface{} {
 		reportLints(lints)
 	}
 
-	js.Global().Call("writeOutput", "Compiled successfully.\n")
+	writeOutput("Compiled successfully.\n")
 	return nil
 }
 
@@ -142,7 +147,7 @@ func normalise(this js.Value, args []js.Value) interface{} {
 
 func execute(this js.Value, args []js.Value) interface{} {
 	if pipelineLayer == nil {
-		reportErr("Failed to execute: %v\n", errors.New("pipeline must be compiled first"))
+		reportErr("Error: Failed to execute: %v\n", errors.New("pipeline must be compiled first"))
 		return nil
 	}
 
@@ -179,10 +184,28 @@ func execute(this js.Value, args []js.Value) interface{} {
 	}
 
 	for _, out := range message.GetAllBytes(outTran.Payload) {
-		js.Global().Call("writeOutput", string(out)+"\n")
+		writeOutput(string(out) + "\n")
 	}
 	return nil
 }
+
+//------------------------------------------------------------------------------
+
+type logWriter struct{}
+
+func (l logWriter) Printf(format string, v ...interface{}) {
+	writeOutput("Log: " + fmt.Sprintf(format, v...))
+}
+
+func (l logWriter) Println(v ...interface{}) {
+	if str, ok := v[0].(string); ok {
+		writeOutput("Log: " + fmt.Sprintf(str, v[1:]...) + "\n")
+	} else {
+		writeOutput("Log: " + fmt.Sprintf("%v\n", v))
+	}
+}
+
+//------------------------------------------------------------------------------
 
 func registerFunctions() {
 	executeFunc := js.FuncOf(execute)
