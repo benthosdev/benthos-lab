@@ -26,7 +26,7 @@ body {
 
 #editor {
   position: absolute;
-  top: 56px;
+  top: 50px;
   width: 50%;
   bottom: 0px;
   left: 0px;
@@ -34,10 +34,11 @@ body {
 
 #editor-output {
   position: absolute;
-  top: 56px;
+  top: 50px;
   width: 50%;
   bottom: 0px;
   right: 0px;
+  border-left: 2px solid #202020;
 }
 
 button {
