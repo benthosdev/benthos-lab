@@ -32,6 +32,7 @@ import (
 	"github.com/Jeffail/benthos/lib/message"
 	"github.com/Jeffail/benthos/lib/metrics"
 	"github.com/Jeffail/benthos/lib/pipeline"
+	"github.com/Jeffail/benthos/lib/processor"
 	"github.com/Jeffail/benthos/lib/response"
 	"github.com/Jeffail/benthos/lib/types"
 	uconf "github.com/Jeffail/benthos/lib/util/config"
@@ -84,6 +85,7 @@ func closePipeline() {
 	if err := pipelineLayer.WaitForClose(time.Until(timesOut)); err != nil {
 		reportErr("Error: Failed to shut down pipeline: %v\n", err)
 	}
+	pipelineLayer = nil
 }
 
 func compile(this js.Value, args []js.Value) interface{} {
@@ -92,7 +94,7 @@ func compile(this js.Value, args []js.Value) interface{} {
 	contents := js.Global().Get("configSession").Call("getValue").String()
 	conf, err := compileConfig(contents)
 	if err != nil {
-		reportErr("Error: Failed to create pipeline: %v", err)
+		reportErr("Error: Failed to create pipeline: %v\n", err)
 		return nil
 	}
 
@@ -101,20 +103,22 @@ func compile(this js.Value, args []js.Value) interface{} {
 		err = pipelineLayer.Consume(transactionChan)
 	}
 	if err != nil {
+		pipelineLayer = nil
 		reportErr("Error: Failed to create pipeline: %v\n", err)
 		return nil
 	}
-	lints, err := config.Lint([]byte(contents), conf)
-	if err != nil {
-		reportErr("Error: Failed to parse config: %v\n", err)
-		return nil
-	}
-
-	if len(lints) > 0 {
+	if lints, err := config.Lint([]byte(contents), conf); err != nil {
+		reportErr("Error: Failed to parse config for linter: %v\n", err)
+	} else if len(lints) > 0 {
 		reportLints(lints)
 	}
 
 	writeOutput("Compiled successfully.\n")
+	compileBtn := js.Global().Get("document").Call("getElementById", "compileBtn")
+	compileBtnClassList := compileBtn.Get("classList")
+	compileBtnClassList.Call("add", "btn-disabled")
+	compileBtnClassList.Call("remove", "btn-primary")
+	compileBtn.Set("disabled", true)
 	return nil
 }
 
@@ -123,13 +127,13 @@ func normalise(this js.Value, args []js.Value) interface{} {
 	contents := session.Call("getValue").String()
 	conf, err := compileConfig(contents)
 	if err != nil {
-		reportErr("Error: Failed to create pipeline: %v", err)
+		reportErr("Error: Failed to create pipeline: %v\n", err)
 		return nil
 	}
 
 	sanit, err := conf.Sanitised()
 	if err != nil {
-		reportErr("Error: Failed to normalise config: %v", err)
+		reportErr("Error: Failed to normalise config: %v\n", err)
 		return nil
 	}
 
@@ -137,7 +141,7 @@ func normalise(this js.Value, args []js.Value) interface{} {
 		"pipeline": sanit.Pipeline,
 	})
 	if err != nil {
-		reportErr("Error: Failed to marshal normalised config: %v", err)
+		reportErr("Error: Failed to marshal normalised config: %v\n", err)
 		return nil
 	}
 
@@ -207,14 +211,36 @@ func (l logWriter) Println(v ...interface{}) {
 
 //------------------------------------------------------------------------------
 
+// Blacklist of all non-permitted processor types.
+var processorBlacklist = []string{
+	"cache",  // TODO
+	"dedupe", // TODO
+	"http",
+	"lambda",
+	"sql",
+	"subprocess",
+}
+
+//------------------------------------------------------------------------------
+
 func registerFunctions() {
 	executeFunc := js.FuncOf(execute)
 	normaliseFunc := js.FuncOf(normalise)
 	compileFunc := js.FuncOf(compile)
 
 	js.Global().Get("document").Call("getElementById", "normaliseBtn").Call("addEventListener", "click", normaliseFunc)
-	js.Global().Get("document").Call("getElementById", "compileBtn").Call("addEventListener", "click", compileFunc)
 	js.Global().Get("document").Call("getElementById", "executeBtn").Call("addEventListener", "click", executeFunc)
+
+	compileBtn := js.Global().Get("document").Call("getElementById", "compileBtn")
+	compileBtn.Call("addEventListener", "click", compileFunc)
+	compileBtnClassList := compileBtn.Get("classList")
+
+	js.Global().Get("configSession").Call("on", "change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		compileBtnClassList.Call("add", "btn-primary")
+		compileBtnClassList.Call("remove", "btn-disabled")
+		compileBtn.Set("disabled", false)
+		return nil
+	}))
 }
 
 func main() {
@@ -222,6 +248,10 @@ func main() {
 
 	println("WASM Benthos Initialized")
 	transactionChan = make(chan types.Transaction, 1)
+
+	for _, k := range processorBlacklist {
+		processor.Block(k, "benthos labs cannot execute it")
+	}
 
 	registerFunctions()
 	<-c

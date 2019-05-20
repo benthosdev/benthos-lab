@@ -43,6 +43,7 @@ body {
 
 button {
   cursor: pointer;
+  transition: background-color 0.5s;
 }
 
 .tab {
@@ -81,20 +82,24 @@ button {
 
 .btn-primary {
   background-color: rgb(18, 185, 116) !important;
-  border-color: rgb(18, 185, 116) !important;
 }
 
 .btn-primary:hover {
   background-color: rgb(18, 151, 96) !important;
-  border-color: rgb(18, 151, 96) !important;
+}
+
+.btn-disabled {
+  background-color: rgb(117, 117, 117) !important;
+}
+
+.btn-disabled:hover {
+  background-color: rgb(102, 102, 102) !important;
 }
 
 .btn-warning {
   background-color: rgb(216, 80, 51) !important;
-  border-color: rgb(248, 117, 88) !important;
 }
 
 .btn-warning:hover {
   background-color: rgb(177, 63, 37) !important;
-  border-color: rgb(216, 80, 51) !important;
 }

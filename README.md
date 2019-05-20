@@ -10,12 +10,17 @@ deletion. I'm basically just messing about for fun, please don't get mad.
 ### Build
 
 ``` sh
-npm install
-gulp wasm
+# Build client
+GOOS=js GOARCH=wasm go build -o ./client/wasm/benthos-lab.wasm ./client/wasm/benthos-lab.go
+
+# Install server
+go install ./server/benthos-lab
 ```
 
 ### Run
 
 ``` sh
-gulp dev
+cd ./client && benthos-lab
 ```
+
+Then open your browser at `http://localhost:8080`.
