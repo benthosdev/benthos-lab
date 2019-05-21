@@ -1,26 +1,15 @@
-var configTab, inputTab;//, outputTab;
+var configTab, inputTab;
 
 var openConfig = function() {
     configTab.classList.add("openTab");
     inputTab.classList.remove("openTab");
-    // outputTab.classList.remove("openTab");
     editor.setSession(configSession);
 };
 
 var openInput = function() {
     configTab.classList.remove("openTab");
     inputTab.classList.add("openTab");
-    // outputTab.classList.remove("openTab");
     editor.setSession(inputSession);
-};
-
-var openOutput = function() {
-    /*
-    configTab.classList.remove("openTab");
-    inputTab.classList.remove("openTab");
-    outputTab.classList.add("openTab");
-    editor.setSession(outputSession);
-    */
 };
 
 var writeOutput = function(value) {
@@ -28,7 +17,6 @@ var writeOutput = function(value) {
     var length = session.getLength();
     session.insert({row: length, column: 0}, value);
     editorOutput.scrollToLine(length+1);
-	openOutput();
 };
 
 var writeConfig = function(value) {
@@ -43,18 +31,15 @@ var writeConfig = function(value) {
 var clearOutput = function() {
 	var session = outputSession;
     session.setValue("");
-	openOutput();
 };
 
 var initLabControls = function() {
     configTab = document.getElementById("configTab");
     inputTab = document.getElementById("inputTab");
-    // outputTab = document.getElementById("outputTab");
     configTab.classList.add("openTab");
 
     configTab.onclick = openConfig;
     inputTab.onclick = openInput;
-    // outputTab.onclick = openOutput;
 
     document.getElementById("clearOutputBtn").onclick = clearOutput;
 };

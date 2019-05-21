@@ -32,7 +32,7 @@ body {
   left: 0px;
 }
 
-#editor-output {
+#editorOutput {
   position: absolute;
   top: 50px;
   width: 50%;
@@ -41,9 +41,26 @@ body {
   border-left: 2px solid #202020;
 }
 
+#procSelect {
+  position: absolute;
+  top: 50px;
+  width: 200px;
+  right: 50%;
+  margin-right: 5px;
+}
+
 button {
   cursor: pointer;
   transition: background-color 0.5s;
+}
+
+select {
+  cursor: pointer;
+  background-color: rgb(18, 185, 116);
+  color: #fff;
+  border: 0px;
+  border-radius: 4px;
+  padding: 5px;
 }
 
 .tab {
@@ -76,7 +93,7 @@ button {
 }
 
 .nav-spacer {
-  width: 40px;
+  width: 20px;
   display: inline-block;
 }
 
@@ -86,6 +103,14 @@ button {
 
 .btn-primary:hover {
   background-color: rgb(18, 151, 96) !important;
+}
+
+.btn-secondary {
+  background-color: rgb(18, 151, 185) !important;
+}
+
+.btn-secondary:hover {
+  background-color: rgb(17, 112, 136) !important;
 }
 
 .btn-disabled {

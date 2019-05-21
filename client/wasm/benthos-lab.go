@@ -21,6 +21,7 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"strings"
@@ -157,38 +158,68 @@ func execute(this js.Value, args []js.Value) interface{} {
 
 	inputContent := js.Global().Get("inputSession").Call("getValue").String()
 	lines := strings.Split(inputContent, "\n")
-	inputMsg := message.New(nil)
+
+	inputMsgs := []types.Message{}
+	inputMsgs = append(inputMsgs, message.New(nil))
 	for _, line := range lines {
-		inputMsg.Append(message.NewPart([]byte(line)))
+		if len(line) == 0 {
+			if inputMsgs[len(inputMsgs)-1].Len() > 0 {
+				inputMsgs = append(inputMsgs, message.New(nil))
+			}
+			continue
+		}
+		inputMsgs[len(inputMsgs)-1].Append(message.NewPart([]byte(line)))
 	}
 
 	resChan := make(chan types.Response, 1)
-	select {
-	case transactionChan <- types.NewTransaction(inputMsg, resChan):
-	case <-time.After(time.Second * 30):
-		reportErr("Error: Failed to execute: %v\n", errors.New("request timed out"))
-		return nil
-	}
+	for _, inputMsg := range inputMsgs {
+		if inputMsg.Len() == 0 {
+			continue
+		}
 
-	var outTran types.Transaction
-	select {
-	case outTran = <-pipelineLayer.TransactionChan():
-	case <-time.After(time.Second * 30):
-		reportErr("Error: Failed to execute: %v\n", errors.New("response timed out"))
-		closePipeline()
-		return nil
-	}
+		select {
+		case transactionChan <- types.NewTransaction(inputMsg, resChan):
+		case <-time.After(time.Second * 30):
+			reportErr("Error: Failed to execute: %v\n", errors.New("request timed out"))
+			return nil
+		}
 
-	select {
-	case outTran.ResponseChan <- response.NewAck():
-	case <-time.After(time.Second * 30):
-		reportErr("Error: Failed to execute: %v\n", errors.New("response 2 timed out"))
-		closePipeline()
-		return nil
-	}
+		var outTran types.Transaction
+		select {
+		case outTran = <-pipelineLayer.TransactionChan():
+		case res := <-resChan:
+			reportErr("Error: Failed to execute: %v\n", res.Error())
+			closePipeline()
+			return nil
+		case <-time.After(time.Second * 30):
+			reportErr("Error: Failed to execute: %v\n", errors.New("response timed out"))
+			closePipeline()
+			return nil
+		}
 
-	for _, out := range message.GetAllBytes(outTran.Payload) {
-		writeOutput(string(out) + "\n")
+		select {
+		case outTran.ResponseChan <- response.NewAck():
+		case <-time.After(time.Second * 30):
+			reportErr("Error: Failed to execute: %v\n", errors.New("response 2 timed out"))
+			closePipeline()
+			return nil
+		}
+
+		select {
+		case res := <-resChan:
+			if res.Error() != nil {
+				reportErr("Error: Failed to execute: %v\n", res.Error())
+			}
+		case <-time.After(time.Second * 30):
+			reportErr("Error: Failed to execute: %v\n", errors.New("response 3 timed out"))
+			closePipeline()
+			return nil
+		}
+
+		for _, out := range message.GetAllBytes(outTran.Payload) {
+			writeOutput(string(out) + "\n")
+		}
+		writeOutput("\n")
 	}
 	return nil
 }
@@ -219,6 +250,49 @@ var processorBlacklist = []string{
 	"lambda",
 	"sql",
 	"subprocess",
+	"throttle",
+	"sleep",
+}
+
+func addProc(this js.Value, args []js.Value) interface{} {
+	value := this.Get("value").String()
+	this.Set("value", "")
+	if _, ok := processor.Constructors[value]; !ok {
+		reportErr("Failed to add processor: %v\n", fmt.Errorf("processor type '%v' not recognised", value))
+		return nil
+	}
+	procConf := processor.NewConfig()
+	procConf.Type = value
+	sanitConf, err := processor.SanitiseConfig(procConf)
+	if err != nil {
+		reportErr("Failed to sanitise new processor: %v\n", err)
+		return nil
+	}
+
+	session := js.Global().Get("configSession")
+	contents := session.Call("getValue").String()
+
+	rawConfig := struct {
+		Pipeline struct {
+			Processors []interface{} `yaml:"processors"`
+		} `yaml:"pipeline"`
+	}{}
+	rawConfig.Pipeline.Processors = []interface{}{sanitConf}
+
+	resultBytes, err := uconf.MarshalYAML(rawConfig)
+	if err != nil {
+		reportErr("Failed to marshal new config: %v\n", err)
+		return nil
+	}
+
+	resultBytes = bytes.Join(bytes.Split(resultBytes, []byte("\n"))[2:], []byte("\n"))
+
+	if contents[len(contents)-1] != '\n' {
+		contents = contents + "\n"
+	}
+
+	js.Global().Call("writeConfig", contents+string(resultBytes))
+	return nil
 }
 
 //------------------------------------------------------------------------------
@@ -241,6 +315,15 @@ func registerFunctions() {
 		compileBtn.Set("disabled", false)
 		return nil
 	}))
+
+	procSelect := js.Global().Get("document").Call("getElementById", "procSelect")
+	procSelect.Call("addEventListener", "change", js.FuncOf(addProc))
+	for k := range processor.Constructors {
+		option := js.Global().Get("document").Call("createElement", "option")
+		option.Set("text", k)
+		option.Set("value", k)
+		procSelect.Get("options").Call("add", option)
+	}
 }
 
 func main() {

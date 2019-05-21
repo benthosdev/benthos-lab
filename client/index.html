@@ -39,15 +39,21 @@
     <button id="configTab" class="tab">Config</button>
     <button id="inputTab" class="tab">Input</button>
     <div class="nav-spacer"></div>
+    <div class="nav-spacer"></div>
     <button id="compileBtn" class="btn btn-primary">Compile</button>
     <button id="executeBtn" class="btn btn-primary">Execute</button>
+    <div class="nav-spacer"></div>
+    <button id="shareBtn" class="btn btn-secondary">Share</button>
     <div class="nav-spacer"></div>
     <button id="normaliseBtn" class="btn btn-warning">Normalise</button>
     <button id="clearOutputBtn" class="btn btn-warning">Clear Output</button>
   </nav>
 
   <div id="editor"></div>
-  <div id="editor-output"></div>
+  <div id="editorOutput"></div>
+  <select id="procSelect" name="processor-selector">
+    <option value="" selected>Add processor</option>
+  </select>
 
   <img class="prof-img" src="img/prof.png"/>
 
@@ -68,11 +74,13 @@
 `Welcome to the Benthos Lab, a place where you can experiment with Benthos
 pipeline configurations and share them with others.
 
-Edit your test pipeline configuration as well as the input test data on the left
-by changing tabs. When you'd like to try your pipeline click 'Compile'.
+Edit your pipeline configuration as well as the input data on the left by
+changing tabs. When you're ready to try your pipeline click 'Compile'.
 
 If your config compiled successfully you can then execute it with your test data
-by clicking 'Execute'.
+by clicking 'Execute'. Each line of your input data will be read as a message of
+a batch, in order to test with multiple batches add a blank line between each
+batch. The output of your pipeline will be printed in this window.
 
 Some processors are banned from being executed in the lab, if one exists within
 your config then execution will be blocked. However, you can still write,
@@ -90,7 +98,7 @@ Is your config ugly or incomplete? Click 'Normalise' to have Benthos format it.
       editor.setSession(configSession);
       editor.setShowPrintMargin(false);
 
-      var editorOutput = ace.edit("editor-output");
+      var editorOutput = ace.edit("editorOutput");
       editorOutput.setFontSize("12pt");
       editorOutput.setReadOnly(true);
       editorOutput.setHighlightActiveLine(false);
