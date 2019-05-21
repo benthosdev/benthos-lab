@@ -20,16 +20,122 @@
 
 package main
 
-import "net/http"
+import (
+	"bytes"
+	"crypto/md5"
+	"encoding/base64"
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"regexp"
+	"strings"
+
+	"github.com/Jeffail/benthos/lib/cache"
+	"github.com/Jeffail/benthos/lib/log"
+	"github.com/Jeffail/benthos/lib/metrics"
+	"github.com/Jeffail/benthos/lib/types"
+)
 
 //------------------------------------------------------------------------------
 
+type labState struct {
+	Config string `json:"config"`
+	Input  string `json:"input"`
+}
+
 func main() {
+	logConf := log.NewConfig()
+	logConf.Prefix = "benthos-lab"
+	log := log.New(os.Stdout, logConf)
+
+	cacheConf := cache.NewConfig()
+	cache, err := cache.New(cacheConf, types.DudMgr{}, log, metrics.Noop())
+	if err != nil {
+		panic(err)
+	}
+
+	templateRegexp := regexp.MustCompile(`// BENTHOS LAB START([\n]|.)*// BENTHOS LAB END`)
+
 	mux := http.NewServeMux()
+
 	mux.Handle("/", http.FileServer(http.Dir(".")))
-	mux.HandleFunc("/lab/cache", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello world"))
+
+	mux.HandleFunc("/l/", func(w http.ResponseWriter, r *http.Request) {
+		path := strings.TrimPrefix(r.URL.Path, "/l/")
+		if len(path) == 0 {
+			http.Error(w, "Path required", http.StatusBadRequest)
+			log.Warnf("Bad path: %v\n", path)
+			return
+		}
+
+		stateBody, err := cache.Get(path)
+		if err != nil {
+			http.Error(w, "Server failed", http.StatusBadGateway)
+			log.Errorf("Failed to read state: %v\n", err)
+			return
+		}
+
+		index, err := ioutil.ReadFile("./index.html")
+		if err != nil {
+			http.Error(w, "Server failed", http.StatusBadGateway)
+			log.Errorf("Failed to read index: %v\n", path)
+			return
+		}
+
+		index = templateRegexp.ReplaceAll(index, stateBody)
+
+		w.Header().Set("Content-Type", "text/html")
+		w.Write(index)
 	})
+
+	mux.HandleFunc("/share", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			http.Error(w, "Method not supported", http.StatusBadRequest)
+			log.Warnf("Bad method: %v\n", r.Method)
+			return
+		}
+		reqBody, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Failed to read body", http.StatusBadRequest)
+			log.Errorf("Failed to read request body: %v\n", err)
+			return
+		}
+		defer r.Body.Close()
+
+		state := labState{}
+		if err = json.Unmarshal(reqBody, &state); err != nil {
+			http.Error(w, "Failed to parse body", http.StatusBadRequest)
+			log.Errorf("Failed to parse request body: %v\n", err)
+			return
+		}
+
+		if reqBody, err = json.Marshal(state); err != nil {
+			http.Error(w, "Failed to parse body", http.StatusBadRequest)
+			log.Errorf("Failed to normalise request body: %v\n", err)
+			return
+		}
+
+		var buf bytes.Buffer
+
+		hasher := md5.New()
+		hasher.Write(reqBody)
+
+		encoder := base64.NewEncoder(base64.URLEncoding, &buf)
+		encoder.Write(hasher.Sum(nil))
+		encoder.Close()
+
+		hashBytes := buf.Bytes()
+
+		if err = cache.Set(string(hashBytes), reqBody); err != nil {
+			http.Error(w, "Save failed", http.StatusBadGateway)
+			log.Errorf("Failed to store request body: %v\n", err)
+			return
+		}
+
+		w.Write(hashBytes)
+	})
+
 	http.ListenAndServe(":8080", mux)
 }
 

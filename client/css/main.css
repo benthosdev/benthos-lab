@@ -44,7 +44,6 @@ body {
 #procSelect {
   position: absolute;
   top: 50px;
-  width: 200px;
   right: 50%;
   margin-right: 5px;
 }

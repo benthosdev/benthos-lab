@@ -54,6 +54,6 @@ if (!WebAssembly.instantiateStreaming) {
 
 const go = new Go();
 
-WebAssembly.instantiateStreaming(fetch("wasm/benthos-lab.wasm"), go.importObject).then((result) => {
+WebAssembly.instantiateStreaming(fetch("/wasm/benthos-lab.wasm"), go.importObject).then((result) => {
     go.run(result.instance);
 });

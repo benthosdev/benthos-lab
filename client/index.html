@@ -20,13 +20,27 @@
 
   <title>Benthos Lab</title>
 
-  <link href="css/main.css" rel="stylesheet">
+  <link href="/css/main.css" rel="stylesheet">
 
-  <script src="js/wasm_exec.js"></script>
-  <script src="js/editor.js"></script>
+  <script src="/js/wasm_exec.js"></script>
+  <script src="/js/editor.js"></script>
 
-  <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
-  <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16" />
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+
+  <script>
+    const model =
+// BENTHOS LAB START
+{
+  config: `pipeline:
+  processors:
+  - jmespath:
+      query: '{ message: @, meta: { link_count: length(links) } }'`,
+  input: '{"id":"foo","links":["https://github.com/Jeffail/benthos","https://docs.benthos.dev","https://www.benthos.dev"]}'
+}
+// BENTHOS LAB END
+;
+  </script>
 
 </head>
 
@@ -55,19 +69,16 @@
     <option value="" selected>Add processor</option>
   </select>
 
-  <img class="prof-img" src="img/prof.png"/>
+  <img class="prof-img" src="/img/prof.png"/>
 
   <!-- ACE Editor -->
-  <script src="vendor/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/vendor/ace/ace.js" type="text/javascript" charset="utf-8"></script>
   <script>
       var editor = ace.edit("editor");
-      var configSession = ace.createEditSession(`pipeline:
-  processors:
-  - jmespath:
-      query: '{ message: @, meta: { link_count: length(links) } }'`, "ace/mode/yaml");
+      var configSession = ace.createEditSession(model.config, "ace/mode/yaml");
       configSession.setTabSize(2);
 
-      var inputSession = ace.createEditSession('{"id":"foo","links":["https://github.com/Jeffail/benthos","https://docs.benthos.dev","https://www.benthos.dev"]}', "ace/mode/text");
+      var inputSession = ace.createEditSession(model.input, "ace/mode/text");
       inputSession.setUseWrapMode(true);
 
       var welcomeText =

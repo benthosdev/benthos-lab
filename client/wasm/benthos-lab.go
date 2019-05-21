@@ -22,8 +22,13 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+	"sort"
 	"strings"
 	"syscall/js"
 	"time"
@@ -87,6 +92,51 @@ func closePipeline() {
 		reportErr("Error: Failed to shut down pipeline: %v\n", err)
 	}
 	pipelineLayer = nil
+}
+
+func share(this js.Value, args []js.Value) interface{} {
+	config := js.Global().Get("configSession").Call("getValue").String()
+	input := js.Global().Get("inputSession").Call("getValue").String()
+	href := js.Global().Get("window").Get("location").Get("href").String()
+
+	currentURL, err := url.Parse(href)
+	if err != nil {
+		reportErr("Error: Failed to parse current url: %v\n", err)
+		return nil
+	}
+	currentURL.Path = "/share"
+
+	state := struct {
+		Config string `json:"config"`
+		Input  string `json:"input"`
+	}{
+		Config: config,
+		Input:  input,
+	}
+
+	stateBytes, err := json.Marshal(state)
+	if err != nil {
+		reportErr("Error: Failed to marshal state: %v\n", err)
+		return nil
+	}
+
+	go func() {
+		res, err := http.Post(currentURL.String(), "application/json", bytes.NewReader(stateBytes))
+		if err != nil {
+			reportErr("Error: Failed to save state: %v\n", err)
+			return
+		}
+
+		resBytes, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			reportErr("Error: Failed to read save response: %v\n", err)
+			return
+		}
+
+		currentURL.Path = "/l/" + string(resBytes)
+		writeOutput("Saved at: " + currentURL.String())
+	}()
+	return nil
 }
 
 func compile(this js.Value, args []js.Value) interface{} {
@@ -171,56 +221,58 @@ func execute(this js.Value, args []js.Value) interface{} {
 		inputMsgs[len(inputMsgs)-1].Append(message.NewPart([]byte(line)))
 	}
 
-	resChan := make(chan types.Response, 1)
-	for _, inputMsg := range inputMsgs {
-		if inputMsg.Len() == 0 {
-			continue
-		}
-
-		select {
-		case transactionChan <- types.NewTransaction(inputMsg, resChan):
-		case <-time.After(time.Second * 30):
-			reportErr("Error: Failed to execute: %v\n", errors.New("request timed out"))
-			return nil
-		}
-
-		var outTran types.Transaction
-		select {
-		case outTran = <-pipelineLayer.TransactionChan():
-		case res := <-resChan:
-			reportErr("Error: Failed to execute: %v\n", res.Error())
-			closePipeline()
-			return nil
-		case <-time.After(time.Second * 30):
-			reportErr("Error: Failed to execute: %v\n", errors.New("response timed out"))
-			closePipeline()
-			return nil
-		}
-
-		select {
-		case outTran.ResponseChan <- response.NewAck():
-		case <-time.After(time.Second * 30):
-			reportErr("Error: Failed to execute: %v\n", errors.New("response 2 timed out"))
-			closePipeline()
-			return nil
-		}
-
-		select {
-		case res := <-resChan:
-			if res.Error() != nil {
-				reportErr("Error: Failed to execute: %v\n", res.Error())
+	go func(pipeLayer types.Pipeline) {
+		resChan := make(chan types.Response, 1)
+		for _, inputMsg := range inputMsgs {
+			if inputMsg.Len() == 0 {
+				continue
 			}
-		case <-time.After(time.Second * 30):
-			reportErr("Error: Failed to execute: %v\n", errors.New("response 3 timed out"))
-			closePipeline()
-			return nil
-		}
 
-		for _, out := range message.GetAllBytes(outTran.Payload) {
-			writeOutput(string(out) + "\n")
+			select {
+			case transactionChan <- types.NewTransaction(inputMsg, resChan):
+			case <-time.After(time.Second * 30):
+				reportErr("Error: Failed to execute: %v\n", errors.New("request timed out"))
+				return
+			}
+
+			var outTran types.Transaction
+			select {
+			case outTran = <-pipeLayer.TransactionChan():
+			case res := <-resChan:
+				reportErr("Error: Failed to execute: %v\n", res.Error())
+				closePipeline()
+				return
+			case <-time.After(time.Second * 30):
+				reportErr("Error: Failed to execute: %v\n", errors.New("response timed out"))
+				closePipeline()
+				return
+			}
+
+			select {
+			case outTran.ResponseChan <- response.NewAck():
+			case <-time.After(time.Second * 30):
+				reportErr("Error: Failed to execute: %v\n", errors.New("response 2 timed out"))
+				closePipeline()
+				return
+			}
+
+			select {
+			case res := <-resChan:
+				if res.Error() != nil {
+					reportErr("Error: Failed to execute: %v\n", res.Error())
+				}
+			case <-time.After(time.Second * 30):
+				reportErr("Error: Failed to execute: %v\n", errors.New("response 3 timed out"))
+				closePipeline()
+				return
+			}
+
+			for _, out := range message.GetAllBytes(outTran.Payload) {
+				writeOutput(string(out) + "\n")
+			}
+			writeOutput("\n")
 		}
-		writeOutput("\n")
-	}
+	}(pipelineLayer)
 	return nil
 }
 
@@ -250,8 +302,6 @@ var processorBlacklist = []string{
 	"lambda",
 	"sql",
 	"subprocess",
-	"throttle",
-	"sleep",
 }
 
 func addProc(this js.Value, args []js.Value) interface{} {
@@ -301,9 +351,11 @@ func registerFunctions() {
 	executeFunc := js.FuncOf(execute)
 	normaliseFunc := js.FuncOf(normalise)
 	compileFunc := js.FuncOf(compile)
+	shareFunc := js.FuncOf(share)
 
 	js.Global().Get("document").Call("getElementById", "normaliseBtn").Call("addEventListener", "click", normaliseFunc)
 	js.Global().Get("document").Call("getElementById", "executeBtn").Call("addEventListener", "click", executeFunc)
+	js.Global().Get("document").Call("getElementById", "shareBtn").Call("addEventListener", "click", shareFunc)
 
 	compileBtn := js.Global().Get("document").Call("getElementById", "compileBtn")
 	compileBtn.Call("addEventListener", "click", compileFunc)
@@ -318,7 +370,13 @@ func registerFunctions() {
 
 	procSelect := js.Global().Get("document").Call("getElementById", "procSelect")
 	procSelect.Call("addEventListener", "change", js.FuncOf(addProc))
+
+	procs := []string{}
 	for k := range processor.Constructors {
+		procs = append(procs, k)
+	}
+	sort.Strings(procs)
+	for _, k := range procs {
 		option := js.Global().Get("document").Call("createElement", "option")
 		option.Set("text", k)
 		option.Set("value", k)
@@ -337,6 +395,12 @@ func main() {
 	}
 
 	registerFunctions()
+
+	js.Global().Call("addEventListener", "beforeunload", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		c <- struct{}{}
+		return nil
+	}))
+
 	<-c
 }
 
