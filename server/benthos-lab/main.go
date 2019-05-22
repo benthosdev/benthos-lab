@@ -173,7 +173,7 @@ func main() {
 			return
 		}
 
-		index = templateRegexp.ReplaceAll(index, stateBody)
+		index = templateRegexp.ReplaceAllLiteral(index, stateBody)
 
 		w.Header().Set("Content-Type", "text/html")
 		w.Write(index)

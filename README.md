@@ -31,7 +31,7 @@ Docker:
 
 ``` sh
 go mod vendor
-docker build . -t benthosdev/benthos-lab
+docker build . -t jeffail/benthos-lab
 ```
 
 ### Run
@@ -43,7 +43,7 @@ cd ./client && benthos-lab
 Docker:
 
 ``` sh
-docker run --rm -p 8080:8080 benthosdev/benthos-lab
+docker run --rm -p 8080:8080 jeffail/benthos-lab
 ```
 
 Then open your browser at `http://localhost:8080`.
