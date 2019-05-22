@@ -30,6 +30,7 @@ go install ./server/benthos-lab
 Docker:
 
 ``` sh
+go mod vendor
 docker build . -t benthosdev/benthos-lab
 ```
 

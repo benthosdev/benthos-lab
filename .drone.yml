@@ -21,6 +21,7 @@ steps:
   image: plugins/docker
   settings:
     repo: jeffail/benthos-lab
+    auto_tag: true
     username: jeffail
     password:
       from_secret: docker_password
