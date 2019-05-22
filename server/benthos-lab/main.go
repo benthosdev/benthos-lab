@@ -22,14 +22,20 @@ package main
 
 import (
 	"bytes"
+	"compress/gzip"
 	"crypto/md5"
 	"encoding/base64"
 	"encoding/json"
+	"flag"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/Jeffail/benthos/lib/cache"
 	"github.com/Jeffail/benthos/lib/log"
@@ -44,23 +50,107 @@ type labState struct {
 	Input  string `json:"input"`
 }
 
+type benthosLabCache struct {
+	path string
+	log  log.Modular
+
+	cache    []byte
+	cachedAt time.Time
+
+	sync.RWMutex
+}
+
+func newBenthosLabCache(path string, log log.Modular) *benthosLabCache {
+	c := benthosLabCache{
+		path: path,
+		log:  log,
+	}
+	c.read()
+	go c.loop()
+	return &c
+}
+
+func (c *benthosLabCache) Get() []byte {
+	c.RLock()
+	cache := c.cache
+	c.RUnlock()
+	return cache
+}
+
+func (c *benthosLabCache) read() {
+	finfo, err := os.Stat(c.path)
+	if err != nil {
+		c.log.Errorf("Failed to stat benthos-lab.wasm: %v\n", err)
+		return
+	}
+	if finfo.ModTime().After(c.cachedAt) {
+		c.log.Debugln("Reading modified benthos-lab.wasm")
+		file, err := os.Open(c.path)
+		if err != nil {
+			c.log.Errorf("Failed to open benthos-lab.wasm: %v\n", err)
+			return
+		}
+		var gzipBuf bytes.Buffer
+		gzipWriter := gzip.NewWriter(&gzipBuf)
+		if _, err = io.Copy(gzipWriter, file); err != nil {
+			c.log.Errorf("Failed to compress benthos-lab.wasm: %v\n", err)
+			return
+		}
+		gzipWriter.Close()
+		c.Lock()
+		c.cache = gzipBuf.Bytes()
+		c.cachedAt = finfo.ModTime()
+		c.Unlock()
+	}
+}
+
+func (c *benthosLabCache) loop() {
+	for {
+		<-time.After(time.Second)
+		c.read()
+	}
+}
+
 func main() {
+	wwwPath := flag.String(
+		"www", ".", "Path to the directory of client files to serve",
+	)
+	flag.Parse()
+
 	logConf := log.NewConfig()
 	logConf.Prefix = "benthos-lab"
 	log := log.New(os.Stdout, logConf)
 
+	metricsConf := metrics.NewConfig()
+	metricsConf.Prefix = "benthoslab"
+	metricsConf.Type = "prometheus"
+	stats, err := metrics.New(metricsConf)
+	if err != nil {
+		panic(err)
+	}
+	defer stats.Close()
+
 	cacheConf := cache.NewConfig()
-	cache, err := cache.New(cacheConf, types.DudMgr{}, log, metrics.Noop())
+	cacheConf.Memory.TTL = 259200 // Seconds
+	cache, err := cache.New(cacheConf, types.DudMgr{}, log.NewModule(".cache"), metrics.Namespaced(stats, "cache"))
 	if err != nil {
 		panic(err)
 	}
 
-	templateRegexp := regexp.MustCompile(`// BENTHOS LAB START([\n]|.)*// BENTHOS LAB END`)
+	labCache := newBenthosLabCache(filepath.Join(*wwwPath, "/wasm/benthos-lab.wasm"), log)
 
 	mux := http.NewServeMux()
 
-	mux.Handle("/", http.FileServer(http.Dir(".")))
+	mux.Handle("/", http.FileServer(http.Dir(*wwwPath)))
 
+	mux.HandleFunc("/wasm/benthos-lab.wasm", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Encoding", "gzip")
+		w.Header().Set("Content-Type", "application/wasm")
+		w.Write(labCache.Get())
+	})
+
+	templateRegexp := regexp.MustCompile(`// BENTHOS LAB START([\n]|.)*// BENTHOS LAB END`)
+	indexPath := filepath.Join(*wwwPath, "/index.html")
 	mux.HandleFunc("/l/", func(w http.ResponseWriter, r *http.Request) {
 		path := strings.TrimPrefix(r.URL.Path, "/l/")
 		if len(path) == 0 {
@@ -76,7 +166,7 @@ func main() {
 			return
 		}
 
-		index, err := ioutil.ReadFile("./index.html")
+		index, err := ioutil.ReadFile(indexPath)
 		if err != nil {
 			http.Error(w, "Server failed", http.StatusBadGateway)
 			log.Errorf("Failed to read index: %v\n", path)
@@ -136,7 +226,26 @@ func main() {
 		w.Write(hashBytes)
 	})
 
-	http.ListenAndServe(":8080", mux)
+	adminMux := http.NewServeMux()
+	adminMux.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("pong"))
+	})
+
+	if wHandlerFunc, ok := stats.(metrics.WithHandlerFunc); ok {
+		adminMux.HandleFunc("/metrics", wHandlerFunc.HandlerFunc())
+		adminMux.HandleFunc("/stats", wHandlerFunc.HandlerFunc())
+	}
+
+	log.Infoln("Listening for requests at :8080")
+	go func() {
+		log.Infoln("Listening for admin requests at :8081")
+		if herr := http.ListenAndServe(":8081", adminMux); herr != nil {
+			panic(herr)
+		}
+	}()
+	if herr := http.ListenAndServe(":8080", mux); herr != nil {
+		panic(herr)
+	}
 }
 
 //------------------------------------------------------------------------------

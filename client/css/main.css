@@ -62,6 +62,10 @@ select {
   padding: 5px;
 }
 
+.hidden {
+  display: none;
+}
+
 .tab {
   background-color: #464740;
   color: #fff;

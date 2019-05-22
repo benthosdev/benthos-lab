@@ -1,4 +1,4 @@
 client/wasm/*.wasm
 go.sum
+./benthoslab
 ./benthos-lab
-vendor

@@ -1,0 +1,21 @@
+kind: pipeline
+name: default
+
+steps:
+- name: docker-dr
+  image: plugins/docker
+  settings:
+    repo: jeffail/benthos-lab
+    dry_run: true
+  when:
+    event: [ push, pull_request ]
+
+- name: docker
+  image: plugins/docker
+  settings:
+    repo: jeffail/benthos-lab
+    username: jeffail
+    password:
+      from_secret: docker_password
+  when:
+    event: tag

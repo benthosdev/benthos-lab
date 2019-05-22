@@ -1,12 +1,14 @@
 var configTab, inputTab;
 
 var openConfig = function() {
+    document.getElementById("procSelect").classList.remove("hidden");
     configTab.classList.add("openTab");
     inputTab.classList.remove("openTab");
     editor.setSession(configSession);
 };
 
 var openInput = function() {
+    document.getElementById("procSelect").classList.add("hidden");
     configTab.classList.remove("openTab");
     inputTab.classList.add("openTab");
     editor.setSession(inputSession);

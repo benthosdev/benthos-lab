@@ -134,7 +134,7 @@ func share(this js.Value, args []js.Value) interface{} {
 		}
 
 		currentURL.Path = "/l/" + string(resBytes)
-		writeOutput("Saved at: " + currentURL.String())
+		writeOutput("Saved at: " + currentURL.String() + "\n\n")
 	}()
 	return nil
 }
@@ -173,6 +173,22 @@ func compile(this js.Value, args []js.Value) interface{} {
 	return nil
 }
 
+func marshalConf(conf config.Type) ([]byte, error) {
+	sanit, err := conf.Sanitised()
+	if err != nil {
+		return nil, err
+	}
+
+	sanitBytes, err := uconf.MarshalYAML(map[string]interface{}{
+		"pipeline": sanit.Pipeline,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return sanitBytes, nil
+}
+
 func normalise(this js.Value, args []js.Value) interface{} {
 	session := js.Global().Get("configSession")
 	contents := session.Call("getValue").String()
@@ -182,17 +198,9 @@ func normalise(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	sanit, err := conf.Sanitised()
+	sanitBytes, err := marshalConf(conf)
 	if err != nil {
 		reportErr("Error: Failed to normalise config: %v\n", err)
-		return nil
-	}
-
-	sanitBytes, err := uconf.MarshalYAML(map[string]interface{}{
-		"pipeline": sanit.Pipeline,
-	})
-	if err != nil {
-		reportErr("Error: Failed to marshal normalised config: %v\n", err)
 		return nil
 	}
 
@@ -239,8 +247,12 @@ func execute(this js.Value, args []js.Value) interface{} {
 			select {
 			case outTran = <-pipeLayer.TransactionChan():
 			case res := <-resChan:
-				reportErr("Error: Failed to execute: %v\n", res.Error())
-				closePipeline()
+				if res.Error() != nil {
+					reportErr("Error: Failed to execute: %v\n", res.Error())
+					closePipeline()
+				} else {
+					writeOutput("Pipeline executed without output.\n")
+				}
 				return
 			case <-time.After(time.Second * 30):
 				reportErr("Error: Failed to execute: %v\n", errors.New("response timed out"))
@@ -313,35 +325,24 @@ func addProc(this js.Value, args []js.Value) interface{} {
 	}
 	procConf := processor.NewConfig()
 	procConf.Type = value
-	sanitConf, err := processor.SanitiseConfig(procConf)
-	if err != nil {
-		reportErr("Failed to sanitise new processor: %v\n", err)
-		return nil
-	}
 
 	session := js.Global().Get("configSession")
 	contents := session.Call("getValue").String()
 
-	rawConfig := struct {
-		Pipeline struct {
-			Processors []interface{} `yaml:"processors"`
-		} `yaml:"pipeline"`
-	}{}
-	rawConfig.Pipeline.Processors = []interface{}{sanitConf}
-
-	resultBytes, err := uconf.MarshalYAML(rawConfig)
-	if err != nil {
-		reportErr("Failed to marshal new config: %v\n", err)
+	conf := config.New()
+	if err := yaml.Unmarshal([]byte(contents), &conf); err != nil {
+		reportErr("Failed to unmarshal current config: %v\n", err)
 		return nil
 	}
 
-	resultBytes = bytes.Join(bytes.Split(resultBytes, []byte("\n"))[2:], []byte("\n"))
-
-	if contents[len(contents)-1] != '\n' {
-		contents = contents + "\n"
+	conf.Pipeline.Processors = append(conf.Pipeline.Processors, procConf)
+	resultBytes, err := marshalConf(conf)
+	if err != nil {
+		reportErr("Error: Failed to normalise config: %v\n", err)
+		return nil
 	}
 
-	js.Global().Call("writeConfig", contents+string(resultBytes))
+	js.Global().Call("writeConfig", string(resultBytes))
 	return nil
 }
 
