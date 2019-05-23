@@ -33,8 +33,10 @@ import (
 	"syscall/js"
 	"time"
 
+	"github.com/Jeffail/benthos/lib/cache"
 	"github.com/Jeffail/benthos/lib/config"
 	"github.com/Jeffail/benthos/lib/log"
+	"github.com/Jeffail/benthos/lib/manager"
 	"github.com/Jeffail/benthos/lib/message"
 	"github.com/Jeffail/benthos/lib/metrics"
 	"github.com/Jeffail/benthos/lib/pipeline"
@@ -57,6 +59,7 @@ var (
 
 // Create pipeline and output layers.
 var pipelineLayer types.Pipeline
+var closeFn = func() {}
 var transactionChan chan types.Transaction
 
 func writeOutput(msg string) {
@@ -79,19 +82,6 @@ func compileConfig(confStr string) (config.Type, error) {
 		return conf, err
 	}
 	return conf, nil
-}
-
-func closePipeline() {
-	if pipelineLayer == nil {
-		return
-	}
-	exitTimeout := time.Second * 30
-	timesOut := time.Now().Add(exitTimeout)
-	pipelineLayer.CloseAsync()
-	if err := pipelineLayer.WaitForClose(time.Until(timesOut)); err != nil {
-		reportErr("Error: Failed to shut down pipeline: %v\n", err)
-	}
-	pipelineLayer = nil
 }
 
 func share(this js.Value, args []js.Value) interface{} {
@@ -145,7 +135,7 @@ func share(this js.Value, args []js.Value) interface{} {
 }
 
 func compile(this js.Value, args []js.Value) interface{} {
-	closePipeline()
+	closeFn()
 
 	contents := js.Global().Get("configSession").Call("getValue").String()
 	conf, err := compileConfig(contents)
@@ -155,11 +145,18 @@ func compile(this js.Value, args []js.Value) interface{} {
 	}
 
 	logger := log.WrapAtLevel(logWriter{}, log.LogError)
-	if pipelineLayer, err = pipeline.New(conf.Pipeline, types.NoopMgr(), logger, metrics.Noop()); err == nil {
+	mgr, err := manager.New(conf.Manager, types.NoopMgr(), logger, metrics.Noop())
+	if err != nil {
+		reportErr("Error: Failed to create pipeline resources: %v\n", err)
+		return nil
+	}
+
+	if pipelineLayer, err = pipeline.New(conf.Pipeline, mgr, logger, metrics.Noop()); err == nil {
 		err = pipelineLayer.Consume(transactionChan)
 	}
 	if err != nil {
 		pipelineLayer = nil
+		mgr.CloseAsync()
 		reportErr("Error: Failed to create pipeline: %v\n", err)
 		return nil
 	}
@@ -175,6 +172,23 @@ func compile(this js.Value, args []js.Value) interface{} {
 	compileBtnClassList.Call("add", "btn-disabled")
 	compileBtnClassList.Call("remove", "btn-primary")
 	compileBtn.Set("disabled", true)
+
+	closeFn = func() {
+		if pipelineLayer == nil {
+			return
+		}
+		exitTimeout := time.Second * 30
+		timesOut := time.Now().Add(exitTimeout)
+		pipelineLayer.CloseAsync()
+		if err := pipelineLayer.WaitForClose(time.Until(timesOut)); err != nil {
+			reportErr("Error: Failed to shut down pipeline: %v\n", err)
+		}
+		if mgr != nil {
+			mgr.CloseAsync()
+		}
+		pipelineLayer = nil
+		mgr = nil
+	}
 	return nil
 }
 
@@ -185,7 +199,8 @@ func marshalConf(conf config.Type) ([]byte, error) {
 	}
 
 	sanitBytes, err := uconf.MarshalYAML(map[string]interface{}{
-		"pipeline": sanit.Pipeline,
+		"pipeline":  sanit.Pipeline,
+		"resources": sanit.Manager,
 	})
 	if err != nil {
 		return nil, err
@@ -254,14 +269,14 @@ func execute(this js.Value, args []js.Value) interface{} {
 			case res := <-resChan:
 				if res.Error() != nil {
 					reportErr("Error: Failed to execute: %v\n", res.Error())
-					closePipeline()
+					closeFn()
 				} else {
 					writeOutput("Pipeline executed without output.\n")
 				}
 				return
 			case <-time.After(time.Second * 30):
 				reportErr("Error: Failed to execute: %v\n", errors.New("response timed out"))
-				closePipeline()
+				closeFn()
 				return
 			}
 
@@ -269,7 +284,7 @@ func execute(this js.Value, args []js.Value) interface{} {
 			case outTran.ResponseChan <- response.NewAck():
 			case <-time.After(time.Second * 30):
 				reportErr("Error: Failed to execute: %v\n", errors.New("response 2 timed out"))
-				closePipeline()
+				closeFn()
 				return
 			}
 
@@ -280,7 +295,7 @@ func execute(this js.Value, args []js.Value) interface{} {
 				}
 			case <-time.After(time.Second * 30):
 				reportErr("Error: Failed to execute: %v\n", errors.New("response 3 timed out"))
-				closePipeline()
+				closeFn()
 				return
 			}
 
@@ -313,12 +328,19 @@ func (l logWriter) Println(v ...interface{}) {
 
 // Blacklist of all non-permitted processor types.
 var processorBlacklist = []string{
-	"cache",  // TODO
-	"dedupe", // TODO
 	"http",
 	"lambda",
 	"sql",
 	"subprocess",
+}
+
+// Blacklist of all non-permitted cache types.
+var cacheBlacklist = []string{
+	"dynamodb",
+	"file",
+	"memcached",
+	"redis",
+	"s3",
 }
 
 func addProc(this js.Value, args []js.Value) interface{} {
@@ -398,6 +420,9 @@ func main() {
 
 	for _, k := range processorBlacklist {
 		processor.Block(k, "benthos labs cannot execute it")
+	}
+	for _, k := range cacheBlacklist {
+		cache.Block(k, "benthos labs cannot execute it")
 	}
 
 	registerFunctions()
