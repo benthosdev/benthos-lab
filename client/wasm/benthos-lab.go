@@ -133,6 +133,11 @@ func share(this js.Value, args []js.Value) interface{} {
 			return
 		}
 
+		if res.StatusCode != 200 {
+			reportErr("Error: Failed to save state: %v\n", errors.New(string(resBytes)))
+			return
+		}
+
 		currentURL.Path = "/l/" + string(resBytes)
 		writeOutput("Saved at: " + currentURL.String() + "\n\n")
 	}()

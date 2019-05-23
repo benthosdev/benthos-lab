@@ -112,10 +112,22 @@ func (c *benthosLabCache) loop() {
 }
 
 func main() {
+	cacheConf := cache.NewConfig()
+
 	wwwPath := flag.String(
 		"www", ".", "Path to the directory of client files to serve",
 	)
+	flag.StringVar(
+		&cacheConf.Redis.URL, "redis-url", "", "Optional: Redis URL to use for caching",
+	)
+	flag.StringVar(
+		&cacheConf.Redis.Expiration, "redis-ttl", cacheConf.Redis.Expiration, "Optional: Redis TTL to use for caching",
+	)
 	flag.Parse()
+
+	if len(cacheConf.Redis.URL) > 0 {
+		cacheConf.Type = "redis"
+	}
 
 	logConf := log.NewConfig()
 	logConf.Prefix = "benthos-lab"
@@ -130,8 +142,7 @@ func main() {
 	}
 	defer stats.Close()
 
-	cacheConf := cache.NewConfig()
-	cacheConf.Memory.TTL = 259200 // Seconds
+	cacheConf.Memory.TTL = 259200
 	cache, err := cache.New(cacheConf, types.DudMgr{}, log.NewModule(".cache"), metrics.Namespaced(stats, "cache"))
 	if err != nil {
 		panic(err)
@@ -140,12 +151,28 @@ func main() {
 	labCache := newBenthosLabCache(filepath.Join(*wwwPath, "/wasm/benthos-lab.wasm"), log)
 
 	mux := http.NewServeMux()
+	fileServe := http.FileServer(http.Dir(*wwwPath))
 
-	mux.Handle("/", http.FileServer(http.Dir(*wwwPath)))
+	mux.Handle("/", fileServe)
 
 	mux.HandleFunc("/wasm/benthos-lab.wasm", func(w http.ResponseWriter, r *http.Request) {
+		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+			fileServe.ServeHTTP(w, r)
+			return
+		}
+		if since := r.Header.Get("If-Modified-Since"); len(since) > 0 {
+			tSince, err := time.Parse(time.RFC1123, since)
+			if err != nil {
+				log.Errorf("Failed to parse time: %v\n", err)
+			}
+			if err == nil && labCache.cachedAt.Sub(tSince) < time.Second {
+				w.WriteHeader(http.StatusNotModified)
+				return
+			}
+		}
 		w.Header().Set("Content-Encoding", "gzip")
 		w.Header().Set("Content-Type", "application/wasm")
+		w.Header().Set("Last-Modified", labCache.cachedAt.UTC().Format(time.RFC1123))
 		w.Write(labCache.Get())
 	})
 

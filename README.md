@@ -31,7 +31,7 @@ Docker:
 
 ``` sh
 go mod vendor
-docker build . -t jeffail/benthos-lab
+docker build . -t jeffail/benthos-lab:latest
 ```
 
 ### Run
