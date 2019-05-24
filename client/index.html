@@ -2,20 +2,10 @@
 <html lang="en">
 
 <head>
-  <!--
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135959729-1"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'UA-135959729-1');
-  </script>
-  -->
-
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Benthos is a resilient stream processor for performing common and mundane stream tasks and is able to connect to a wide variety of sources and sinks.">
-  <meta name="keywords" content="benthos,stream processor,go,golang">
+  <meta name="description" content="Benthos lab allows you to edit, execute and share Benthos pipeline configurations from your browser.">
+  <meta name="keywords" content="benthos lab,benthos,stream processor,go,golang">
   <meta name="author" content="Ashley Jeffs">
 
   <title>Benthos Lab</title>
@@ -48,26 +38,37 @@
 
   <!-- Navigation -->
   <nav class="navbar">
-    <h4 class="font-weight-bold" href="#">Benthos Lab</h4>
-    <div class="nav-spacer"></div>
-    <button id="configTab" class="tab">Config</button>
-    <button id="inputTab" class="tab">Input</button>
-    <div class="nav-spacer"></div>
-    <div class="nav-spacer"></div>
-    <button id="compileBtn" class="btn btn-primary">Compile</button>
-    <button id="executeBtn" class="btn btn-primary">Execute</button>
-    <div class="nav-spacer"></div>
-    <button id="shareBtn" class="btn btn-secondary">Share</button>
-    <div class="nav-spacer"></div>
-    <button id="normaliseBtn" class="btn btn-warning">Normalise</button>
-    <button id="clearOutputBtn" class="btn btn-warning">Clear Output</button>
+    <h4 class="font-weight-bold"><a href="https://www.benthos.dev" class="undecorated">Benthos Lab</a></h4>
+    <div class="button-group" id="tabGroup">
+      <button id="configTab" class="tab">Config</button>
+      <button id="inputTab" class="tab">Input</button>
+    </div>
+    <div class="button-group" id="happyGroup">
+      <button id="compileBtn" class="btn btn-primary">Compile</button>
+      <button id="executeBtn" class="btn btn-primary">Execute</button>
+    </div>
+    <div class="button-group" id="shareGroup">
+      <button id="shareBtn" class="btn btn-secondary">Share</button>
+    </div>
+    <div class="button-group" id="warningGroup">
+      <button id="normaliseBtn" class="btn btn-warning">Normalise</button>
+      <button id="clearOutputBtn" class="btn btn-warning">Clear Output</button>
+    </div>
   </nav>
 
   <div id="editor"></div>
   <div id="editorOutput"></div>
-  <select id="procSelect" name="processor-selector">
-    <option value="" selected>Add processor</option>
-  </select>
+  <div id="addComponentWindow">
+    <select id="procSelect" name="processor-selector">
+      <option value="" selected>Add processor</option>
+    </select>
+    <select id="cacheSelect" name="cache-selector">
+      <option value="" selected>Add cache</option>
+    </select>
+    <select id="ratelimitSelect" name="ratelimit-selector">
+      <option value="" selected>Add rate limit</option>
+    </select>
+  </div>
 
   <img class="prof-img" src="/img/prof.png"/>
 
@@ -93,11 +94,10 @@ by clicking 'Execute'. Each line of your input data will be read as a message of
 a batch, in order to test with multiple batches add a blank line between each
 batch. The output of your pipeline will be printed in this window.
 
-Some processors are banned from being executed in the lab, if one exists within
-your config then execution will be blocked. However, you can still write,
-compile and normalise configs containing banned processors.
-
 Is your config ugly or incomplete? Click 'Normalise' to have Benthos format it.
+
+Some components won't compile or execute within the sandbox of your browser, but
+you can still normalise and share them.
 
 `;
 

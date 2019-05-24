@@ -41,6 +41,7 @@ import (
 	"github.com/Jeffail/benthos/lib/metrics"
 	"github.com/Jeffail/benthos/lib/pipeline"
 	"github.com/Jeffail/benthos/lib/processor"
+	"github.com/Jeffail/benthos/lib/ratelimit"
 	"github.com/Jeffail/benthos/lib/response"
 	"github.com/Jeffail/benthos/lib/types"
 	uconf "github.com/Jeffail/benthos/lib/util/config"
@@ -144,7 +145,7 @@ func compile(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	logger := log.WrapAtLevel(logWriter{}, log.LogError)
+	logger := log.WrapAtLevel(logWriter{}, log.LogInfo)
 	mgr, err := manager.New(conf.Manager, types.NoopMgr(), logger, metrics.Noop())
 	if err != nil {
 		reportErr("Error: Failed to create pipeline resources: %v\n", err)
@@ -326,23 +327,6 @@ func (l logWriter) Println(v ...interface{}) {
 
 //------------------------------------------------------------------------------
 
-// Blacklist of all non-permitted processor types.
-var processorBlacklist = []string{
-	"http",
-	"lambda",
-	"sql",
-	"subprocess",
-}
-
-// Blacklist of all non-permitted cache types.
-var cacheBlacklist = []string{
-	"dynamodb",
-	"file",
-	"memcached",
-	"redis",
-	"s3",
-}
-
 func addProc(this js.Value, args []js.Value) interface{} {
 	value := this.Get("value").String()
 	this.Set("value", "")
@@ -373,6 +357,155 @@ func addProc(this js.Value, args []js.Value) interface{} {
 	return nil
 }
 
+func addCache(this js.Value, args []js.Value) interface{} {
+	value := this.Get("value").String()
+	this.Set("value", "")
+	if _, ok := cache.Constructors[value]; !ok {
+		reportErr("Failed to add cache: %v\n", fmt.Errorf("cache type '%v' not recognised", value))
+		return nil
+	}
+	cacheConf := cache.NewConfig()
+	cacheConf.Type = value
+
+	session := js.Global().Get("configSession")
+	contents := session.Call("getValue").String()
+
+	conf := config.New()
+	if err := yaml.Unmarshal([]byte(contents), &conf); err != nil {
+		reportErr("Failed to unmarshal current config: %v\n", err)
+		return nil
+	}
+
+	var cacheID string
+	for i := 0; i < 10000; i++ {
+		var candidate string
+		if i == 0 {
+			candidate = "example"
+		} else {
+			candidate = fmt.Sprintf("example%v", i)
+		}
+		if _, exists := conf.Manager.Caches[candidate]; !exists {
+			cacheID = candidate
+			break
+		}
+	}
+	if len(cacheID) == 0 {
+		reportErr("Failed to find an ID for your new cache", errors.New("what the hell are you doing?"))
+		return nil
+	}
+
+	conf.Manager.Caches[cacheID] = cacheConf
+	resultBytes, err := marshalConf(conf)
+	if err != nil {
+		reportErr("Error: Failed to normalise config: %v\n", err)
+		return nil
+	}
+
+	js.Global().Call("writeConfig", string(resultBytes))
+	return nil
+}
+
+func addRatelimit(this js.Value, args []js.Value) interface{} {
+	value := this.Get("value").String()
+	this.Set("value", "")
+	if _, ok := ratelimit.Constructors[value]; !ok {
+		reportErr("Failed to add ratelimit: %v\n", fmt.Errorf("ratelimit type '%v' not recognised", value))
+		return nil
+	}
+	ratelimitConf := ratelimit.NewConfig()
+	ratelimitConf.Type = value
+
+	session := js.Global().Get("configSession")
+	contents := session.Call("getValue").String()
+
+	conf := config.New()
+	if err := yaml.Unmarshal([]byte(contents), &conf); err != nil {
+		reportErr("Failed to unmarshal current config: %v\n", err)
+		return nil
+	}
+
+	var ratelimitID string
+	for i := 0; i < 10000; i++ {
+		var candidate string
+		if i == 0 {
+			candidate = "example"
+		} else {
+			candidate = fmt.Sprintf("example%v", i)
+		}
+		if _, exists := conf.Manager.RateLimits[candidate]; !exists {
+			ratelimitID = candidate
+			break
+		}
+	}
+	if len(ratelimitID) == 0 {
+		reportErr("Failed to find an ID for your new ratelimit", errors.New("what the hell are you doing?"))
+		return nil
+	}
+
+	conf.Manager.RateLimits[ratelimitID] = ratelimitConf
+	resultBytes, err := marshalConf(conf)
+	if err != nil {
+		reportErr("Error: Failed to normalise config: %v\n", err)
+		return nil
+	}
+
+	js.Global().Call("writeConfig", string(resultBytes))
+	return nil
+}
+
+//------------------------------------------------------------------------------
+
+func addProcSelectOptions() {
+	procSelect := js.Global().Get("document").Call("getElementById", "procSelect")
+	procSelect.Call("addEventListener", "change", js.FuncOf(addProc))
+
+	procs := []string{}
+	for k := range processor.Constructors {
+		procs = append(procs, k)
+	}
+	sort.Strings(procs)
+	for _, k := range procs {
+		option := js.Global().Get("document").Call("createElement", "option")
+		option.Set("text", k)
+		option.Set("value", k)
+		procSelect.Get("options").Call("add", option)
+	}
+}
+
+func addCacheSelectOptions() {
+	cacheSelect := js.Global().Get("document").Call("getElementById", "cacheSelect")
+	cacheSelect.Call("addEventListener", "change", js.FuncOf(addCache))
+
+	caches := []string{}
+	for k := range cache.Constructors {
+		caches = append(caches, k)
+	}
+	sort.Strings(caches)
+	for _, k := range caches {
+		option := js.Global().Get("document").Call("createElement", "option")
+		option.Set("text", k)
+		option.Set("value", k)
+		cacheSelect.Get("options").Call("add", option)
+	}
+}
+
+func addRatelimitSelectOptions() {
+	ratelimitSelect := js.Global().Get("document").Call("getElementById", "ratelimitSelect")
+	ratelimitSelect.Call("addEventListener", "change", js.FuncOf(addRatelimit))
+
+	ratelimits := []string{}
+	for k := range ratelimit.Constructors {
+		ratelimits = append(ratelimits, k)
+	}
+	sort.Strings(ratelimits)
+	for _, k := range ratelimits {
+		option := js.Global().Get("document").Call("createElement", "option")
+		option.Set("text", k)
+		option.Set("value", k)
+		ratelimitSelect.Get("options").Call("add", option)
+	}
+}
+
 //------------------------------------------------------------------------------
 
 func registerFunctions() {
@@ -396,20 +529,9 @@ func registerFunctions() {
 		return nil
 	}))
 
-	procSelect := js.Global().Get("document").Call("getElementById", "procSelect")
-	procSelect.Call("addEventListener", "change", js.FuncOf(addProc))
-
-	procs := []string{}
-	for k := range processor.Constructors {
-		procs = append(procs, k)
-	}
-	sort.Strings(procs)
-	for _, k := range procs {
-		option := js.Global().Get("document").Call("createElement", "option")
-		option.Set("text", k)
-		option.Set("value", k)
-		procSelect.Get("options").Call("add", option)
-	}
+	addProcSelectOptions()
+	addCacheSelectOptions()
+	addRatelimitSelectOptions()
 }
 
 func main() {
@@ -417,13 +539,6 @@ func main() {
 
 	println("WASM Benthos Initialized")
 	transactionChan = make(chan types.Transaction, 1)
-
-	for _, k := range processorBlacklist {
-		processor.Block(k, "benthos labs cannot execute it")
-	}
-	for _, k := range cacheBlacklist {
-		cache.Block(k, "benthos labs cannot execute it")
-	}
 
 	registerFunctions()
 

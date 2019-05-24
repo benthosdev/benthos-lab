@@ -6,6 +6,11 @@ body {
   margin: 0px;
 }
 
+.undecorated {
+  color: #fff;
+  text-decoration: none;
+}
+
 .navbar {
   height: 35px;
   padding: 5px 15px;
@@ -41,11 +46,17 @@ body {
   border-left: 2px solid #202020;
 }
 
-#procSelect {
+#addComponentWindow {
   position: absolute;
   top: 50px;
   right: 50%;
   margin-right: 5px;
+}
+
+#addComponentWindow > * {
+  min-width: 160px;
+  display: block;
+  margin-bottom: 5px;
 }
 
 button {
@@ -55,11 +66,12 @@ button {
 
 select {
   cursor: pointer;
-  background-color: rgb(18, 185, 116);
+  background-color: #33352e;
+  border: 1px #272822;
   color: #fff;
-  border: 0px;
   border-radius: 4px;
   padding: 5px;
+  font-size: 10pt;
 }
 
 .hidden {
@@ -76,7 +88,7 @@ select {
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
   position: relative;
-  bottom: -6px;
+  bottom: -5px;
 }
 
 .tab:hover {
@@ -93,11 +105,12 @@ select {
   border-radius: 3px;
   color: #fff;
   margin: 0px 2px;
+  min-width: 80px;
 }
 
-.nav-spacer {
-  width: 20px;
-  display: inline-block;
+.button-group {
+  margin: 0 20px;
+  display: inline;
 }
 
 .btn-primary {
@@ -130,4 +143,79 @@ select {
 
 .btn-warning:hover {
   background-color: rgb(177, 63, 37) !important;
+}
+
+@media (max-width: 90rem) {
+  #editor {
+    width: 100%;
+    top: 50px;
+    bottom: 30%;
+    left: 0px;
+    right: 0px;
+  }
+
+  #editorOutput {
+    top: 70%;
+    width: 100%;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    border-top: 2px solid #202020;
+    border-left: none;
+  }
+
+  #addComponentWindow {
+    top: 50px;
+    right: 0px;
+    margin-right: 5px;
+  }
+}
+
+@media (max-width: 60rem) {
+  #warningGroup {
+    position: absolute;
+    right: 0px;
+    bottom: 30%;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    z-index: 50;
+  }
+
+  #warningGroup > button {
+    width: 120px;
+    display: block;
+    margin-top: 5px;
+  }
+}
+
+@media (max-width: 40rem) {
+  #addComponentWindow > * {
+    min-width: 140px;
+  }
+
+  #happyGroup {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    margin-top: 7px;
+    margin-right: 10px;
+    z-index: 50;
+  }
+
+  #shareGroup {
+    position: absolute;
+    right: 0px;
+    top: 70%;
+    margin-top: 5px;
+    margin-right: 10px;
+    z-index: 50;
+  }
+
+  #shareGroup > button {
+    width: 120px;
+  }
+
+  .prof-img {
+    display: none;
+  }
 }
