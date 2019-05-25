@@ -23,7 +23,7 @@ package main
 import (
 	"bytes"
 	"compress/gzip"
-	"crypto/md5"
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"flag"
@@ -235,7 +235,7 @@ func main() {
 
 		var buf bytes.Buffer
 
-		hasher := md5.New()
+		hasher := sha256.New()
 		hasher.Write(reqBody)
 
 		encoder := base64.NewEncoder(base64.URLEncoding, &buf)

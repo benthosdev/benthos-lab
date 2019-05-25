@@ -45,10 +45,11 @@
     </div>
     <div class="button-group" id="happyGroup">
       <button id="compileBtn" class="btn btn-primary">Compile</button>
-      <button id="executeBtn" class="btn btn-primary">Execute</button>
+      <button id="executeBtn" class="btn btn-disabled" disabled>Execute</button>
     </div>
     <div class="button-group" id="shareGroup">
       <button id="shareBtn" class="btn btn-secondary">Share</button>
+      <button id="shareCopyBtn" class="btn btn-disabled">Copy URL to Clipboard</button>
     </div>
     <div class="button-group" id="warningGroup">
       <button id="normaliseBtn" class="btn btn-warning">Normalise</button>
@@ -76,6 +77,7 @@
   <script src="/vendor/ace/ace.js" type="text/javascript" charset="utf-8"></script>
   <script>
       var editor = ace.edit("editor");
+
       var configSession = ace.createEditSession(model.config, "ace/mode/yaml");
       configSession.setTabSize(2);
 

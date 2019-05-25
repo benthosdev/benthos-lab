@@ -15,23 +15,42 @@ var openInput = function() {
 };
 
 var writeOutput = function(value) {
-	var session = outputSession;
+    var session = outputSession;
     var length = session.getLength();
     session.insert({row: length, column: 0}, value);
     editorOutput.scrollToLine(length+1);
 };
 
+var setShareURL = function(url) {
+    var shareBtn = document.getElementById("shareCopyBtn");
+    shareBtn.onclick = function() {
+        if (!navigator.clipboard) {
+            writeOutput("Nope sorry your browser doesn't like that.\n");
+            return;
+        }
+        navigator.clipboard.writeText(url).then(function() {
+            writeOutput("URL copied to clipboard.\n");
+        }, function(err) {
+            writeOutput("Nope sorry your browser doesn't like that: " + err + "\n");
+        });
+    };
+    shareBtn.classList.remove("btn-disabled");
+    shareBtn.classList.add("btn-secondary");
+
+    writeOutput("Session saved at: " + url + "\n");
+}
+
 var writeConfig = function(value) {
-	var session = configSession;
+    var session = configSession;
     var length = session.getLength();
     var lastLineLength = session.getRowLength(length-1);
     session.remove({start:{row: 0, column: 0},end:{row: length, column: lastLineLength}});
-	session.insert({row: 0, column: 0}, value);
-	openConfig();
+    session.insert({row: 0, column: 0}, value);
+    openConfig();
 };
 
 var clearOutput = function() {
-	var session = outputSession;
+    var session = outputSession;
     session.setValue("");
 };
 

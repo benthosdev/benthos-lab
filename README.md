@@ -1,5 +1,4 @@
-Benthos Lab
-===========
+![benthos-lab](logo.svg "benthos lab")
 
 [![Build Status](https://cloud.drone.io/api/badges/benthosdev/benthos-lab/status.svg)](https://cloud.drone.io/benthosdev/benthos-lab)
 

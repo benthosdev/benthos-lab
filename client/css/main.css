@@ -146,6 +146,21 @@ select {
 }
 
 @media (max-width: 90rem) {
+  #warningGroup {
+    position: absolute;
+    right: 0px;
+    bottom: 30%;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    z-index: 50;
+  }
+
+  #warningGroup > button {
+    width: 120px;
+    display: block;
+    margin-top: 5px;
+  }
+
   #editor {
     width: 100%;
     top: 50px;
@@ -172,16 +187,16 @@ select {
 }
 
 @media (max-width: 60rem) {
-  #warningGroup {
+  #shareGroup {
     position: absolute;
     right: 0px;
-    bottom: 30%;
-    margin-bottom: 10px;
+    top: 70%;
+    margin-top: 5px;
     margin-right: 10px;
     z-index: 50;
   }
 
-  #warningGroup > button {
+  #shareGroup > button {
     width: 120px;
     display: block;
     margin-top: 5px;
@@ -200,19 +215,6 @@ select {
     margin-top: 7px;
     margin-right: 10px;
     z-index: 50;
-  }
-
-  #shareGroup {
-    position: absolute;
-    right: 0px;
-    top: 70%;
-    margin-top: 5px;
-    margin-right: 10px;
-    z-index: 50;
-  }
-
-  #shareGroup > button {
-    width: 120px;
   }
 
   .prof-img {

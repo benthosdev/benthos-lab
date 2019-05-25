@@ -68,7 +68,7 @@ func writeOutput(msg string) {
 }
 
 func reportErr(msg string, err error) {
-	writeOutput(fmt.Sprintf(msg, err))
+	writeOutput("Error: " + fmt.Sprintf(msg, err))
 }
 
 func reportLints(msg []string) {
@@ -92,7 +92,7 @@ func share(this js.Value, args []js.Value) interface{} {
 
 	currentURL, err := url.Parse(href)
 	if err != nil {
-		reportErr("Error: Failed to parse current url: %v\n", err)
+		reportErr("failed to parse current url: %v\n", err)
 		return nil
 	}
 	currentURL.Path = "/share"
@@ -107,30 +107,30 @@ func share(this js.Value, args []js.Value) interface{} {
 
 	stateBytes, err := json.Marshal(state)
 	if err != nil {
-		reportErr("Error: Failed to marshal state: %v\n", err)
+		reportErr("failed to marshal state: %v\n", err)
 		return nil
 	}
 
 	go func() {
 		res, err := http.Post(currentURL.String(), "application/json", bytes.NewReader(stateBytes))
 		if err != nil {
-			reportErr("Error: Failed to save state: %v\n", err)
+			reportErr("failed to save state: %v\n", err)
 			return
 		}
 
 		resBytes, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			reportErr("Error: Failed to read save response: %v\n", err)
+			reportErr("failed to read save response: %v\n", err)
 			return
 		}
 
 		if res.StatusCode != 200 {
-			reportErr("Error: Failed to save state: %v\n", errors.New(string(resBytes)))
+			reportErr("failed to save state: %v\n", errors.New(string(resBytes)))
 			return
 		}
 
 		currentURL.Path = "/l/" + string(resBytes)
-		writeOutput("Saved at: " + currentURL.String() + "\n\n")
+		js.Global().Call("setShareURL", currentURL.String())
 	}()
 	return nil
 }
@@ -141,14 +141,14 @@ func compile(this js.Value, args []js.Value) interface{} {
 	contents := js.Global().Get("configSession").Call("getValue").String()
 	conf, err := compileConfig(contents)
 	if err != nil {
-		reportErr("Error: Failed to create pipeline: %v\n", err)
+		reportErr("failed to create pipeline: %v\n", err)
 		return nil
 	}
 
 	logger := log.WrapAtLevel(logWriter{}, log.LogInfo)
 	mgr, err := manager.New(conf.Manager, types.NoopMgr(), logger, metrics.Noop())
 	if err != nil {
-		reportErr("Error: Failed to create pipeline resources: %v\n", err)
+		reportErr("failed to create pipeline resources: %v\n", err)
 		return nil
 	}
 
@@ -158,11 +158,11 @@ func compile(this js.Value, args []js.Value) interface{} {
 	if err != nil {
 		pipelineLayer = nil
 		mgr.CloseAsync()
-		reportErr("Error: Failed to create pipeline: %v\n", err)
+		reportErr("failed to create pipeline: %v\n", err)
 		return nil
 	}
 	if lints, err := config.Lint([]byte(contents), conf); err != nil {
-		reportErr("Error: Failed to parse config for linter: %v\n", err)
+		reportErr("failed to parse config for linter: %v\n", err)
 	} else if len(lints) > 0 {
 		reportLints(lints)
 	}
@@ -174,6 +174,12 @@ func compile(this js.Value, args []js.Value) interface{} {
 	compileBtnClassList.Call("remove", "btn-primary")
 	compileBtn.Set("disabled", true)
 
+	executeBtn := js.Global().Get("document").Call("getElementById", "executeBtn")
+	executeClassList := executeBtn.Get("classList")
+	executeClassList.Call("add", "btn-primary")
+	executeClassList.Call("remove", "btn-disabled")
+	executeBtn.Set("disabled", false)
+
 	closeFn = func() {
 		if pipelineLayer == nil {
 			return
@@ -182,7 +188,7 @@ func compile(this js.Value, args []js.Value) interface{} {
 		timesOut := time.Now().Add(exitTimeout)
 		pipelineLayer.CloseAsync()
 		if err := pipelineLayer.WaitForClose(time.Until(timesOut)); err != nil {
-			reportErr("Error: Failed to shut down pipeline: %v\n", err)
+			reportErr("failed to shut down pipeline: %v\n", err)
 		}
 		if mgr != nil {
 			mgr.CloseAsync()
@@ -215,13 +221,13 @@ func normalise(this js.Value, args []js.Value) interface{} {
 	contents := session.Call("getValue").String()
 	conf, err := compileConfig(contents)
 	if err != nil {
-		reportErr("Error: Failed to create pipeline: %v\n", err)
+		reportErr("failed to create pipeline: %v\n", err)
 		return nil
 	}
 
 	sanitBytes, err := marshalConf(conf)
 	if err != nil {
-		reportErr("Error: Failed to normalise config: %v\n", err)
+		reportErr("failed to normalise config: %v\n", err)
 		return nil
 	}
 
@@ -231,7 +237,7 @@ func normalise(this js.Value, args []js.Value) interface{} {
 
 func execute(this js.Value, args []js.Value) interface{} {
 	if pipelineLayer == nil {
-		reportErr("Error: Failed to execute: %v\n", errors.New("pipeline must be compiled first"))
+		reportErr("failed to execute: %v\n", errors.New("pipeline must be compiled first"))
 		return nil
 	}
 
@@ -260,7 +266,7 @@ func execute(this js.Value, args []js.Value) interface{} {
 			select {
 			case transactionChan <- types.NewTransaction(inputMsg, resChan):
 			case <-time.After(time.Second * 30):
-				reportErr("Error: Failed to execute: %v\n", errors.New("request timed out"))
+				reportErr("failed to execute: %v\n", errors.New("request timed out"))
 				return
 			}
 
@@ -269,14 +275,14 @@ func execute(this js.Value, args []js.Value) interface{} {
 			case outTran = <-pipeLayer.TransactionChan():
 			case res := <-resChan:
 				if res.Error() != nil {
-					reportErr("Error: Failed to execute: %v\n", res.Error())
+					reportErr("failed to execute: %v\n", res.Error())
 					closeFn()
 				} else {
 					writeOutput("Pipeline executed without output.\n")
 				}
 				return
 			case <-time.After(time.Second * 30):
-				reportErr("Error: Failed to execute: %v\n", errors.New("response timed out"))
+				reportErr("failed to execute: %v\n", errors.New("response timed out"))
 				closeFn()
 				return
 			}
@@ -284,7 +290,7 @@ func execute(this js.Value, args []js.Value) interface{} {
 			select {
 			case outTran.ResponseChan <- response.NewAck():
 			case <-time.After(time.Second * 30):
-				reportErr("Error: Failed to execute: %v\n", errors.New("response 2 timed out"))
+				reportErr("failed to execute: %v\n", errors.New("response 2 timed out"))
 				closeFn()
 				return
 			}
@@ -292,10 +298,10 @@ func execute(this js.Value, args []js.Value) interface{} {
 			select {
 			case res := <-resChan:
 				if res.Error() != nil {
-					reportErr("Error: Failed to execute: %v\n", res.Error())
+					reportErr("failed to execute: %v\n", res.Error())
 				}
 			case <-time.After(time.Second * 30):
-				reportErr("Error: Failed to execute: %v\n", errors.New("response 3 timed out"))
+				reportErr("failed to execute: %v\n", errors.New("response 3 timed out"))
 				closeFn()
 				return
 			}
@@ -349,7 +355,7 @@ func addProc(this js.Value, args []js.Value) interface{} {
 	conf.Pipeline.Processors = append(conf.Pipeline.Processors, procConf)
 	resultBytes, err := marshalConf(conf)
 	if err != nil {
-		reportErr("Error: Failed to normalise config: %v\n", err)
+		reportErr("failed to normalise config: %v\n", err)
 		return nil
 	}
 
@@ -397,7 +403,7 @@ func addCache(this js.Value, args []js.Value) interface{} {
 	conf.Manager.Caches[cacheID] = cacheConf
 	resultBytes, err := marshalConf(conf)
 	if err != nil {
-		reportErr("Error: Failed to normalise config: %v\n", err)
+		reportErr("failed to normalise config: %v\n", err)
 		return nil
 	}
 
@@ -445,7 +451,7 @@ func addRatelimit(this js.Value, args []js.Value) interface{} {
 	conf.Manager.RateLimits[ratelimitID] = ratelimitConf
 	resultBytes, err := marshalConf(conf)
 	if err != nil {
-		reportErr("Error: Failed to normalise config: %v\n", err)
+		reportErr("failed to normalise config: %v\n", err)
 		return nil
 	}
 
