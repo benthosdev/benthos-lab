@@ -153,10 +153,16 @@ func main() {
 	mux := http.NewServeMux()
 	fileServe := http.FileServer(http.Dir(*wwwPath))
 
+	httpStats := metrics.Namespaced(stats, "http")
+	mWASMGet200 := httpStats.GetCounter("wasm.get.200")
+	mWASMGet304 := httpStats.GetCounter("wasm.get.304")
+	mWASMGetNoGZIP := httpStats.GetCounter("wasm.no_gzip")
+
 	mux.Handle("/", fileServe)
 
 	mux.HandleFunc("/wasm/benthos-lab.wasm", func(w http.ResponseWriter, r *http.Request) {
 		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+			mWASMGetNoGZIP.Incr(1)
 			fileServe.ServeHTTP(w, r)
 			return
 		}
@@ -166,10 +172,12 @@ func main() {
 				log.Errorf("Failed to parse time: %v\n", err)
 			}
 			if err == nil && labCache.cachedAt.Sub(tSince) < time.Second {
+				mWASMGet304.Incr(1)
 				w.WriteHeader(http.StatusNotModified)
 				return
 			}
 		}
+		mWASMGet200.Incr(1)
 		w.Header().Set("Content-Encoding", "gzip")
 		w.Header().Set("Content-Type", "application/wasm")
 		w.Header().Set("Last-Modified", labCache.cachedAt.UTC().Format(time.RFC1123))
