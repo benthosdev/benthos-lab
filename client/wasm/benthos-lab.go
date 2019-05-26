@@ -63,17 +63,17 @@ var pipelineLayer types.Pipeline
 var closeFn = func() {}
 var transactionChan chan types.Transaction
 
-func writeOutput(msg string) {
-	js.Global().Call("writeOutput", msg)
+func writeOutput(msg, style string) {
+	js.Global().Call("writeOutput", msg, style)
 }
 
 func reportErr(msg string, err error) {
-	writeOutput("Error: " + fmt.Sprintf(msg, err))
+	writeOutput("Error: "+fmt.Sprintf(msg, err), "errorMessage")
 }
 
 func reportLints(msg []string) {
 	for _, m := range msg {
-		writeOutput("Lint: " + m + "\n")
+		writeOutput("Lint: "+m+"\n", "lintMessage")
 	}
 }
 
@@ -167,7 +167,7 @@ func compile(this js.Value, args []js.Value) interface{} {
 		reportLints(lints)
 	}
 
-	writeOutput("Compiled successfully.\n")
+	writeOutput("Compiled successfully.\n", "infoMessage")
 	compileBtn := js.Global().Get("document").Call("getElementById", "compileBtn")
 	compileBtnClassList := compileBtn.Get("classList")
 	compileBtnClassList.Call("add", "btn-disabled")
@@ -278,7 +278,7 @@ func execute(this js.Value, args []js.Value) interface{} {
 					reportErr("failed to execute: %v\n", res.Error())
 					closeFn()
 				} else {
-					writeOutput("Pipeline executed without output.\n")
+					writeOutput("Pipeline executed without output.\n", "infoMessage")
 				}
 				return
 			case <-time.After(time.Second * 30):
@@ -307,9 +307,9 @@ func execute(this js.Value, args []js.Value) interface{} {
 			}
 
 			for _, out := range message.GetAllBytes(outTran.Payload) {
-				writeOutput(string(out) + "\n")
+				writeOutput(string(out)+"\n", "")
 			}
-			writeOutput("\n")
+			writeOutput("\n", "")
 		}
 	}(pipelineLayer)
 	return nil
@@ -320,14 +320,14 @@ func execute(this js.Value, args []js.Value) interface{} {
 type logWriter struct{}
 
 func (l logWriter) Printf(format string, v ...interface{}) {
-	writeOutput("Log: " + fmt.Sprintf(format, v...))
+	writeOutput("Log: "+fmt.Sprintf(format, v...), "logMessage")
 }
 
 func (l logWriter) Println(v ...interface{}) {
 	if str, ok := v[0].(string); ok {
-		writeOutput("Log: " + fmt.Sprintf(str, v[1:]...) + "\n")
+		writeOutput("Log: "+fmt.Sprintf(str, v[1:]...)+"\n", "logMessage")
 	} else {
-		writeOutput("Log: " + fmt.Sprintf("%v\n", v))
+		writeOutput("Log: "+fmt.Sprintf("%v\n", v), "logMessage")
 	}
 }
 

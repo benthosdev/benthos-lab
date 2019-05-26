@@ -252,7 +252,7 @@ func main() {
 
 		hashBytes := buf.Bytes()
 
-		if err = cache.Set(string(hashBytes), reqBody); err != nil {
+		if err = cache.Add(string(hashBytes), reqBody); err != nil && err != types.ErrKeyAlreadyExists {
 			http.Error(w, "Save failed", http.StatusBadGateway)
 			log.Errorf("Failed to store request body: %v\n", err)
 			return

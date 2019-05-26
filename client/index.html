@@ -49,7 +49,7 @@
     </div>
     <div class="button-group" id="shareGroup">
       <button id="shareBtn" class="btn btn-secondary">Share</button>
-      <button id="shareCopyBtn" class="btn btn-disabled">Copy URL to Clipboard</button>
+      <button id="aboutBtn" class="btn btn-secondary">About</button>
     </div>
     <div class="button-group" id="warningGroup">
       <button id="normaliseBtn" class="btn btn-warning">Normalise</button>
@@ -58,7 +58,11 @@
   </nav>
 
   <div id="editor"></div>
-  <div id="editorOutput"></div>
+  <div id="editorOutput">
+    <div style="text-align:center;">
+      <img style="max-width:50%;" src="/img/logo.svg"/>
+    </div>
+  </div>
   <div id="addComponentWindow">
     <select id="procSelect" name="processor-selector">
       <option value="" selected>Add processor</option>
@@ -84,41 +88,10 @@
       var inputSession = ace.createEditSession(model.input, "ace/mode/text");
       inputSession.setUseWrapMode(true);
 
-      var welcomeText =
-`Welcome to the Benthos Lab, a place where you can experiment with Benthos
-pipeline configurations and share them with others.
-
-Edit your pipeline configuration as well as the input data on the left by
-changing tabs. When you're ready to try your pipeline click 'Compile'.
-
-If your config compiled successfully you can then execute it with your test data
-by clicking 'Execute'. Each line of your input data will be read as a message of
-a batch, in order to test with multiple batches add a blank line between each
-batch. The output of your pipeline will be printed in this window.
-
-Is your config ugly or incomplete? Click 'Normalise' to have Benthos format it.
-
-Some components won't compile or execute within the sandbox of your browser, but
-you can still normalise and share them.
-
-`;
-
-      var outputSession = ace.createEditSession(welcomeText, "ace/mode/text");
-      outputSession.setUseWrapMode(true);
-
       editor.setFontSize("12pt");
       editor.setTheme("ace/theme/monokai");
       editor.setSession(configSession);
       editor.setShowPrintMargin(false);
-
-      var editorOutput = ace.edit("editorOutput");
-      editorOutput.setFontSize("12pt");
-      editorOutput.setReadOnly(true);
-      editorOutput.setHighlightActiveLine(false);
-      editorOutput.setTheme("ace/theme/monokai");
-      editorOutput.setSession(outputSession);
-      editorOutput.setShowPrintMargin(false);
-      editorOutput.renderer.setShowGutter(false);
 
       initLabControls();
   </script>

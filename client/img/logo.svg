@@ -9,27 +9,43 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="1850"
+   width="1000"
    height="500"
-   viewBox="0 0 489.47917 132.29167"
+   viewBox="0 0 264.58334 132.29167"
    version="1.1"
    id="svg8"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="logo.svg">
+   sodipodi:docname="logo.svg"
+   inkscape:export-filename="/home/ash/src/dev/benthos-lab/logo.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96">
   <defs
      id="defs2">
     <filter
        inkscape:collect="always"
        style="color-interpolation-filters:sRGB"
        id="filter2417"
-       x="-0.018868015"
-       width="1.037736"
+       x="-0.018868014"
+       width="1.0377361"
        y="-0.15327868"
        height="1.3065574">
       <feGaussianBlur
          inkscape:collect="always"
          stdDeviation="1.9658789"
          id="feGaussianBlur2419" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter1295"
+       x="-0.0087137148"
+       width="1.0174274"
+       y="-0.027208265"
+       height="1.0544165">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.65528738"
+         id="feGaussianBlur1297" />
     </filter>
   </defs>
   <sodipodi:namedview
@@ -39,9 +55,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="932.05942"
-     inkscape:cy="112.52433"
+     inkscape:zoom="0.69999999"
+     inkscape:cx="977.9698"
+     inkscape:cy="139.46301"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -50,7 +66,8 @@
      inkscape:window-height="1376"
      inkscape:window-x="2560"
      inkscape:window-y="27"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="1"
+     inkscape:snap-nodes="false" />
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -69,333 +86,490 @@
      id="layer1"
      transform="translate(0,-164.70834)">
     <g
-       id="g2541"
-       transform="translate(-2.5431316e-6,-0.68419302)">
+       id="g1692"
+       transform="translate(-112.44792,-130.16026)">
       <rect
-         ry="12.359006"
-         y="229.34227"
-         x="139.8512"
-         height="60.098217"
-         width="209.77678"
-         id="rect2476"
-         style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:7.3388133;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
-      <flowRoot
-         xml:space="preserve"
-         id="flowRoot1815"
-         style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:0.82700004;fill:#d6ffce;fill-opacity:1;stroke:none;filter:url(#filter2417)"
-         transform="matrix(0.69235212,0,0,0.69235212,-79.36099,-0.83926705)"><flowRegion
-           id="flowRegion1811"
-           style="fill:#d6ffce;fill-opacity:1"><rect
-             id="rect1809"
-             width="1020.7143"
-             height="154.28572"
-             x="340"
-             y="362.14285"
-             style="fill:#d6ffce;fill-opacity:1" /></flowRegion><flowPara
-           id="flowPara1813"
-           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#d6ffce;fill-opacity:1">Benthos Lab</flowPara></flowRoot>      <flowRoot
-         transform="matrix(0.69235212,0,0,0.69235212,-79.36099,-0.83926705)"
-         style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#beffb2;fill-opacity:1;stroke:none"
-         id="flowRoot1554"
-         xml:space="preserve"><flowRegion
-           style="fill:#beffb2;fill-opacity:1"
-           id="flowRegion1556"><rect
-             style="fill:#beffb2;fill-opacity:1"
-             y="362.14285"
-             x="340"
-             height="154.28572"
-             width="1020.7143"
-             id="rect1558" /></flowRegion><flowPara
-           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#beffb2;fill-opacity:1"
-           id="flowPara1560">Benthos Lab</flowPara></flowRoot>      <path
-         inkscape:connector-curvature="0"
-         id="path1904"
-         d="m 271.04126,177.60387 0.93867,11.03692 -9.96078,-2.67255 0.37501,0.26722 c -6.09415,-3.07099 -12.72311,-4.91578 -19.62741,-4.91578 -7.9891,0 -14.86341,1.68348 -20.69577,4.47955 l -8.74669,3.16221 8.8e-4,-10.13252 -4.70199,8.66128 -1.94629,-5.66396 -0.84138,6.30526 -4.56859,-2.46701 1.22779,4.72344 -6.44869,-6.09557 4.54577,10.23255 -9.22536,-4.27079 6.7917,7.32338 -12.34558,6.45917 9.86714,1.99198 -5.56483,7.53259 9.60222,-6.14948 -2.16235,8.36301 c -1.13813,0.0613 -2.48966,0.17469 -3.88984,0.38915 l -0.0594,-0.25625 0.21422,-0.0498 c 0.50529,-0.11731 0.81755,-0.61837 0.70025,-1.12366 l -0.21196,-0.91218 c -0.11731,-0.50526 -0.61837,-0.81752 -1.12366,-0.70021 l -4.57774,1.0629 c -0.5053,0.11731 -0.81799,0.61837 -0.70069,1.12365 l 0.21196,0.91217 c 0.1173,0.50529 0.61836,0.81756 1.12363,0.70022 l 0.21424,-0.0498 0.0676,0.29139 c -2.07406,0.75179 -3.71358,1.88726 -4.06569,3.60485 -0.63545,3.09963 1.40961,7.03562 3.60161,9.53645 l -3.39424,12.19345 0.26584,1.14559 c 0.1525,0.65688 0.7248,1.08152 1.28306,0.95191 l 14.26539,-3.31203 c 7.54562,5.66353 19.81265,0.75732 22.83804,0.42614 3.03465,-0.3315 6.67391,2.08186 13.44319,2.30167 6.76928,0.21939 10.46212,-1.73019 16.27928,-0.8957 5.75332,0.82533 14.65537,8.69843 32.60422,3.58014 l 14.87106,3.36593 c 0.61818,0.1399 1.24817,-0.33323 1.41278,-1.06059 l 0.28731,-1.26847 -3.27045,-11.50101 c 2.54156,-2.92833 4.75997,-7.37176 4.07392,-11.32151 -0.41383,-2.38248 -2.54558,-4.00732 -5.23779,-5.11946 l 0.0849,-0.37454 0.23707,0.0535 c 0.55949,0.12664 1.11166,-0.22201 1.23829,-0.78153 l 0.22884,-1.00994 c 0.12663,-0.55952 -0.22201,-1.11165 -0.78153,-1.23829 l -5.06924,-1.14742 c -0.55952,-0.12661 -1.11213,0.22156 -1.23877,0.78109 l -0.22836,1.01038 c -0.12665,0.55952 0.222,1.11166 0.78153,1.23829 l 0.2366,0.0535 -0.0128,0.0571 c -0.68902,-0.14809 -1.37493,-0.27613 -2.04542,-0.38507 -0.0751,-0.16838 -0.15254,-0.33702 -0.22974,-0.50564 l 0.0978,0.10185 -3.57058,-10.1645 11.02871,5.81013 -6.75882,-7.69018 10.56371,-3.08275 -14.04521,-5.89325 6.71954,-8.60555 -9.65336,5.50547 4.00404,-11.56679 -6.45964,7.23659 0.89982,-5.25878 -4.74811,3.11014 -1.49958,-6.79033 -1.59597,6.34956 z"
-         style="fill:#ff9197;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:7.9375;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:#272822;fill-opacity:1;stroke:none;stroke-width:7.39170933;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="rect1375"
+         width="205.50047"
+         height="62.236374"
+         x="141.98935"
+         y="356.68018"
+         ry="12.798711" />
       <g
-         id="g2012"
-         transform="matrix(0.88390367,0,0,0.88390367,-54.764993,116.11321)">
+         aria-label="Benthos Lab"
+         transform="matrix(0.69235212,0,0,0.69235212,-79.360996,131.84403)"
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:0.82700004;fill:#d6ffce;fill-opacity:1;stroke:none;filter:url(#filter2417)"
+         id="g1397">
         <path
-           style="fill:#ff9197;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.35896313;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-           d="m 292.43686,120.46069 -12.11895,11.38763 c -1.96085,1.84242 -9.98024,-7.19545 -8.72282,-13.32894 1.25738,-6.13319 17.00989,-5.72187 17.00989,-5.72187 2.1231,1.34162 4.81035,6.74369 3.83188,7.66318 z"
-           id="path1670-3"
            inkscape:connector-curvature="0"
+           d="m 343.08594,369.02985 h 9.96093 q 5.82032,0 8.63282,1.73828 2.83203,1.71875 2.83203,5.3711 0,2.40234 -1.23047,4.10156 -1.23047,1.69922 -3.24219,2.1875 v 0.19531 q 2.65625,0.70313 3.84766,2.34375 1.1914,1.64063 1.1914,4.25782 0,3.88671 -2.92968,6.13281 -2.91016,2.22656 -7.94922,2.22656 h -11.11328 z m 7.71484,10.95703 h 2.32422 q 1.66016,0 2.55859,-0.68359 0.91797,-0.68359 0.91797,-2.03125 0,-2.40234 -3.63281,-2.40234 h -2.16797 z m 0,5.64454 v 5.99609 h 2.71484 q 3.61329,0 3.61329,-3.04688 0,-1.42578 -0.97657,-2.1875 -0.95703,-0.76171 -2.79297,-0.76171 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#d6ffce;fill-opacity:1"
+           id="path1377" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 380.27344,397.97517 q -5.52735,0 -8.59375,-2.92969 -3.04688,-2.94922 -3.04688,-8.37891 0,-5.60547 2.83203,-8.59375 2.83203,-3.00781 8.08594,-3.00781 5,0 7.71484,2.61719 2.73438,2.59765 2.73438,7.5 v 3.39843 h -13.65234 q 0.0781,1.85547 1.34765,2.91016 1.28906,1.05469 3.4961,1.05469 2.01171,0 3.6914,-0.3711 1.69922,-0.39062 3.67188,-1.30859 v 5.48828 q -1.79688,0.91797 -3.71094,1.26953 -1.91406,0.35157 -4.57031,0.35157 z m -0.44922,-17.71485 q -1.34766,0 -2.26563,0.85938 -0.89843,0.83984 -1.05468,2.65625 h 6.5625 q -0.0391,-1.60157 -0.91797,-2.5586 -0.85938,-0.95703 -2.32422,-0.95703 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#d6ffce;fill-opacity:1"
+           id="path1379" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 408.32031,397.58454 v -12.07031 q 0,-2.20703 -0.64453,-3.32031 -0.625,-1.13282 -2.03125,-1.13282 -1.93359,0 -2.79297,1.54297 -0.85937,1.54297 -0.85937,5.29297 v 9.6875 h -7.63672 v -22.12891 h 5.76172 l 0.95703,2.73438 h 0.44922 q 0.97656,-1.5625 2.69531,-2.34375 1.73828,-0.78125 3.98437,-0.78125 3.67188,0 5.70313,2.12891 2.05078,2.1289 2.05078,5.99609 v 14.39453 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#d6ffce;fill-opacity:1"
+           id="path1381" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 431.99219,391.94001 q 1.54297,0 3.6914,-0.76172 v 5.56641 q -1.54297,0.66406 -2.94922,0.9375 -1.38671,0.29297 -3.26171,0.29297 -3.84766,0 -5.54688,-1.875 -1.69922,-1.89454 -1.69922,-5.80079 v -9.12109 h -2.67578 v -3.10547 l 3.39844,-2.40234 1.97265,-4.64844 h 5 v 4.43359 h 5.42969 v 5.72266 h -5.42969 v 8.61328 q 0,2.14844 2.07032,2.14844 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#d6ffce;fill-opacity:1"
+           id="path1383" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 453.51562,397.58454 v -12.07031 q 0,-4.45313 -2.63671,-4.45313 -1.875,0 -2.77344,1.58203 -0.87891,1.5625 -0.87891,5.21485 v 9.72656 h -7.63672 v -30.39062 h 7.63672 v 4.3164 q 0,2.92969 -0.3125,6.67969 h 0.35156 q 1.09375,-1.71875 2.59766,-2.42188 1.50391,-0.70312 3.49609,-0.70312 3.71094,0 5.76172,2.14844 2.07032,2.1289 2.07032,5.97656 v 14.39453 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#d6ffce;fill-opacity:1"
+           id="path1385" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 487.51953,386.47126 q 0,5.42969 -2.92969,8.47656 -2.91015,3.02735 -8.16406,3.02735 -5.03906,0 -8.02734,-3.10547 -2.96875,-3.10547 -2.96875,-8.39844 0,-5.41016 2.91015,-8.39844 2.92969,-3.00781 8.20313,-3.00781 3.26172,0 5.76172,1.38672 2.5,1.38672 3.84765,3.98437 1.36719,2.57813 1.36719,6.03516 z m -14.33594,0 q 0,2.85156 0.76172,4.35547 0.76172,1.48437 2.5586,1.48437 1.77734,0 2.5,-1.48437 0.74218,-1.50391 0.74218,-4.35547 0,-2.83203 -0.74218,-4.27734 -0.74219,-1.44532 -2.53907,-1.44532 -1.75781,0 -2.51953,1.44532 -0.76172,1.42578 -0.76172,4.27734 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#d6ffce;fill-opacity:1"
+           id="path1387" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 508.94531,390.78767 q 0,3.55468 -2.42187,5.37109 -2.42188,1.81641 -6.95313,1.81641 -2.46094,0 -4.27734,-0.27344 -1.81641,-0.25391 -3.71094,-0.95703 v -6.11328 q 1.77734,0.78125 3.88672,1.28906 2.12891,0.50781 3.78906,0.50781 2.48047,0 2.48047,-1.13281 0,-0.58594 -0.70312,-1.03516 -0.6836,-0.46875 -4.02344,-1.79687 -3.04688,-1.25 -4.25781,-2.83203 -1.21094,-1.60157 -1.21094,-4.04297 0,-3.08594 2.38281,-4.80469 2.38281,-1.71875 6.73828,-1.71875 2.1875,0 4.10156,0.48828 1.9336,0.46875 4.00391,1.38672 l -2.07031,4.92187 q -1.52344,-0.68359 -3.22266,-1.15234 -1.69922,-0.48828 -2.77344,-0.48828 -1.875,0 -1.875,0.91797 0,0.5664 0.64454,0.97656 0.66406,0.39063 3.78906,1.62109 2.32422,0.95704 3.45703,1.875 1.15234,0.91797 1.67969,2.16797 0.54687,1.23047 0.54687,3.00782 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#d6ffce;fill-opacity:1"
+           id="path1389" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 524.02344,397.58454 v -28.55469 h 7.71484 v 22.32422 h 10.99609 v 6.23047 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#d6ffce;fill-opacity:1"
+           id="path1391" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 561.28906,397.58454 -1.46484,-2.92969 h -0.15625 q -1.54297,1.91407 -3.14453,2.61719 -1.60157,0.70313 -4.14063,0.70313 -3.125,0 -4.92187,-1.875 -1.79688,-1.875 -1.79688,-5.27344 0,-3.53516 2.46094,-5.25391 2.46094,-1.73828 7.12891,-1.95312 l 3.6914,-0.11719 v -0.3125 q 0,-2.73438 -2.69531,-2.73438 -2.42188,0 -6.15234,1.64063 l -2.20704,-5.03906 q 3.86719,-1.99219 9.76563,-1.99219 4.25781,0 6.58203,2.10937 2.34375,2.10938 2.34375,5.89844 v 14.51172 z m -5.66406,-5 q 1.38672,0 2.36328,-0.87891 0.99609,-0.8789 0.99609,-2.28515 v -1.71875 l -1.75781,0.0781 q -3.76953,0.13672 -3.76953,2.77344 0,2.03125 2.16797,2.03125 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#d6ffce;fill-opacity:1"
+           id="path1393" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 585.29297,375.06501 q 3.61328,0 5.72265,3.02734 2.12891,3.02735 2.12891,8.37891 0,5.39062 -2.14844,8.45703 -2.1289,3.04688 -5.9375,3.04688 -1.23047,0 -2.1875,-0.27344 -0.95703,-0.25391 -1.71875,-0.72266 -0.74218,-0.46875 -1.73828,-1.5625 h -0.46875 l -1.21094,2.16797 h -5.95703 v -30.39062 h 7.63672 v 6.875 q 0,1.23046 -0.27344,4.23828 h 0.27344 q 1.11328,-1.71875 2.5586,-2.48047 1.46484,-0.76172 3.32031,-0.76172 z M 582.5,381.0611 q -1.60156,0 -2.34375,1.11328 -0.74219,1.11329 -0.74219,3.4961 v 1.07422 q 0,2.71484 0.74219,3.90625 0.74219,1.17187 2.42187,1.17187 1.34766,0 2.07032,-1.36719 0.72265,-1.38671 0.72265,-4.0625 0,-5.33203 -2.87109,-5.33203 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#d6ffce;fill-opacity:1"
+           id="path1395" />
+      </g>
+      <g
+         aria-label="Benthos Lab"
+         transform="matrix(0.69235212,0,0,0.69235212,-79.360996,131.84403)"
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#beffb2;fill-opacity:1;stroke:none"
+         id="g1419">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 343.08594,369.02985 h 9.96093 q 5.82032,0 8.63282,1.73828 2.83203,1.71875 2.83203,5.3711 0,2.40234 -1.23047,4.10156 -1.23047,1.69922 -3.24219,2.1875 v 0.19531 q 2.65625,0.70313 3.84766,2.34375 1.1914,1.64063 1.1914,4.25782 0,3.88671 -2.92968,6.13281 -2.91016,2.22656 -7.94922,2.22656 h -11.11328 z m 7.71484,10.95703 h 2.32422 q 1.66016,0 2.55859,-0.68359 0.91797,-0.68359 0.91797,-2.03125 0,-2.40234 -3.63281,-2.40234 h -2.16797 z m 0,5.64454 v 5.99609 h 2.71484 q 3.61329,0 3.61329,-3.04688 0,-1.42578 -0.97657,-2.1875 -0.95703,-0.76171 -2.79297,-0.76171 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#beffb2;fill-opacity:1"
+           id="path1399" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 380.27344,397.97517 q -5.52735,0 -8.59375,-2.92969 -3.04688,-2.94922 -3.04688,-8.37891 0,-5.60547 2.83203,-8.59375 2.83203,-3.00781 8.08594,-3.00781 5,0 7.71484,2.61719 2.73438,2.59765 2.73438,7.5 v 3.39843 h -13.65234 q 0.0781,1.85547 1.34765,2.91016 1.28906,1.05469 3.4961,1.05469 2.01171,0 3.6914,-0.3711 1.69922,-0.39062 3.67188,-1.30859 v 5.48828 q -1.79688,0.91797 -3.71094,1.26953 -1.91406,0.35157 -4.57031,0.35157 z m -0.44922,-17.71485 q -1.34766,0 -2.26563,0.85938 -0.89843,0.83984 -1.05468,2.65625 h 6.5625 q -0.0391,-1.60157 -0.91797,-2.5586 -0.85938,-0.95703 -2.32422,-0.95703 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#beffb2;fill-opacity:1"
+           id="path1401" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 408.32031,397.58454 v -12.07031 q 0,-2.20703 -0.64453,-3.32031 -0.625,-1.13282 -2.03125,-1.13282 -1.93359,0 -2.79297,1.54297 -0.85937,1.54297 -0.85937,5.29297 v 9.6875 h -7.63672 v -22.12891 h 5.76172 l 0.95703,2.73438 h 0.44922 q 0.97656,-1.5625 2.69531,-2.34375 1.73828,-0.78125 3.98437,-0.78125 3.67188,0 5.70313,2.12891 2.05078,2.1289 2.05078,5.99609 v 14.39453 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#beffb2;fill-opacity:1"
+           id="path1403" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 431.99219,391.94001 q 1.54297,0 3.6914,-0.76172 v 5.56641 q -1.54297,0.66406 -2.94922,0.9375 -1.38671,0.29297 -3.26171,0.29297 -3.84766,0 -5.54688,-1.875 -1.69922,-1.89454 -1.69922,-5.80079 v -9.12109 h -2.67578 v -3.10547 l 3.39844,-2.40234 1.97265,-4.64844 h 5 v 4.43359 h 5.42969 v 5.72266 h -5.42969 v 8.61328 q 0,2.14844 2.07032,2.14844 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#beffb2;fill-opacity:1"
+           id="path1405" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 453.51562,397.58454 v -12.07031 q 0,-4.45313 -2.63671,-4.45313 -1.875,0 -2.77344,1.58203 -0.87891,1.5625 -0.87891,5.21485 v 9.72656 h -7.63672 v -30.39062 h 7.63672 v 4.3164 q 0,2.92969 -0.3125,6.67969 h 0.35156 q 1.09375,-1.71875 2.59766,-2.42188 1.50391,-0.70312 3.49609,-0.70312 3.71094,0 5.76172,2.14844 2.07032,2.1289 2.07032,5.97656 v 14.39453 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#beffb2;fill-opacity:1"
+           id="path1407" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 487.51953,386.47126 q 0,5.42969 -2.92969,8.47656 -2.91015,3.02735 -8.16406,3.02735 -5.03906,0 -8.02734,-3.10547 -2.96875,-3.10547 -2.96875,-8.39844 0,-5.41016 2.91015,-8.39844 2.92969,-3.00781 8.20313,-3.00781 3.26172,0 5.76172,1.38672 2.5,1.38672 3.84765,3.98437 1.36719,2.57813 1.36719,6.03516 z m -14.33594,0 q 0,2.85156 0.76172,4.35547 0.76172,1.48437 2.5586,1.48437 1.77734,0 2.5,-1.48437 0.74218,-1.50391 0.74218,-4.35547 0,-2.83203 -0.74218,-4.27734 -0.74219,-1.44532 -2.53907,-1.44532 -1.75781,0 -2.51953,1.44532 -0.76172,1.42578 -0.76172,4.27734 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#beffb2;fill-opacity:1"
+           id="path1409" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 508.94531,390.78767 q 0,3.55468 -2.42187,5.37109 -2.42188,1.81641 -6.95313,1.81641 -2.46094,0 -4.27734,-0.27344 -1.81641,-0.25391 -3.71094,-0.95703 v -6.11328 q 1.77734,0.78125 3.88672,1.28906 2.12891,0.50781 3.78906,0.50781 2.48047,0 2.48047,-1.13281 0,-0.58594 -0.70312,-1.03516 -0.6836,-0.46875 -4.02344,-1.79687 -3.04688,-1.25 -4.25781,-2.83203 -1.21094,-1.60157 -1.21094,-4.04297 0,-3.08594 2.38281,-4.80469 2.38281,-1.71875 6.73828,-1.71875 2.1875,0 4.10156,0.48828 1.9336,0.46875 4.00391,1.38672 l -2.07031,4.92187 q -1.52344,-0.68359 -3.22266,-1.15234 -1.69922,-0.48828 -2.77344,-0.48828 -1.875,0 -1.875,0.91797 0,0.5664 0.64454,0.97656 0.66406,0.39063 3.78906,1.62109 2.32422,0.95704 3.45703,1.875 1.15234,0.91797 1.67969,2.16797 0.54687,1.23047 0.54687,3.00782 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#beffb2;fill-opacity:1"
+           id="path1411" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 524.02344,397.58454 v -28.55469 h 7.71484 v 22.32422 h 10.99609 v 6.23047 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#beffb2;fill-opacity:1"
+           id="path1413" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 561.28906,397.58454 -1.46484,-2.92969 h -0.15625 q -1.54297,1.91407 -3.14453,2.61719 -1.60157,0.70313 -4.14063,0.70313 -3.125,0 -4.92187,-1.875 -1.79688,-1.875 -1.79688,-5.27344 0,-3.53516 2.46094,-5.25391 2.46094,-1.73828 7.12891,-1.95312 l 3.6914,-0.11719 v -0.3125 q 0,-2.73438 -2.69531,-2.73438 -2.42188,0 -6.15234,1.64063 l -2.20704,-5.03906 q 3.86719,-1.99219 9.76563,-1.99219 4.25781,0 6.58203,2.10937 2.34375,2.10938 2.34375,5.89844 v 14.51172 z m -5.66406,-5 q 1.38672,0 2.36328,-0.87891 0.99609,-0.8789 0.99609,-2.28515 v -1.71875 l -1.75781,0.0781 q -3.76953,0.13672 -3.76953,2.77344 0,2.03125 2.16797,2.03125 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#beffb2;fill-opacity:1"
+           id="path1415" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 585.29297,375.06501 q 3.61328,0 5.72265,3.02734 2.12891,3.02735 2.12891,8.37891 0,5.39062 -2.14844,8.45703 -2.1289,3.04688 -5.9375,3.04688 -1.23047,0 -2.1875,-0.27344 -0.95703,-0.25391 -1.71875,-0.72266 -0.74218,-0.46875 -1.73828,-1.5625 h -0.46875 l -1.21094,2.16797 h -5.95703 v -30.39062 h 7.63672 v 6.875 q 0,1.23046 -0.27344,4.23828 h 0.27344 q 1.11328,-1.71875 2.5586,-2.48047 1.46484,-0.76172 3.32031,-0.76172 z M 582.5,381.0611 q -1.60156,0 -2.34375,1.11328 -0.74219,1.11329 -0.74219,3.4961 v 1.07422 q 0,2.71484 0.74219,3.90625 0.74219,1.17187 2.42187,1.17187 1.34766,0 2.07032,-1.36719 0.72265,-1.38671 0.72265,-4.0625 0,-5.33203 -2.87109,-5.33203 z"
+           style="font-style:normal;font-variant:normal;font-weight:800;font-stretch:normal;font-family:'Open Sans';-inkscape-font-specification:'Open Sans Ultra-Bold';fill:#beffb2;fill-opacity:1"
+           id="path1417" />
+      </g>
+      <path
+         style="fill:#ff9197;fill-opacity:1;fill-rule:evenodd;stroke:#272822;stroke-width:7.9375;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 271.04125,307.07994 0.93867,11.03692 -9.96078,-2.67255 0.37501,0.26722 c -6.09415,-3.07099 -12.7231,-4.91578 -19.6274,-4.91578 -7.98911,0 -14.86341,1.68348 -20.69578,4.47955 l -8.74669,3.16221 8.8e-4,-10.13252 -4.70199,8.66128 -1.94629,-5.66396 -0.84138,6.30526 -4.56859,-2.46701 1.22779,4.72344 -6.44869,-6.09557 4.54578,10.23255 -9.22536,-4.27079 6.79169,7.32338 -12.34558,6.45917 9.86714,1.99198 -5.56483,7.53259 9.60222,-6.14948 -2.16235,8.36301 c -1.13813,0.0613 -2.48966,0.17469 -3.88984,0.38915 l -0.0594,-0.25625 0.21422,-0.0498 c 0.50529,-0.11731 0.81755,-0.61837 0.70025,-1.12366 l -0.21196,-0.91218 c -0.11731,-0.50526 -0.61837,-0.81752 -1.12366,-0.70021 l -4.57774,1.0629 c -0.5053,0.11731 -0.81799,0.61837 -0.70069,1.12365 l 0.21196,0.91217 c 0.1173,0.50529 0.61836,0.81756 1.12363,0.70022 l 0.21424,-0.0498 0.0676,0.29139 c -2.07406,0.75179 -3.71358,1.88726 -4.06569,3.60485 -0.63545,3.09963 1.40961,7.03562 3.60161,9.53645 l -3.39424,12.19345 0.26584,1.14559 c 0.1525,0.65688 0.7248,1.08152 1.28306,0.95191 l 14.26539,-3.31203 c 7.54562,5.66353 19.81265,0.75732 22.83804,0.42614 3.03465,-0.3315 6.67391,2.08186 13.44319,2.30167 6.76928,0.21939 10.46212,-1.73019 16.27928,-0.8957 5.75332,0.82533 14.65537,8.69843 32.60422,3.58014 l 14.87106,3.36593 c 0.61818,0.1399 1.24817,-0.33323 1.41278,-1.06059 l 0.28731,-1.26847 -3.27045,-11.50101 c 2.54156,-2.92833 4.75997,-7.37176 4.07392,-11.32151 -0.41383,-2.38248 -2.54558,-4.00732 -5.23779,-5.11946 l 0.0849,-0.37454 0.23707,0.0535 c 0.55949,0.12664 1.11166,-0.22201 1.23829,-0.78153 l 0.22884,-1.00994 c 0.12663,-0.55952 -0.22201,-1.11165 -0.78153,-1.23829 l -5.06923,-1.14742 c -0.55953,-0.12661 -1.11213,0.22156 -1.23877,0.78109 l -0.22836,1.01038 c -0.12665,0.55952 0.22199,1.11166 0.78152,1.23829 l 0.2366,0.0535 -0.0128,0.0571 c -0.68902,-0.14809 -1.37493,-0.27613 -2.04542,-0.38507 -0.0751,-0.16838 -0.15254,-0.33702 -0.22974,-0.50564 l 0.0978,0.10185 -3.57058,-10.1645 11.02871,5.81013 -6.75882,-7.69018 10.56371,-3.08275 -14.04521,-5.89325 6.71954,-8.60555 -9.65336,5.50547 4.00404,-11.56679 -6.45964,7.23659 0.89982,-5.25878 -4.74811,3.11014 -1.49958,-6.79033 -1.59597,6.34956 z"
+         id="path1421"
+         inkscape:connector-curvature="0" />
+      <path
+         transform="rotate(-140.21144,313.20559,334.85231)"
+         inkscape:connector-curvature="0"
+         id="path1429"
+         d="m 343.24211,320.89158 -27.21429,14.1741 6.61458,1.88989 -4.7247,4.34672 13.79613,2.26786"
+         style="fill:none;stroke:#ccf6ff;stroke-width:0.79374999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter1295)" />
+      <path
+         style="fill:none;stroke:#a9f0ff;stroke-width:0.79374999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 281.19093,326.35782 29.98257,6.52442 -3.87327,-5.68526 6.41223,-0.31647 -9.14978,-10.57157"
+         id="path1445"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:none;stroke:#ccf6ff;stroke-width:1.58749998;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter1295)"
+         d="m 158.28512,377.06758 0.89558,-26.47866 8.36461,4.72124 5.03711,-18.15449 14.41055,29.58781 4.76232,-14.86019 2.13509,8.91413 13.14889,-35.47329 6.48171,10.10111 4.31515,-7.80056"
+         id="path1423"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path1425"
+         d="m 268.37815,345.86695 24.24284,-10.68677 -0.62246,9.58486 18.54147,-3.34248 -20.39988,25.82534 15.45443,-2.16009 -7.10378,5.79281 37.66468,-3.55229 -6.28636,10.22381 8.90044,0.50146"
+         style="fill:none;stroke:#ccf6ff;stroke-width:1.58749998;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter1295)" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path1427"
+         d="m 282.91516,364.03824 30.04913,-11.71726 -0.56698,8.50446 13.04019,-3.96875 -13.98512,18.33185 6.42559,-1.51191 -0.56698,3.2128"
+         style="fill:none;stroke:#ccf6ff;stroke-width:0.79374999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter1295)" />
+      <path
+         transform="rotate(154.47852,181.16889,324.11981)"
+         inkscape:connector-curvature="0"
+         id="path1431"
+         d="m 160.60246,313.14633 6.2366,10.77232 -4.7247,0.37797 12.4732,5.10268 -2.26785,1.5119"
+         style="fill:none;stroke:#ccf6ff;stroke-width:0.79374999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter1295)" />
+      <path
+         transform="rotate(108.68061,164.69784,348.63025)"
+         inkscape:connector-curvature="0"
+         id="path1433"
+         d="m 160.08616,308.795 -12.85119,12.6622 2.83482,-0.18899 -0.75595,3.2128 9.63839,0.94494"
+         style="fill:none;stroke:#ccf6ff;stroke-width:0.79374999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter1295)" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path1435"
+         d="m 199.38244,333.23318 -17.3869,-5.66964 7.74851,12.28423 -9.82738,1.32291 7.9375,11.71726 -15.875,7.55953 4.34672,16.06399"
+         style="fill:none;stroke:#ccf6ff;stroke-width:0.79374999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter1295)" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path1439"
+         d="m 158.28512,377.06758 0.89558,-26.47866 8.36461,4.72124 5.03711,-18.15449 14.41055,29.58781 4.76232,-14.86019 2.13509,8.91413 13.14889,-35.47329 6.48171,10.10111 4.31515,-7.80056"
+         style="fill:none;stroke:#a9f0ff;stroke-width:1.58749998;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         style="fill:none;stroke:#a9f0ff;stroke-width:1.58749998;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 268.37815,345.86695 24.24284,-10.68677 -0.62246,9.58486 18.54147,-3.34248 -20.39988,25.82534 15.45443,-2.16009 -7.10378,5.79281 37.66468,-3.55229 -6.28636,10.22381 8.90044,0.50146"
+         id="path1441"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:none;stroke:#a9f0ff;stroke-width:0.79374999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 282.91516,364.03824 30.04913,-11.71726 -0.56698,8.50446 13.04019,-3.96875 -13.98512,18.33185 6.42559,-1.51191 -0.56698,3.2128"
+         id="path1443"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:none;stroke:#a9f0ff;stroke-width:0.79374999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 204.45644,325.16148 -10.2693,-7.03416 4.10083,-2.37672 -13.4546,0.76929 1.39516,-2.34148"
+         id="path1447"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:none;stroke:#a9f0ff;stroke-width:0.79374999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 203.91158,357.02044 -7.87899,-16.22978 -0.72894,2.746 -2.80142,-1.74515 -3.98226,8.82797"
+         id="path1449"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:none;stroke:#a9f0ff;stroke-width:0.79374999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 199.38244,333.23318 -17.3869,-5.66964 7.74851,12.28423 -9.82738,1.32291 7.9375,11.71726 -15.875,7.55953 4.34672,16.06399"
+         id="path1451"
+         inkscape:connector-curvature="0" />
+      <g
+         transform="matrix(0.88390367,0,0,0.88390367,-54.764999,245.58928)"
+         id="g1521">
+        <path
+           inkscape:export-ydpi="250.44547"
+           inkscape:export-xdpi="250.44547"
+           inkscape:export-filename="/home/ash/Downloads/benthos.png"
            sodipodi:nodetypes="sszss"
-           inkscape:export-filename="/home/ash/Downloads/benthos.png"
-           inkscape:export-xdpi="250.44547"
-           inkscape:export-ydpi="250.44547" />
-        <path
-           style="fill:#ffc7c7;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.35896313;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-           d="m 284.71187,134.80709 c 6.27326,16.29971 26.60211,7.86896 30.84702,7.4043 3.43325,-0.37505 7.55075,2.35555 15.20914,2.60424 7.6584,0.24819 11.83642,-1.9575 18.41763,-1.01343 6.58121,0.94412 16.80221,10.04185 37.56439,3.85439 27.43619,-8.27926 -6.55171,-73.765816 -50.31821,-73.765816 -43.76645,0 -57.99329,44.616796 -51.71997,60.916316 z"
-           id="path1672-6"
            inkscape:connector-curvature="0"
-           sodipodi:nodetypes="zszzczz"
-           inkscape:export-filename="/home/ash/Downloads/benthos.png"
+           id="path1455"
+           d="m 292.43686,120.46069 -12.11895,11.38763 c -1.96085,1.84242 -9.98024,-7.19545 -8.72282,-13.32894 1.25738,-6.13319 17.00989,-5.72187 17.00989,-5.72187 2.1231,1.34162 4.81035,6.74369 3.83188,7.66318 z"
+           style="fill:#ff9197;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.35896313;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+        <path
+           inkscape:export-ydpi="250.44547"
            inkscape:export-xdpi="250.44547"
-           inkscape:export-ydpi="250.44547" />
+           inkscape:export-filename="/home/ash/Downloads/benthos.png"
+           sodipodi:nodetypes="zszzczz"
+           inkscape:connector-curvature="0"
+           id="path1457"
+           d="m 284.71187,134.80709 c 6.27326,16.29971 26.60211,7.86896 30.84702,7.4043 3.43325,-0.37505 7.55075,2.35555 15.20914,2.60424 7.6584,0.24819 11.83642,-1.9575 18.41763,-1.01343 6.58121,0.94412 16.80221,10.04185 37.56439,3.85439 27.43619,-8.27926 -6.55171,-73.765816 -50.31821,-73.765816 -43.76645,0 -57.99329,44.616796 -51.71997,60.916316 z"
+           style="fill:#ffc7c7;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.35896313;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+        <path
+           sodipodi:nodetypes="ccccccccccccccccccccccccccc"
+           inkscape:connector-curvature="0"
+           id="path1459"
+           d="m 390.28544,74.60998 -4.53026,13.085891 10.92138,-6.228735 -7.60234,9.736041 15.89013,6.667128 -11.95095,3.487915 7.64626,8.70012 -12.4769,-6.57303 4.03912,11.49926 -8.45094,-8.80134 -3.94723,-2.64379 -1.23115,-4.263503 -5.26822,-0.148194 0.25317,-4.759412 -3.84826,-0.324967 0.75676,-4.399281 -5.7368,-1.426235 1.60072,-3.264657 -8.13696,-5.803324 11.26885,3.023461 -1.06193,-12.48677 6.70128,10.18102 1.80558,-7.183638 1.6969,7.682043 5.37135,-3.518626 -1.01811,5.949427 z"
+           style="fill:#efefef;fill-opacity:1;stroke:none;stroke-width:0.40502131px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+           inkscape:export-xdpi="179.75954"
+           inkscape:export-ydpi="179.75954" />
+        <path
+           inkscape:export-ydpi="250.44547"
+           inkscape:export-xdpi="250.44547"
+           inkscape:export-filename="/home/ash/Downloads/benthos.png"
+           style="fill:#ff9197;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.35896313;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m 379.57743,123.3336 15.13802,15.94145 c 2.44931,2.57943 12.46289,-7.72338 11.01314,-16.06987 -1.44974,-8.34663 -21.49781,-8.50668 -21.49781,-8.50668 -2.7334,1.71683 -5.8756,7.34794 -4.65335,8.6351 z"
+           id="path1461"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="sszss" />
+        <g
+           transform="matrix(0.74213982,0,0,0.74213982,155.72076,-60.640945)"
+           id="g1497">
+          <path
+             inkscape:export-ydpi="179.75954"
+             inkscape:export-xdpi="179.75954"
+             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+             style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.52287358px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+             d="m 200.53889,209.27277 c -1.0959,1.64782 0.61215,11.99603 4.72476,15.82796 4.11266,3.83191 11.60919,0.31554 16.30043,2.78764 4.69124,2.472 4.77952,-12.18873 0,-16.34775 -4.77952,-4.15889 -12.70346,-0.0336 -14.26883,-1.22841 -1.56535,-1.19542 -5.66051,-2.6872 -6.75636,-1.03944 z"
+             id="path1463"
+             inkscape:connector-curvature="0"
+             sodipodi:nodetypes="zzzzzz" />
+          <path
+             inkscape:export-ydpi="179.75954"
+             inkscape:export-xdpi="179.75954"
+             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+             sodipodi:nodetypes="cssc"
+             inkscape:connector-curvature="0"
+             id="path1465"
+             d="m 218.87552,223.06911 c 0,0 0.23284,10.8496 -5.575,11.52843 -4.54484,0.53106 -4.36632,-1.64952 -8.2074,-4.2933 -3.62954,-2.49812 -8.50894,-2.7129 -8.23483,-5.62875"
+             style="fill:none;stroke:#000000;stroke-width:0.62868452;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+          <path
+             inkscape:export-ydpi="179.75954"
+             inkscape:export-xdpi="179.75954"
+             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+             style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:7.31380796;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+             d="m 210.26988,222.4432 c -1.62018,0.0768 -2.99624,-1.17378 -3.07431,-2.79392 -0.078,-1.62018 1.17146,-2.99712 2.7916,-3.07643 1.62006,-0.0793 2.99802,1.16898 3.07883,2.79372 0.0757,1.62499 -1.17598,2.99993 -2.79612,3.07663 z"
+             id="path1467"
+             inkscape:connector-curvature="0"
+             sodipodi:nodetypes="ssscs" />
+          <path
+             inkscape:export-ydpi="179.75954"
+             inkscape:export-xdpi="179.75954"
+             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+             style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.55268508"
+             id="path1469"
+             sodipodi:type="arc"
+             sodipodi:cx="220.52551"
+             sodipodi:cy="230.0802"
+             sodipodi:rx="16.644495"
+             sodipodi:ry="14.602841"
+             sodipodi:start="6.2736034"
+             sodipodi:end="6.2704097"
+             sodipodi:open="true"
+             d="m 237.16924,229.94028 a 16.644495,14.602841 0 0 1 -16.47096,14.74197 16.644495,14.602841 0 0 1 -16.81622,-14.43881 16.644495,14.602841 0 0 1 16.4441,-14.76503 16.644495,14.602841 0 0 1 16.84249,14.41524"
+             transform="matrix(0.9993991,-0.03466186,0.03935641,0.99922524,0,0)" />
+          <path
+             inkscape:export-ydpi="179.75954"
+             inkscape:export-xdpi="179.75954"
+             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+             transform="rotate(-2.1166912)"
+             d="m 238.46496,228.90682 a 16.042475,14.996225 0 0 1 -15.87522,15.1391 16.042475,14.996225 0 0 1 -16.20799,-14.82778 16.042475,14.996225 0 0 1 15.84933,-15.16278 16.042475,14.996225 0 0 1 16.2333,14.80357"
+             sodipodi:open="true"
+             sodipodi:end="6.2704097"
+             sodipodi:start="6.2736034"
+             sodipodi:ry="14.996225"
+             sodipodi:rx="16.042475"
+             sodipodi:cy="229.05051"
+             sodipodi:cx="222.42322"
+             sodipodi:type="arc"
+             id="path1471"
+             style="fill:#ffc7c7;fill-opacity:1;stroke:none;stroke-width:0.55268502" />
+          <path
+             inkscape:export-ydpi="179.75954"
+             inkscape:export-xdpi="179.75954"
+             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+             style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.52287358px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+             d="m 228.8729,209.61402 c 2.34581,7.5943 5.2654,8.95715 4.81084,11.96049 -0.45455,3.0033 3.86891,-0.88422 6.48144,0.46775 2.61259,1.35197 4.8978,6.22605 9.04664,6.80732 4.14904,0.58132 5.48754,-2.36926 8.4597,-6.67371 2.97218,-4.30446 1.1174,-8.27512 -0.13361,-16.43725 -1.25097,-8.16228 -31.01086,-3.71876 -28.66494,3.8754 z"
+             id="path1473"
+             inkscape:connector-curvature="0"
+             sodipodi:nodetypes="zzzzzzz" />
+          <path
+             inkscape:export-ydpi="179.75954"
+             inkscape:export-xdpi="179.75954"
+             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+             sodipodi:nodetypes="ssscs"
+             inkscape:connector-curvature="0"
+             id="path1475"
+             d="m 252.3312,229.36265 c -4.76146,0.22535 -8.80522,-3.44957 -9.0346,-8.21089 -0.22922,-4.76128 3.44259,-8.80788 8.20384,-9.04103 4.76107,-0.2331 8.81054,3.43554 9.04821,8.21027 0.22225,4.77541 -3.45605,8.81615 -8.21745,9.04165 z"
+             style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:8.72459221;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+          <path
+             inkscape:export-ydpi="179.75954"
+             inkscape:export-xdpi="179.75954"
+             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+             style="fill:#ffc7c7;fill-opacity:1;stroke:#000000;stroke-width:1.25736904;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+             d="m 228.69246,191.31076 c 0,0 -3.25277,31.14245 10.25162,24.19421 13.50439,-6.94829 29.20094,1.22813 27.59768,-17.4743"
+             id="path1477"
+             inkscape:connector-curvature="0"
+             sodipodi:nodetypes="czc" />
+          <path
+             inkscape:export-ydpi="179.75954"
+             inkscape:export-xdpi="179.75954"
+             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+             sodipodi:nodetypes="czc"
+             inkscape:connector-curvature="0"
+             id="path1479"
+             d="m 225.41787,195.56844 c 0,0 0.57797,24.59454 -11.07128,20.95702 -11.64932,-3.63752 -14.62819,3.47745 -13.91355,-12.32164"
+             style="fill:#ffc7c7;fill-opacity:1;stroke:#000000;stroke-width:1.25736904;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+          <path
+             inkscape:export-ydpi="179.75954"
+             inkscape:export-xdpi="179.75954"
+             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+             sodipodi:nodetypes="cc"
+             inkscape:connector-curvature="0"
+             id="path1481"
+             d="m 268.08677,207.6914 c -6.59707,4.33317 -4.50836,7.57466 2.55139,13.41831"
+             style="fill:none;stroke:#000000;stroke-width:0.62868452;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+          <path
+             inkscape:export-ydpi="179.75954"
+             inkscape:export-xdpi="179.75954"
+             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+             style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.31235546;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+             d="m 252.05435,223.52135 c -1.53726,0.0726 -2.84274,-1.1137 -2.91678,-2.65089 -0.0742,-1.53713 1.11143,-2.84364 2.64856,-2.91884 1.53713,-0.0752 2.84452,1.1091 2.92122,2.6506 0.0718,1.54178 -1.1158,2.8463 -2.653,2.91913 z"
+             id="path1483"
+             inkscape:connector-curvature="0"
+             sodipodi:nodetypes="ssscs" />
+          <path
+             inkscape:export-ydpi="179.75954"
+             inkscape:export-xdpi="179.75954"
+             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+             sodipodi:nodetypes="ssscs"
+             inkscape:connector-curvature="0"
+             id="path1485"
+             d="m 251.9738,221.82312 c -0.59978,0.0282 -1.10931,-0.43459 -1.13823,-1.03437 -0.0287,-0.5999 0.43371,-1.10972 1.03356,-1.13905 0.59978,-0.0295 1.10999,0.43281 1.13994,1.03436 0.0274,0.60156 -0.43542,1.11063 -1.03527,1.13906 z"
+             style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.12188669;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+          <path
+             inkscape:export-ydpi="179.75954"
+             inkscape:export-xdpi="179.75954"
+             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+             style="fill:none;stroke:#000000;stroke-width:0.62868452;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+             d="m 242.02237,221.65163 c 0,0 2.20727,6.93955 9.72135,7.66637 7.51416,0.72689 15.29793,-6.27494 19.19405,-2.65812 3.89626,3.61679 3.59096,13.04039 3.59096,13.04039"
+             id="path1487"
+             inkscape:connector-curvature="0"
+             sodipodi:nodetypes="czzc" />
+          <path
+             inkscape:export-ydpi="179.75954"
+             inkscape:export-xdpi="179.75954"
+             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+             style="fill:none;stroke:#000000;stroke-width:0.62868452;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+             d="m 231.29549,238.29093 c -0.24137,6.34867 2.53012,7.25201 5.2952,8.16743"
+             id="path1489"
+             inkscape:connector-curvature="0"
+             sodipodi:nodetypes="cc" />
+          <path
+             inkscape:export-ydpi="179.75954"
+             inkscape:export-xdpi="179.75954"
+             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+             style="fill:none;stroke:#000000;stroke-width:1.25736904;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+             d="m 196.47567,229.96721 c 16.00813,6.4595 15.98412,20.79346 36.76438,20.90621 20.7802,0.11267 23.35539,-14.34341 34.9574,-19.01626"
+             id="path1491"
+             inkscape:connector-curvature="0"
+             sodipodi:nodetypes="czc" />
+          <path
+             inkscape:export-ydpi="179.75954"
+             inkscape:export-xdpi="179.75954"
+             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+             style="fill:none;stroke:#000000;stroke-width:0.62868452;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+             d="m 210.55146,244.94885 c 0,0 6.09572,9.38783 11.9064,9.26059 3.45908,-0.0757 0.86678,3.05175 0.0375,6.43684 -0.56375,2.30121 1.44187,4.87963 1.44187,4.87963"
+             id="path1493"
+             inkscape:connector-curvature="0"
+             sodipodi:nodetypes="cssc" />
+          <path
+             inkscape:export-ydpi="179.75954"
+             inkscape:export-xdpi="179.75954"
+             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
+             sodipodi:nodetypes="cssc"
+             inkscape:connector-curvature="0"
+             id="path1495"
+             d="m 254.93298,247.35323 c 0,0 -4.79298,4.44437 -8.73265,6.58892 -3.03899,1.65419 -0.86678,3.05178 -0.0377,6.43684 0.56367,2.30124 -3.04555,9.02237 -3.04555,9.02237"
+             style="fill:none;stroke:#000000;stroke-width:0.62868452;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+        </g>
         <path
            inkscape:export-ydpi="179.75954"
            inkscape:export-xdpi="179.75954"
            inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-           style="fill:#efefef;fill-opacity:1;stroke:none;stroke-width:0.40502131px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-           d="m 390.28544,74.60998 -4.53026,13.085891 10.92138,-6.228735 -7.60234,9.736041 15.89013,6.667128 -11.95095,3.487915 7.64626,8.70012 -12.4769,-6.57303 4.03912,11.49926 -8.45094,-8.80134 -3.94723,-2.64379 -1.23115,-4.263503 -5.26822,-0.148194 0.25317,-4.759412 -3.84826,-0.324967 0.75676,-4.399281 -5.7368,-1.426235 1.60072,-3.264657 -8.13696,-5.803324 11.26885,3.023461 -1.06193,-12.48677 6.70128,10.18102 1.80558,-7.183638 1.6969,7.682043 5.37135,-3.518626 -1.01811,5.949427 z"
-           id="path10038-7"
-           inkscape:connector-curvature="0"
-           sodipodi:nodetypes="ccccccccccccccccccccccccccc" />
-        <path
-           sodipodi:nodetypes="sszss"
-           inkscape:connector-curvature="0"
-           id="path1674-5"
-           d="m 379.57743,123.3336 15.13802,15.94145 c 2.44931,2.57943 12.46289,-7.72338 11.01314,-16.06987 -1.44974,-8.34663 -21.49781,-8.50668 -21.49781,-8.50668 -2.7334,1.71683 -5.8756,7.34794 -4.65335,8.6351 z"
-           style="fill:#ff9197;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.35896313;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-           inkscape:export-filename="/home/ash/Downloads/benthos.png"
-           inkscape:export-xdpi="250.44547"
-           inkscape:export-ydpi="250.44547" />
-        <g
-           id="g10074-3"
-           transform="matrix(0.74213982,0,0,0.74213982,155.72076,-60.640945)">
-          <path
-             sodipodi:nodetypes="zzzzzz"
-             inkscape:connector-curvature="0"
-             id="path10040-5"
-             d="m 200.53889,209.27277 c -1.0959,1.64782 0.61215,11.99603 4.72476,15.82796 4.11266,3.83191 11.60919,0.31554 16.30043,2.78764 4.69124,2.472 4.77952,-12.18873 0,-16.34775 -4.77952,-4.15889 -12.70346,-0.0336 -14.26883,-1.22841 -1.56535,-1.19542 -5.66051,-2.6872 -6.75636,-1.03944 z"
-             style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.52287358px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-             inkscape:export-xdpi="179.75954"
-             inkscape:export-ydpi="179.75954" />
-          <path
-             style="fill:none;stroke:#000000;stroke-width:0.62868452;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-             d="m 218.87552,223.06911 c 0,0 0.23284,10.8496 -5.575,11.52843 -4.54484,0.53106 -4.36632,-1.64952 -8.2074,-4.2933 -3.62954,-2.49812 -8.50894,-2.7129 -8.23483,-5.62875"
-             id="path10042-6"
-             inkscape:connector-curvature="0"
-             sodipodi:nodetypes="cssc"
-             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-             inkscape:export-xdpi="179.75954"
-             inkscape:export-ydpi="179.75954" />
-          <path
-             sodipodi:nodetypes="ssscs"
-             inkscape:connector-curvature="0"
-             id="path10044-2"
-             d="m 210.26988,222.4432 c -1.62018,0.0768 -2.99624,-1.17378 -3.07431,-2.79392 -0.078,-1.62018 1.17146,-2.99712 2.7916,-3.07643 1.62006,-0.0793 2.99802,1.16898 3.07883,2.79372 0.0757,1.62499 -1.17598,2.99993 -2.79612,3.07663 z"
-             style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:7.31380796;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-             inkscape:export-xdpi="179.75954"
-             inkscape:export-ydpi="179.75954" />
-          <path
-             transform="matrix(0.9993991,-0.03466186,0.03935641,0.99922524,0,0)"
-             d="m 237.16924,229.94028 a 16.644495,14.602841 0 0 1 -16.47096,14.74197 16.644495,14.602841 0 0 1 -16.81622,-14.43881 16.644495,14.602841 0 0 1 16.4441,-14.76503 16.644495,14.602841 0 0 1 16.84249,14.41524"
-             sodipodi:open="true"
-             sodipodi:end="6.2704097"
-             sodipodi:start="6.2736034"
-             sodipodi:ry="14.602841"
-             sodipodi:rx="16.644495"
-             sodipodi:cy="230.0802"
-             sodipodi:cx="220.52551"
-             sodipodi:type="arc"
-             id="path10046-9"
-             style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.55268508"
-             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-             inkscape:export-xdpi="179.75954"
-             inkscape:export-ydpi="179.75954" />
-          <path
-             style="fill:#ffc7c7;fill-opacity:1;stroke:none;stroke-width:0.55268502"
-             id="path10048-1"
-             sodipodi:type="arc"
-             sodipodi:cx="222.42322"
-             sodipodi:cy="229.05051"
-             sodipodi:rx="16.042475"
-             sodipodi:ry="14.996225"
-             sodipodi:start="6.2736034"
-             sodipodi:end="6.2704097"
-             sodipodi:open="true"
-             d="m 238.46496,228.90682 a 16.042475,14.996225 0 0 1 -15.87522,15.1391 16.042475,14.996225 0 0 1 -16.20799,-14.82778 16.042475,14.996225 0 0 1 15.84933,-15.16278 16.042475,14.996225 0 0 1 16.2333,14.80357"
-             transform="rotate(-2.1166912)"
-             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-             inkscape:export-xdpi="179.75954"
-             inkscape:export-ydpi="179.75954" />
-          <path
-             sodipodi:nodetypes="zzzzzzz"
-             inkscape:connector-curvature="0"
-             id="path10050-2"
-             d="m 228.8729,209.61402 c 2.34581,7.5943 5.2654,8.95715 4.81084,11.96049 -0.45455,3.0033 3.86891,-0.88422 6.48144,0.46775 2.61259,1.35197 4.8978,6.22605 9.04664,6.80732 4.14904,0.58132 5.48754,-2.36926 8.4597,-6.67371 2.97218,-4.30446 1.1174,-8.27512 -0.13361,-16.43725 -1.25097,-8.16228 -31.01086,-3.71876 -28.66494,3.8754 z"
-             style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.52287358px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-             inkscape:export-xdpi="179.75954"
-             inkscape:export-ydpi="179.75954" />
-          <path
-             style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:8.72459221;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-             d="m 252.3312,229.36265 c -4.76146,0.22535 -8.80522,-3.44957 -9.0346,-8.21089 -0.22922,-4.76128 3.44259,-8.80788 8.20384,-9.04103 4.76107,-0.2331 8.81054,3.43554 9.04821,8.21027 0.22225,4.77541 -3.45605,8.81615 -8.21745,9.04165 z"
-             id="path10052-7"
-             inkscape:connector-curvature="0"
-             sodipodi:nodetypes="ssscs"
-             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-             inkscape:export-xdpi="179.75954"
-             inkscape:export-ydpi="179.75954" />
-          <path
-             sodipodi:nodetypes="czc"
-             inkscape:connector-curvature="0"
-             id="path10054-0"
-             d="m 228.69246,191.31076 c 0,0 -3.25277,31.14245 10.25162,24.19421 13.50439,-6.94829 29.20094,1.22813 27.59768,-17.4743"
-             style="fill:#ffc7c7;fill-opacity:1;stroke:#000000;stroke-width:1.25736904;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-             inkscape:export-xdpi="179.75954"
-             inkscape:export-ydpi="179.75954" />
-          <path
-             style="fill:#ffc7c7;fill-opacity:1;stroke:#000000;stroke-width:1.25736904;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-             d="m 225.41787,195.56844 c 0,0 0.57797,24.59454 -11.07128,20.95702 -11.64932,-3.63752 -14.62819,3.47745 -13.91355,-12.32164"
-             id="path10056-9"
-             inkscape:connector-curvature="0"
-             sodipodi:nodetypes="czc"
-             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-             inkscape:export-xdpi="179.75954"
-             inkscape:export-ydpi="179.75954" />
-          <path
-             style="fill:none;stroke:#000000;stroke-width:0.62868452;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-             d="m 268.08677,207.6914 c -6.59707,4.33317 -4.50836,7.57466 2.55139,13.41831"
-             id="path10058-3"
-             inkscape:connector-curvature="0"
-             sodipodi:nodetypes="cc"
-             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-             inkscape:export-xdpi="179.75954"
-             inkscape:export-ydpi="179.75954" />
-          <path
-             sodipodi:nodetypes="ssscs"
-             inkscape:connector-curvature="0"
-             id="path10060-6"
-             d="m 252.05435,223.52135 c -1.53726,0.0726 -2.84274,-1.1137 -2.91678,-2.65089 -0.0742,-1.53713 1.11143,-2.84364 2.64856,-2.91884 1.53713,-0.0752 2.84452,1.1091 2.92122,2.6506 0.0718,1.54178 -1.1158,2.8463 -2.653,2.91913 z"
-             style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.31235546;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-             inkscape:export-xdpi="179.75954"
-             inkscape:export-ydpi="179.75954" />
-          <path
-             style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.12188669;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-             d="m 251.9738,221.82312 c -0.59978,0.0282 -1.10931,-0.43459 -1.13823,-1.03437 -0.0287,-0.5999 0.43371,-1.10972 1.03356,-1.13905 0.59978,-0.0295 1.10999,0.43281 1.13994,1.03436 0.0274,0.60156 -0.43542,1.11063 -1.03527,1.13906 z"
-             id="path10062-0"
-             inkscape:connector-curvature="0"
-             sodipodi:nodetypes="ssscs"
-             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-             inkscape:export-xdpi="179.75954"
-             inkscape:export-ydpi="179.75954" />
-          <path
-             sodipodi:nodetypes="czzc"
-             inkscape:connector-curvature="0"
-             id="path10064-6"
-             d="m 242.02237,221.65163 c 0,0 2.20727,6.93955 9.72135,7.66637 7.51416,0.72689 15.29793,-6.27494 19.19405,-2.65812 3.89626,3.61679 3.59096,13.04039 3.59096,13.04039"
-             style="fill:none;stroke:#000000;stroke-width:0.62868452;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-             inkscape:export-xdpi="179.75954"
-             inkscape:export-ydpi="179.75954" />
-          <path
-             sodipodi:nodetypes="cc"
-             inkscape:connector-curvature="0"
-             id="path10066-2"
-             d="m 231.29549,238.29093 c -0.24137,6.34867 2.53012,7.25201 5.2952,8.16743"
-             style="fill:none;stroke:#000000;stroke-width:0.62868452;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-             inkscape:export-xdpi="179.75954"
-             inkscape:export-ydpi="179.75954" />
-          <path
-             sodipodi:nodetypes="czc"
-             inkscape:connector-curvature="0"
-             id="path10068-6"
-             d="m 196.47567,229.96721 c 16.00813,6.4595 15.98412,20.79346 36.76438,20.90621 20.7802,0.11267 23.35539,-14.34341 34.9574,-19.01626"
-             style="fill:none;stroke:#000000;stroke-width:1.25736904;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-             inkscape:export-xdpi="179.75954"
-             inkscape:export-ydpi="179.75954" />
-          <path
-             sodipodi:nodetypes="cssc"
-             inkscape:connector-curvature="0"
-             id="path10070-1"
-             d="m 210.55146,244.94885 c 0,0 6.09572,9.38783 11.9064,9.26059 3.45908,-0.0757 0.86678,3.05175 0.0375,6.43684 -0.56375,2.30121 1.44187,4.87963 1.44187,4.87963"
-             style="fill:none;stroke:#000000;stroke-width:0.62868452;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-             inkscape:export-xdpi="179.75954"
-             inkscape:export-ydpi="179.75954" />
-          <path
-             style="fill:none;stroke:#000000;stroke-width:0.62868452;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-             d="m 254.93298,247.35323 c 0,0 -4.79298,4.44437 -8.73265,6.58892 -3.03899,1.65419 -0.86678,3.05178 -0.0377,6.43684 0.56367,2.30124 -3.04555,9.02237 -3.04555,9.02237"
-             id="path10072-8"
-             inkscape:connector-curvature="0"
-             sodipodi:nodetypes="cssc"
-             inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-             inkscape:export-xdpi="179.75954"
-             inkscape:export-ydpi="179.75954" />
-        </g>
-        <path
-           style="fill:#efefef;fill-opacity:1;stroke:none;stroke-width:0.37049296px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-           d="m 283.57439,77.253623 5.1428,11.576366 -10.43703,-4.831445 7.68357,8.285293 -13.96695,7.307634 11.16298,2.253479 -6.29544,8.52203 10.86319,-6.95746 -2.79088,10.79404 7.02103,-8.67671 3.39298,-2.71547 0.79193,-3.981325 4.79034,-0.543176 -0.59933,-4.318395 3.48247,-0.594093 -1.03053,-3.951229 5.11835,-1.744271 -1.7118,-2.851654 6.96713,-5.919741 -10.03709,3.628541 7.8e-4,-11.46344 -5.31945,9.798717 -2.2021,-6.407776 -0.95161,7.133275 -5.16844,-2.791036 1.38887,5.343878 z"
-           id="path1885"
-           inkscape:connector-curvature="0"
            sodipodi:nodetypes="ccccccccccccccccccccccccccc"
-           inkscape:export-filename="/home/ash/Pictures/benthoses/professor_benthos.png"
-           inkscape:export-xdpi="179.75954"
-           inkscape:export-ydpi="179.75954" />
+           inkscape:connector-curvature="0"
+           id="path1499"
+           d="m 283.57439,77.253623 5.1428,11.576366 -10.43703,-4.831445 7.68357,8.285293 -13.96695,7.307634 11.16298,2.253479 -6.29544,8.52203 10.86319,-6.95746 -2.79088,10.79404 7.02103,-8.67671 3.39298,-2.71547 0.79193,-3.981325 4.79034,-0.543176 -0.59933,-4.318395 3.48247,-0.594093 -1.03053,-3.951229 5.11835,-1.744271 -1.7118,-2.851654 6.96713,-5.919741 -10.03709,3.628541 7.8e-4,-11.46344 -5.31945,9.798717 -2.2021,-6.407776 -0.95161,7.133275 -5.16844,-2.791036 1.38887,5.343878 z"
+           style="fill:#efefef;fill-opacity:1;stroke:none;stroke-width:0.37049296px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
         <g
-           id="g10152-7"
-           transform="matrix(1.0453125,0,0,1.0453125,393.19095,391.15982)">
+           transform="matrix(1.0453125,0,0,1.0453125,393.19095,391.15982)"
+           id="g1509">
           <rect
-             style="opacity:1;fill:#efefef;fill-opacity:1;stroke:none;stroke-width:0.72772723;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-             id="rect10078-9"
-             width="7.8668332"
-             height="3.3622057"
-             x="50.256245"
-             y="-260.59399"
+             transform="matrix(-0.97533084,-0.22074814,-0.22074814,0.97533084,0,0)"
              ry="1.1207353"
-             transform="matrix(-0.97533084,-0.22074814,-0.22074814,0.97533084,0,0)" />
+             y="-260.59399"
+             x="50.256245"
+             height="3.3622057"
+             width="7.8668332"
+             id="rect1501"
+             style="opacity:1;fill:#efefef;fill-opacity:1;stroke:none;stroke-width:0.72772723;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
           <rect
-             style="opacity:1;fill:#efefef;fill-opacity:1;stroke:none;stroke-width:0.88757706;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-             id="rect10080-2"
-             width="5.0993462"
-             height="15.578223"
-             x="51.639984"
+             transform="matrix(-0.97533084,-0.22074814,-0.22074814,0.97533084,0,0)"
              y="-258.9689"
-             transform="matrix(-0.97533084,-0.22074814,-0.22074814,0.97533084,0,0)" />
+             x="51.639984"
+             height="15.578223"
+             width="5.0993462"
+             id="rect1503"
+             style="opacity:1;fill:#efefef;fill-opacity:1;stroke:none;stroke-width:0.88757706;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
           <path
-             style="opacity:1;fill:#efefef;fill-opacity:1;stroke:none;stroke-width:0.81823868;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+             sodipodi:nodetypes="cccsssscc"
+             inkscape:connector-curvature="0"
+             id="path1505"
              d="m 1.0007309,-257.0766 3.0888373,0.6991 7.0350118,24.73908 -0.3108,1.37318 c -0.178174,0.78725 -0.8602296,1.2991 -1.5292751,1.14768 l -24.7106799,-5.59281 c -0.669045,-0.15143 -1.064218,-0.9071 -0.886044,-1.69434 l 0.3108,-1.37318 z"
-             id="path10082-0"
+             style="opacity:1;fill:#efefef;fill-opacity:1;stroke:none;stroke-width:0.81823868;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+          <path
+             style="opacity:1;fill:#56cbe3;fill-opacity:1;stroke:none;stroke-width:0.81823868;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+             d="m 9.3658271,-237.82319 1.7587529,6.18477 -0.3108,1.37318 c -0.178174,0.78725 -0.8602296,1.2991 -1.5292751,1.14768 l -24.7106799,-5.59281 c -0.669045,-0.15143 -1.064218,-0.9071 -0.886044,-1.69434 l 0.3108,-1.37318 z"
+             id="path1507"
+             inkscape:connector-curvature="0"
+             sodipodi:nodetypes="ccsssscc" />
+        </g>
+        <g
+           transform="matrix(1.0453125,0,0,1.0453125,489.20105,353.62501)"
+           id="g1519">
+          <rect
+             transform="rotate(-13.070497)"
+             style="opacity:1;fill:#efefef;fill-opacity:1;stroke:none;stroke-width:0.6580267;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+             id="rect1511"
+             width="7.1133604"
+             height="3.0401793"
+             x="-147.99796"
+             y="-272.33472"
+             ry="1.0133932" />
+          <rect
+             transform="rotate(-13.070497)"
+             style="opacity:1;fill:#efefef;fill-opacity:1;stroke:none;stroke-width:0.80256635;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+             id="rect1513"
+             width="4.6109385"
+             height="14.086165"
+             x="-146.74675"
+             y="-270.86526" />
+          <path
+             style="opacity:1;fill:#efefef;fill-opacity:1;stroke:none;stroke-width:0.73986906;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+             d="m -198.92194,-224.44824 -2.78945,0.64761 -6.23714,22.40451 0.28791,1.24009 c 0.16505,0.71094 0.78434,1.17034 1.38854,1.03007 l 22.31555,-5.18088 c 0.6042,-0.14027 0.95774,-0.82554 0.79268,-1.53648 l -0.2879,-1.24008 z"
+             id="path1515"
              inkscape:connector-curvature="0"
              sodipodi:nodetypes="cccsssscc" />
           <path
              sodipodi:nodetypes="ccsssscc"
              inkscape:connector-curvature="0"
-             id="path10084-2"
-             d="m 9.3658271,-237.82319 1.7587529,6.18477 -0.3108,1.37318 c -0.178174,0.78725 -0.8602296,1.2991 -1.5292751,1.14768 l -24.7106799,-5.59281 c -0.669045,-0.15143 -1.064218,-0.9071 -0.886044,-1.69434 l 0.3108,-1.37318 z"
-             style="opacity:1;fill:#56cbe3;fill-opacity:1;stroke:none;stroke-width:0.81823868;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
-        </g>
-        <g
-           id="g10146-3"
-           transform="matrix(1.0453125,0,0,1.0453125,489.20105,353.62501)">
-          <rect
-             ry="1.0133932"
-             y="-272.33472"
-             x="-147.99796"
-             height="3.0401793"
-             width="7.1133604"
-             id="rect10086-7"
-             style="opacity:1;fill:#efefef;fill-opacity:1;stroke:none;stroke-width:0.6580267;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-             transform="rotate(-13.070497)" />
-          <rect
-             y="-270.86526"
-             x="-146.74675"
-             height="14.086165"
-             width="4.6109385"
-             id="rect10088-5"
-             style="opacity:1;fill:#efefef;fill-opacity:1;stroke:none;stroke-width:0.80256635;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-             transform="rotate(-13.070497)" />
-          <path
-             sodipodi:nodetypes="cccsssscc"
-             inkscape:connector-curvature="0"
-             id="path10090-9"
-             d="m -198.92194,-224.44824 -2.78945,0.64761 -6.23714,22.40451 0.28791,1.24009 c 0.16505,0.71094 0.78434,1.17034 1.38854,1.03007 l 22.31555,-5.18088 c 0.6042,-0.14027 0.95774,-0.82554 0.79268,-1.53648 l -0.2879,-1.24008 z"
-             style="opacity:1;fill:#efefef;fill-opacity:1;stroke:none;stroke-width:0.73986906;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
-          <path
-             style="opacity:1;fill:#6ee356;fill-opacity:1;stroke:none;stroke-width:0.73986906;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+             id="path1517"
              d="m -206.38924,-206.99724 -1.55929,5.60112 0.28791,1.24009 c 0.16505,0.71094 0.78434,1.17034 1.38854,1.03007 l 22.31555,-5.18088 c 0.6042,-0.14027 0.95774,-0.82554 0.79268,-1.53648 l -0.2879,-1.24008 z"
-             id="path10092-2"
-             inkscape:connector-curvature="0"
-             sodipodi:nodetypes="ccsssscc" />
+             style="opacity:1;fill:#6ee356;fill-opacity:1;stroke:none;stroke-width:0.73986906;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
         </g>
       </g>
     </g>

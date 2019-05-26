@@ -43,7 +43,34 @@ body {
   width: 50%;
   bottom: 0px;
   right: 0px;
+  font-size: 11pt;
   border-left: 2px solid #202020;
+  overflow: auto;
+  font-family: monospace;
+}
+
+#editorOutput > * {
+  margin: 0px 10px;
+}
+
+a {
+  color: rgb(189, 255, 103);
+}
+
+.logMessage {
+  color: rgb(183, 255, 245);
+}
+
+.errorMessage {
+  color: rgb(255, 188, 183);
+}
+
+.lintMessage {
+  color: rgb(255, 230, 183);
+}
+
+.infoMessage {
+  color: rgb(183, 220, 255);
 }
 
 #addComponentWindow {
