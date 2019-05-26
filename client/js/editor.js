@@ -108,10 +108,18 @@ var clearOutput = function() {
 };
 
 var useSetting = function(id, onchange) {
+    var currentVal = window.Cookies.get(id);
+
     var settingField = document.getElementById(id);
+    if ( typeof(currentVal) === "string" && currentVal.length > 0 ) {
+        settingField.value = currentVal;
+    }
+
     settingField.onchange = function(e) {
+        window.Cookies.set(id, e.target.value, { expires: 30 });
         onchange(e.target);
     };
+
     onchange(settingField);
 };
 
