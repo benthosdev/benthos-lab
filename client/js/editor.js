@@ -1,13 +1,13 @@
 var configTab, inputTab;
 
-var welcomeContent = document.createElement("div");
-welcomeContent.innerHTML = `
-<p>
+var aboutContent = document.createElement("div");
+aboutContent.innerHTML = `<p>
 Welcome to the Benthos Lab, a place where you can experiment with Benthos
 pipeline configurations and share them with others.
-</p>
+</p>`;
 
-<p>
+var aboutContent2 = document.createElement("div");
+aboutContent2.innerHTML = `<p>
 Edit your pipeline configuration as well as the input data on the left by
 changing tabs. When you're ready to try your pipeline click 'Compile'.
 </p>
@@ -26,9 +26,10 @@ Is your config ugly or incomplete? Click 'Normalise' to have Benthos format it.
 <p>
 Some components might not work within the sandbox of your browser, but you can
 still write and share configs that use them.
-</p>
+</p>`;
 
-<p class="infoMessage">
+var aboutContent3 = document.createElement("div");
+aboutContent3.innerHTML = `<p class="infoMessage">
 For more information about Benthos check out the website at
 <a href="https://www.benthos.dev/" target="_blank">https://www.benthos.dev/</a>.
 </p>`;
@@ -100,13 +101,16 @@ var initLabControls = function() {
     inputTab.onclick = openInput;
 
     let setWelcomeText = function() {
-        writeOutputElement(welcomeContent);
+        writeOutputElement(aboutContent);
+        writeOutputElement(aboutContent2);
+        writeOutputElement(aboutContent3);
     };
 
     document.getElementById("aboutBtn").onclick = setWelcomeText;
     document.getElementById("clearOutputBtn").onclick = clearOutput;
 
-    setWelcomeText();
+    writeOutputElement(aboutContent);
+    writeOutputElement(aboutContent3);
 };
 
 if (!WebAssembly.instantiateStreaming) {

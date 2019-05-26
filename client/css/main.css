@@ -6,19 +6,39 @@ body {
   margin: 0px;
 }
 
+#notFoundText {
+  width: 100%;
+  text-align: center;
+  position: fixed;
+  top: 100px;
+  font-size: 1.5em;
+  color: #a2ff91;
+}
+
+#notFoundText > h4 {
+  padding: 0px;
+  margin: 0px;
+}
+
 .undecorated {
   color: #fff;
   text-decoration: none;
 }
 
 .navbar {
+  position: absolute;
   height: 35px;
+  top: 0;
+  left: 0;
+  right: 0;
   padding: 5px 15px;
   background-color: #33352e;
 }
 
 .navbar > h4 {
-  display: inline;
+  display: inline-block;
+  margin: 0px;
+  padding-top: 6px;
 }
 
 .prof-img {
@@ -86,11 +106,6 @@ a {
   margin-bottom: 5px;
 }
 
-button {
-  cursor: pointer;
-  transition: background-color 0.5s;
-}
-
 select {
   cursor: pointer;
   background-color: #33352e;
@@ -127,12 +142,16 @@ select {
 }
 
 .btn {
-  border: 1px;
   padding: 7px;
   border-radius: 3px;
   color: #fff;
   margin: 0px 2px;
   min-width: 80px;
+  display: inline;
+  text-decoration: none;
+  font-size: 11pt;
+  cursor: pointer;
+  transition: background-color 0.5s, border-color 0.5s;
 }
 
 .button-group {
@@ -141,40 +160,48 @@ select {
 }
 
 .btn-primary {
-  background-color: rgb(18, 185, 116) !important;
+  background-color: rgb(18, 185, 116);
+  border-color: rgb(18, 185, 116);
 }
 
 .btn-primary:hover {
-  background-color: rgb(18, 151, 96) !important;
+  background-color: rgb(18, 151, 96);
+  border-color: rgb(18, 151, 96);
 }
 
 .btn-secondary {
-  background-color: rgb(18, 151, 185) !important;
+  background-color: rgb(18, 151, 185);
+  border-color: rgb(18, 151, 185);
 }
 
 .btn-secondary:hover {
-  background-color: rgb(17, 112, 136) !important;
+  background-color: rgb(17, 112, 136);
+  border-color: rgb(17, 112, 136);
 }
 
 .btn-disabled {
-  background-color: rgb(117, 117, 117) !important;
+  background-color: rgb(117, 117, 117);
+  border-color: rgb(117, 117, 117);
 }
 
 .btn-disabled:hover {
-  background-color: rgb(102, 102, 102) !important;
+  background-color: rgb(102, 102, 102);
+  border-color: rgb(102, 102, 102);
 }
 
 .btn-warning {
-  background-color: rgb(216, 80, 51) !important;
+  background-color: rgb(216, 80, 51);
+  border-color: rgb(216, 80, 51);
 }
 
 .btn-warning:hover {
-  background-color: rgb(177, 63, 37) !important;
+  background-color: rgb(177, 63, 37);
+  border-color: rgb(177, 63, 37);
 }
 
 @media (max-width: 90rem) {
   #warningGroup {
-    position: absolute;
+    position: fixed;
     right: 0px;
     bottom: 30%;
     margin-bottom: 10px;
@@ -215,7 +242,7 @@ select {
 
 @media (max-width: 60rem) {
   #shareGroup {
-    position: absolute;
+    position: fixed;
     right: 0px;
     top: 70%;
     margin-top: 5px;
@@ -236,7 +263,7 @@ select {
   }
 
   #happyGroup {
-    position: absolute;
+    position: fixed;
     right: 0px;
     top: 0px;
     margin-top: 7px;
