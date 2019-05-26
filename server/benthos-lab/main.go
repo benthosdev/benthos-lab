@@ -45,6 +45,47 @@ import (
 
 //------------------------------------------------------------------------------
 
+func hijackCode(code int, w http.ResponseWriter, r *http.Request, hijacker http.HandlerFunc) http.ResponseWriter {
+	return &codeHijacker{
+		w:        w,
+		r:        r,
+		code:     code,
+		hijacker: hijacker,
+	}
+}
+
+type codeHijacker struct {
+	w http.ResponseWriter
+	r *http.Request
+
+	code     int
+	hijacked bool
+
+	hijacker http.HandlerFunc
+}
+
+func (c *codeHijacker) Header() http.Header {
+	return c.w.Header()
+}
+
+func (c *codeHijacker) Write(msg []byte) (int, error) {
+	if c.hijacked {
+		c.hijacker(c.w, c.r)
+		return len(msg), nil
+	}
+	return c.w.Write(msg)
+}
+
+func (c *codeHijacker) WriteHeader(statusCode int) {
+	if statusCode == c.code {
+		c.hijacked = true
+	} else {
+		c.w.WriteHeader(statusCode)
+	}
+}
+
+//------------------------------------------------------------------------------
+
 type labState struct {
 	Config string `json:"config"`
 	Input  string `json:"input"`
@@ -158,7 +199,26 @@ func main() {
 	mWASMGet304 := httpStats.GetCounter("wasm.get.304")
 	mWASMGetNoGZIP := httpStats.GetCounter("wasm.no_gzip")
 
-	mux.Handle("/", fileServe)
+	notFoundHandler := func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Del("Content-Type")
+		w.Header().Set("Content-Type", "text/html")
+		w.WriteHeader(http.StatusNotFound)
+		notFoundFile, err := os.Open(filepath.Join(*wwwPath, "/404.html"))
+		if err != nil {
+			log.Errorf("Failed to open 404.html: %v\n", err)
+			w.Write([]byte("Not found"))
+			return
+		}
+		defer notFoundFile.Close()
+		if _, err = io.Copy(w, notFoundFile); err != nil {
+			log.Errorf("Failed to write 404.html: %v\n", err)
+			w.Write([]byte("Not found"))
+		}
+	}
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fileServe.ServeHTTP(hijackCode(http.StatusNotFound, w, r, notFoundHandler), r)
+	})
 
 	mux.HandleFunc("/wasm/benthos-lab.wasm", func(w http.ResponseWriter, r *http.Request) {
 		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
@@ -186,6 +246,7 @@ func main() {
 
 	templateRegexp := regexp.MustCompile(`// BENTHOS LAB START([\n]|.)*// BENTHOS LAB END`)
 	indexPath := filepath.Join(*wwwPath, "/index.html")
+
 	mux.HandleFunc("/l/", func(w http.ResponseWriter, r *http.Request) {
 		path := strings.TrimPrefix(r.URL.Path, "/l/")
 		if len(path) == 0 {
@@ -196,8 +257,12 @@ func main() {
 
 		stateBody, err := cache.Get(path)
 		if err != nil {
-			http.Error(w, "Server failed", http.StatusBadGateway)
-			log.Errorf("Failed to read state: %v\n", err)
+			if err == types.ErrKeyNotFound {
+				notFoundHandler(w, r)
+			} else {
+				http.Error(w, "Server failed", http.StatusBadGateway)
+				log.Errorf("Failed to read state: %v\n", err)
+			}
 			return
 		}
 
