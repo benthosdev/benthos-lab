@@ -42,6 +42,7 @@
     <div class="button-group" id="tabGroup">
       <button id="configTab" class="tab">Config</button>
       <button id="inputTab" class="tab">Input</button>
+      <button id="settingsTab" class="tab">Settings</button>
     </div>
     <div class="button-group" id="happyGroup">
       <button id="compileBtn" class="btn btn-primary">Compile</button>
@@ -63,6 +64,20 @@
       <img style="max-width:50%;" src="/img/logo.svg"/>
     </div>
   </div>
+  <div id="settings" class="hidden">
+    <h2>Settings</h2>
+    <div>
+      <div class="setting">
+        <span>Key mapping: </span>
+        <select class="setting" id="keymapSelect" name="keymap-selector">
+          <option value="" selected>Standard</option>
+          <option value="ace/keyboard/vim">Vim</option>
+          <option value="ace/keyboard/emacs">Emacs</option>
+        </select>
+      </div>
+      <p class="setting">These settings are hopefully saved by your browser.</p>
+    </div>
+  </div>
   <div id="addComponentWindow">
     <select id="procSelect" name="processor-selector">
       <option value="" selected>Add processor</option>
@@ -81,6 +96,9 @@
   <script src="/vendor/ace/ace.js" type="text/javascript" charset="utf-8"></script>
   <script>
       var editor = ace.edit("editor");
+      useSetting("keymapSelect", function(e) {
+        editor.setKeyboardHandler(e.value);
+      });
 
       var configSession = ace.createEditSession(model.config, "ace/mode/yaml");
       configSession.setTabSize(2);

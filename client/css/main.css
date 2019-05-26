@@ -6,6 +6,24 @@ body {
   margin: 0px;
 }
 
+h1, h2, h3, h4 {
+  color: rgb(209, 252, 124);
+}
+
+h1 > a, h2 > a, h3 > a, h4 > a {
+  color: rgb(209, 252, 124) !important;
+}
+
+.normal-mode .ace_hidden-cursors .ace_cursor {
+  background-color: transparent;
+  border: 1px solid #F92672;
+  opacity: 0.7;
+}
+
+.normal-mode .ace_cursor {
+  background-color: rgba(249, 38, 115, 0.65);
+}
+
 #notFoundText {
   width: 100%;
   text-align: center;
@@ -49,7 +67,26 @@ body {
   z-index: 10;
 }
 
-#editor {
+#settings {
+  padding: 10px;
+  text-align: center
+}
+
+#settings > div {
+  display: inline-block;
+  text-align: center;
+}
+
+.setting {
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+#settings > h2 {
+  text-align: center;
+}
+
+#editor, #settings {
   position: absolute;
   top: 50px;
   width: 50%;
@@ -74,23 +111,23 @@ body {
 }
 
 a {
-  color: rgb(189, 255, 103);
+  color: #A6E22E;
 }
 
 .logMessage {
-  color: rgb(183, 255, 245);
+  color: #E6DB74;
 }
 
 .errorMessage {
-  color: rgb(255, 188, 183);
+  color: #F92672;
 }
 
 .lintMessage {
-  color: rgb(255, 230, 183);
+  color: #FD971F;
 }
 
 .infoMessage {
-  color: rgb(183, 220, 255);
+  color: #66D9EF;
 }
 
 #addComponentWindow {
@@ -215,7 +252,7 @@ select {
     margin-top: 5px;
   }
 
-  #editor {
+  #editor, #settings {
     width: 100%;
     top: 50px;
     bottom: 30%;

@@ -1,4 +1,4 @@
-var configTab, inputTab;
+var configTab, inputTab, settingsTab;
 
 var aboutContent = document.createElement("div");
 aboutContent.innerHTML = `<p>
@@ -37,20 +37,35 @@ For more information about Benthos check out the website at
 
 var openConfig = function() {
     document.getElementById("addComponentWindow").classList.remove("hidden");
+    document.getElementById("editor").classList.remove("hidden");
+    document.getElementById("settings").classList.add("hidden");
     configTab.classList.add("openTab");
     inputTab.classList.remove("openTab");
+    settingsTab.classList.remove("openTab");
     editor.setSession(configSession);
 };
 
 var openInput = function() {
     document.getElementById("addComponentWindow").classList.add("hidden");
+    document.getElementById("editor").classList.remove("hidden");
+    document.getElementById("settings").classList.add("hidden");
     configTab.classList.remove("openTab");
     inputTab.classList.add("openTab");
+    settingsTab.classList.remove("openTab");
     editor.setSession(inputSession);
 };
 
+var openSettings = function() {
+    document.getElementById("addComponentWindow").classList.add("hidden");
+    document.getElementById("editor").classList.add("hidden");
+    document.getElementById("settings").classList.remove("hidden");
+    configTab.classList.remove("openTab");
+    inputTab.classList.remove("openTab");
+    settingsTab.classList.add("openTab");
+};
+
 var writeOutput = function(value, style) {
-    var pre = document.createElement("pre");
+    var pre = document.createElement("div");
     if ( style ) {
         pre.classList.add(style);
     }
@@ -92,13 +107,23 @@ var clearOutput = function() {
     outputDiv.innerText = "";
 };
 
+var useSetting = function(id, onchange) {
+    var settingField = document.getElementById(id);
+    settingField.onchange = function(e) {
+        onchange(e.target);
+    };
+    onchange(settingField);
+};
+
 var initLabControls = function() {
     configTab = document.getElementById("configTab");
     inputTab = document.getElementById("inputTab");
+    settingsTab = document.getElementById("settingsTab");
     configTab.classList.add("openTab");
 
     configTab.onclick = openConfig;
     inputTab.onclick = openInput;
+    settingsTab.onclick = openSettings;
 
     let setWelcomeText = function() {
         writeOutputElement(aboutContent);
