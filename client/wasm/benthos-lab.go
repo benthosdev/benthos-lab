@@ -50,14 +50,6 @@ import (
 
 //------------------------------------------------------------------------------
 
-// Build stamps.
-var (
-	Version   string
-	DateBuilt string
-)
-
-//------------------------------------------------------------------------------
-
 // Create pipeline and output layers.
 var pipelineLayer types.Pipeline
 var closeFn = func() {}

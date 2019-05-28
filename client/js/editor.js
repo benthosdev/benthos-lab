@@ -120,6 +120,7 @@ var useSetting = function(id, onchange) {
         onchange(e.target);
     };
 
+    window.Cookies.set(id, settingField.value, { expires: 30 });
     onchange(settingField);
 };
 
