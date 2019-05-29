@@ -23,6 +23,7 @@ package connectors
 import (
 	"context"
 	"errors"
+	"sync"
 	"time"
 
 	"github.com/Jeffail/benthos/lib/message"
@@ -64,9 +65,12 @@ type ResultStore interface {
 
 type resultStoreImpl struct {
 	payloads []types.Message
+	sync.RWMutex
 }
 
 func (r *resultStoreImpl) Add(msg types.Message) {
+	r.Lock()
+	defer r.Unlock()
 	strippedParts := make([]types.Part, msg.Len())
 	msg.DeepCopy().Iter(func(i int, p types.Part) error {
 		strippedParts[i] = message.WithContext(context.Background(), p)
@@ -77,7 +81,16 @@ func (r *resultStoreImpl) Add(msg types.Message) {
 }
 
 func (r *resultStoreImpl) Get() []types.Message {
+	r.RLock()
+	defer r.RUnlock()
 	return r.payloads
+}
+
+//------------------------------------------------------------------------------
+
+// NewResultStore returns an implementation of ResultStore.
+func NewResultStore() ResultStore {
+	return &resultStoreImpl{}
 }
 
 //------------------------------------------------------------------------------

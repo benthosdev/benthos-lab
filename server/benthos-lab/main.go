@@ -86,11 +86,6 @@ func (c *codeHijacker) WriteHeader(statusCode int) {
 
 //------------------------------------------------------------------------------
 
-type labState struct {
-	Config string `json:"config"`
-	Input  string `json:"input"`
-}
-
 type benthosLabCache struct {
 	path string
 	log  log.Modular
@@ -150,6 +145,27 @@ func (c *benthosLabCache) loop() {
 		<-time.After(time.Second)
 		c.read()
 	}
+}
+
+//------------------------------------------------------------------------------
+
+func shareHash(content []byte) []byte {
+	var buf bytes.Buffer
+
+	hasher := sha256.New()
+	hasher.Write(content)
+
+	encoder := base64.NewEncoder(base64.URLEncoding, &buf)
+	encoder.Write(hasher.Sum(nil))
+	encoder.Close()
+
+	hashBytes := buf.Bytes()
+
+	hashLen := 11
+	for hashLen <= len(hashBytes) && hashBytes[hashLen-1] == '_' {
+		hashLen++
+	}
+	return hashBytes[:hashLen]
 }
 
 func main() {
@@ -293,7 +309,11 @@ func main() {
 		}
 		defer r.Body.Close()
 
-		state := labState{}
+		state := struct {
+			Config string `json:"config"`
+			Input  string `json:"input"`
+		}{}
+
 		if err = json.Unmarshal(reqBody, &state); err != nil {
 			http.Error(w, "Failed to parse body", http.StatusBadRequest)
 			log.Errorf("Failed to parse request body: %v\n", err)
@@ -306,17 +326,7 @@ func main() {
 			return
 		}
 
-		var buf bytes.Buffer
-
-		hasher := sha256.New()
-		hasher.Write(reqBody)
-
-		encoder := base64.NewEncoder(base64.URLEncoding, &buf)
-		encoder.Write(hasher.Sum(nil))
-		encoder.Close()
-
-		hashBytes := buf.Bytes()
-
+		hashBytes := shareHash(reqBody)
 		if err = cache.Add(string(hashBytes), reqBody); err != nil && err != types.ErrKeyAlreadyExists {
 			http.Error(w, "Save failed", http.StatusBadGateway)
 			log.Errorf("Failed to store request body: %v\n", err)

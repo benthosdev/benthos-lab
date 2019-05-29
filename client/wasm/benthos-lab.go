@@ -22,6 +22,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -39,21 +40,17 @@ import (
 	"github.com/Jeffail/benthos/lib/manager"
 	"github.com/Jeffail/benthos/lib/message"
 	"github.com/Jeffail/benthos/lib/metrics"
+	"github.com/Jeffail/benthos/lib/output"
 	"github.com/Jeffail/benthos/lib/pipeline"
 	"github.com/Jeffail/benthos/lib/processor"
 	"github.com/Jeffail/benthos/lib/ratelimit"
-	"github.com/Jeffail/benthos/lib/response"
 	"github.com/Jeffail/benthos/lib/types"
 	uconf "github.com/Jeffail/benthos/lib/util/config"
+	"github.com/benthosdev/benthos-lab/lib/connectors"
 	"gopkg.in/yaml.v3"
 )
 
 //------------------------------------------------------------------------------
-
-// Create pipeline and output layers.
-var pipelineLayer types.Pipeline
-var closeFn = func() {}
-var transactionChan chan types.Transaction
 
 func writeOutput(msg, style string) {
 	js.Global().Call("writeOutput", msg, style)
@@ -69,13 +66,236 @@ func reportLints(msg []string) {
 	}
 }
 
-func compileConfig(confStr string) (config.Type, error) {
+//------------------------------------------------------------------------------
+
+// closeFn contains all cleanup logic for the current stream pipeline (if there
+// is one.)
+var closeFn = func() {}
+var transactionChan chan types.Transaction
+
+func registerConnectors() {
+	output.RegisterPlugin(
+		"benthos_lab",
+		func() interface{} {
+			s := struct{}{}
+			return &s
+		},
+		func(_ interface{}, _ types.Manager, logger log.Modular, stats metrics.Type) (types.Output, error) {
+			wtr := connectors.StoreWriter{}
+			return output.NewWriter("benthos_lab", wtr, logger, stats)
+		},
+	)
+	output.DocumentPlugin("benthos_lab", "", func(conf interface{}) interface{} { return nil })
+}
+
+func compile(this js.Value, args []js.Value) interface{} {
+	closeFn()
+
+	contents := js.Global().Get("configSession").Call("getValue").String()
+	conf, err := unmarshalConfig(contents)
+	if err != nil {
+		reportErr("failed to create pipeline: %v\n", err)
+		return nil
+	}
+
+	logger := log.WrapAtLevel(logWriter{}, log.LogInfo)
+	mgr, err := manager.New(conf.Manager, types.NoopMgr(), logger, metrics.Noop())
+	if err != nil {
+		reportErr("failed to create pipeline resources: %v\n", err)
+		return nil
+	}
+
+	tChan := make(chan types.Transaction, 1)
+	var pipelineLayer types.Pipeline
+	var outputLayer types.Output
+
+	if pipelineLayer, err = pipeline.New(conf.Pipeline, mgr, logger, metrics.Noop()); err == nil {
+		err = pipelineLayer.Consume(tChan)
+	}
+	if err == nil {
+		if outputLayer, err = output.New(conf.Output, mgr, logger, metrics.Noop()); err == nil {
+			err = outputLayer.Consume(pipelineLayer.TransactionChan())
+		}
+	}
+	if err != nil {
+		mgr.CloseAsync()
+		reportErr("failed to create pipeline: %v\n", err)
+		return nil
+	}
+	if lints, err := config.Lint([]byte(contents), conf); err != nil {
+		reportErr("failed to parse config for linter: %v\n", err)
+	} else if len(lints) > 0 {
+		reportLints(lints)
+	}
+
+	writeOutput("Compiled successfully.\n", "infoMessage")
+	compileBtn := js.Global().Get("document").Call("getElementById", "compileBtn")
+	compileBtnClassList := compileBtn.Get("classList")
+	compileBtnClassList.Call("add", "btn-disabled")
+	compileBtnClassList.Call("remove", "btn-primary")
+	compileBtn.Set("disabled", true)
+
+	executeBtn := js.Global().Get("document").Call("getElementById", "executeBtn")
+	executeClassList := executeBtn.Get("classList")
+	executeClassList.Call("add", "btn-primary")
+	executeClassList.Call("remove", "btn-disabled")
+	executeBtn.Set("disabled", false)
+
+	transactionChan = tChan
+	closeFn = func() {
+		if tChan == nil {
+			return
+		}
+		close(tChan)
+		tChan = nil
+		transactionChan = nil
+		exitTimeout := time.Second * 30
+		timesOut := time.Now().Add(exitTimeout)
+		pipelineLayer.CloseAsync()
+		outputLayer.CloseAsync()
+		if err := pipelineLayer.WaitForClose(time.Until(timesOut)); err != nil {
+			reportErr("failed to shut down pipeline: %v\n", err)
+		}
+		if err := outputLayer.WaitForClose(time.Until(timesOut)); err != nil {
+			reportErr("failed to shut down output layer: %v\n", err)
+		}
+		mgr.CloseAsync()
+	}
+	return nil
+}
+
+func execute(this js.Value, args []js.Value) interface{} {
+	if transactionChan == nil {
+		reportErr("failed to execute: %v\n", errors.New("pipeline must be compiled first"))
+		return nil
+	}
+
+	resStore := connectors.NewResultStore()
+	resStoreCtx := context.WithValue(context.Background(), connectors.ResultStoreKey, resStore)
+
+	inputContent := js.Global().Get("inputSession").Call("getValue").String()
+	lines := strings.Split(inputContent, "\n")
+
+	inputMsgs := []types.Message{}
+	inputMsgs = append(inputMsgs, message.New(nil))
+	for _, line := range lines {
+		if len(line) == 0 {
+			if inputMsgs[len(inputMsgs)-1].Len() > 0 {
+				inputMsgs = append(inputMsgs, message.New(nil))
+			}
+			continue
+		}
+		inputMsgs[len(inputMsgs)-1].Append(message.WithContext(resStoreCtx, message.NewPart([]byte(line))))
+	}
+
+	go func(tChan chan types.Transaction) {
+		resChan := make(chan types.Response, 1)
+		for _, inputMsg := range inputMsgs {
+			if inputMsg.Len() == 0 {
+				continue
+			}
+
+			select {
+			case tChan <- types.NewTransaction(inputMsg, resChan):
+			case <-time.After(time.Second * 30):
+				reportErr("failed to execute: %v\n", errors.New("request timed out"))
+				return
+			}
+
+			select {
+			case res := <-resChan:
+				if res.Error() != nil {
+					reportErr("failed to execute: %v\n", res.Error())
+				}
+			case <-time.After(time.Second * 30):
+				reportErr("failed to execute: %v\n", errors.New("response 3 timed out"))
+				closeFn()
+				return
+			}
+
+			for _, batch := range resStore.Get() {
+				for _, out := range message.GetAllBytes(batch) {
+					writeOutput(string(out)+"\n", "")
+				}
+				writeOutput("\n", "")
+			}
+		}
+	}(transactionChan)
+	return nil
+}
+
+//------------------------------------------------------------------------------
+
+type logWriter struct{}
+
+func (l logWriter) Printf(format string, v ...interface{}) {
+	writeOutput("Log: "+fmt.Sprintf(format, v...), "logMessage")
+}
+
+func (l logWriter) Println(v ...interface{}) {
+	if str, ok := v[0].(string); ok {
+		writeOutput("Log: "+fmt.Sprintf(str, v[1:]...)+"\n", "logMessage")
+	} else {
+		writeOutput("Log: "+fmt.Sprintf("%v\n", v), "logMessage")
+	}
+}
+
+//------------------------------------------------------------------------------
+
+func unmarshalConfig(confStr string) (config.Type, error) {
 	conf := config.New()
+	conf.Input.Type = "benthos_lab"
+	conf.Output.Type = "benthos_lab"
 	if err := yaml.Unmarshal([]byte(confStr), &conf); err != nil {
 		return conf, err
 	}
 	return conf, nil
 }
+
+type normalisedLabConfig struct {
+	Pipeline  interface{} `yaml:"pipeline"`
+	Output    interface{} `yaml:"output"`
+	Resources interface{} `yaml:"resources"`
+}
+
+func marshalConfig(conf config.Type) ([]byte, error) {
+	sanit, err := conf.Sanitised()
+	if err != nil {
+		return nil, err
+	}
+
+	sanitBytes, err := uconf.MarshalYAML(normalisedLabConfig{
+		Pipeline:  sanit.Pipeline,
+		Output:    sanit.Output,
+		Resources: sanit.Manager,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return sanitBytes, nil
+}
+
+func normalise(this js.Value, args []js.Value) interface{} {
+	session := js.Global().Get("configSession")
+	contents := session.Call("getValue").String()
+	conf, err := unmarshalConfig(contents)
+	if err != nil {
+		reportErr("failed to create pipeline: %v\n", err)
+		return nil
+	}
+
+	sanitBytes, err := marshalConfig(conf)
+	if err != nil {
+		reportErr("failed to normalise config: %v\n", err)
+		return nil
+	}
+
+	js.Global().Call("writeConfig", string(sanitBytes))
+	return nil
+}
+
+//------------------------------------------------------------------------------
 
 func share(this js.Value, args []js.Value) interface{} {
 	config := js.Global().Get("configSession").Call("getValue").String()
@@ -127,202 +347,6 @@ func share(this js.Value, args []js.Value) interface{} {
 	return nil
 }
 
-func compile(this js.Value, args []js.Value) interface{} {
-	closeFn()
-
-	contents := js.Global().Get("configSession").Call("getValue").String()
-	conf, err := compileConfig(contents)
-	if err != nil {
-		reportErr("failed to create pipeline: %v\n", err)
-		return nil
-	}
-
-	logger := log.WrapAtLevel(logWriter{}, log.LogInfo)
-	mgr, err := manager.New(conf.Manager, types.NoopMgr(), logger, metrics.Noop())
-	if err != nil {
-		reportErr("failed to create pipeline resources: %v\n", err)
-		return nil
-	}
-
-	if pipelineLayer, err = pipeline.New(conf.Pipeline, mgr, logger, metrics.Noop()); err == nil {
-		err = pipelineLayer.Consume(transactionChan)
-	}
-	if err != nil {
-		pipelineLayer = nil
-		mgr.CloseAsync()
-		reportErr("failed to create pipeline: %v\n", err)
-		return nil
-	}
-	if lints, err := config.Lint([]byte(contents), conf); err != nil {
-		reportErr("failed to parse config for linter: %v\n", err)
-	} else if len(lints) > 0 {
-		reportLints(lints)
-	}
-
-	writeOutput("Compiled successfully.\n", "infoMessage")
-	compileBtn := js.Global().Get("document").Call("getElementById", "compileBtn")
-	compileBtnClassList := compileBtn.Get("classList")
-	compileBtnClassList.Call("add", "btn-disabled")
-	compileBtnClassList.Call("remove", "btn-primary")
-	compileBtn.Set("disabled", true)
-
-	executeBtn := js.Global().Get("document").Call("getElementById", "executeBtn")
-	executeClassList := executeBtn.Get("classList")
-	executeClassList.Call("add", "btn-primary")
-	executeClassList.Call("remove", "btn-disabled")
-	executeBtn.Set("disabled", false)
-
-	closeFn = func() {
-		if pipelineLayer == nil {
-			return
-		}
-		exitTimeout := time.Second * 30
-		timesOut := time.Now().Add(exitTimeout)
-		pipelineLayer.CloseAsync()
-		if err := pipelineLayer.WaitForClose(time.Until(timesOut)); err != nil {
-			reportErr("failed to shut down pipeline: %v\n", err)
-		}
-		if mgr != nil {
-			mgr.CloseAsync()
-		}
-		pipelineLayer = nil
-		mgr = nil
-	}
-	return nil
-}
-
-func marshalConf(conf config.Type) ([]byte, error) {
-	sanit, err := conf.Sanitised()
-	if err != nil {
-		return nil, err
-	}
-
-	sanitBytes, err := uconf.MarshalYAML(map[string]interface{}{
-		"pipeline":  sanit.Pipeline,
-		"resources": sanit.Manager,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return sanitBytes, nil
-}
-
-func normalise(this js.Value, args []js.Value) interface{} {
-	session := js.Global().Get("configSession")
-	contents := session.Call("getValue").String()
-	conf, err := compileConfig(contents)
-	if err != nil {
-		reportErr("failed to create pipeline: %v\n", err)
-		return nil
-	}
-
-	sanitBytes, err := marshalConf(conf)
-	if err != nil {
-		reportErr("failed to normalise config: %v\n", err)
-		return nil
-	}
-
-	js.Global().Call("writeConfig", string(sanitBytes))
-	return nil
-}
-
-func execute(this js.Value, args []js.Value) interface{} {
-	if pipelineLayer == nil {
-		reportErr("failed to execute: %v\n", errors.New("pipeline must be compiled first"))
-		return nil
-	}
-
-	inputContent := js.Global().Get("inputSession").Call("getValue").String()
-	lines := strings.Split(inputContent, "\n")
-
-	inputMsgs := []types.Message{}
-	inputMsgs = append(inputMsgs, message.New(nil))
-	for _, line := range lines {
-		if len(line) == 0 {
-			if inputMsgs[len(inputMsgs)-1].Len() > 0 {
-				inputMsgs = append(inputMsgs, message.New(nil))
-			}
-			continue
-		}
-		inputMsgs[len(inputMsgs)-1].Append(message.NewPart([]byte(line)))
-	}
-
-	go func(pipeLayer types.Pipeline) {
-		resChan := make(chan types.Response, 1)
-		for _, inputMsg := range inputMsgs {
-			if inputMsg.Len() == 0 {
-				continue
-			}
-
-			select {
-			case transactionChan <- types.NewTransaction(inputMsg, resChan):
-			case <-time.After(time.Second * 30):
-				reportErr("failed to execute: %v\n", errors.New("request timed out"))
-				return
-			}
-
-			var outTran types.Transaction
-			select {
-			case outTran = <-pipeLayer.TransactionChan():
-			case res := <-resChan:
-				if res.Error() != nil {
-					reportErr("failed to execute: %v\n", res.Error())
-					closeFn()
-				} else {
-					writeOutput("Pipeline executed without output.\n", "infoMessage")
-				}
-				return
-			case <-time.After(time.Second * 30):
-				reportErr("failed to execute: %v\n", errors.New("response timed out"))
-				closeFn()
-				return
-			}
-
-			select {
-			case outTran.ResponseChan <- response.NewAck():
-			case <-time.After(time.Second * 30):
-				reportErr("failed to execute: %v\n", errors.New("response 2 timed out"))
-				closeFn()
-				return
-			}
-
-			select {
-			case res := <-resChan:
-				if res.Error() != nil {
-					reportErr("failed to execute: %v\n", res.Error())
-				}
-			case <-time.After(time.Second * 30):
-				reportErr("failed to execute: %v\n", errors.New("response 3 timed out"))
-				closeFn()
-				return
-			}
-
-			for _, out := range message.GetAllBytes(outTran.Payload) {
-				writeOutput(string(out)+"\n", "")
-			}
-			writeOutput("\n", "")
-		}
-	}(pipelineLayer)
-	return nil
-}
-
-//------------------------------------------------------------------------------
-
-type logWriter struct{}
-
-func (l logWriter) Printf(format string, v ...interface{}) {
-	writeOutput("Log: "+fmt.Sprintf(format, v...), "logMessage")
-}
-
-func (l logWriter) Println(v ...interface{}) {
-	if str, ok := v[0].(string); ok {
-		writeOutput("Log: "+fmt.Sprintf(str, v[1:]...)+"\n", "logMessage")
-	} else {
-		writeOutput("Log: "+fmt.Sprintf("%v\n", v), "logMessage")
-	}
-}
-
 //------------------------------------------------------------------------------
 
 func addProc(this js.Value, args []js.Value) interface{} {
@@ -345,7 +369,7 @@ func addProc(this js.Value, args []js.Value) interface{} {
 	}
 
 	conf.Pipeline.Processors = append(conf.Pipeline.Processors, procConf)
-	resultBytes, err := marshalConf(conf)
+	resultBytes, err := marshalConfig(conf)
 	if err != nil {
 		reportErr("failed to normalise config: %v\n", err)
 		return nil
@@ -393,7 +417,7 @@ func addCache(this js.Value, args []js.Value) interface{} {
 	}
 
 	conf.Manager.Caches[cacheID] = cacheConf
-	resultBytes, err := marshalConf(conf)
+	resultBytes, err := marshalConfig(conf)
 	if err != nil {
 		reportErr("failed to normalise config: %v\n", err)
 		return nil
@@ -441,7 +465,7 @@ func addRatelimit(this js.Value, args []js.Value) interface{} {
 	}
 
 	conf.Manager.RateLimits[ratelimitID] = ratelimitConf
-	resultBytes, err := marshalConf(conf)
+	resultBytes, err := marshalConfig(conf)
 	if err != nil {
 		reportErr("failed to normalise config: %v\n", err)
 		return nil
@@ -536,8 +560,8 @@ func main() {
 	c := make(chan struct{}, 0)
 
 	println("WASM Benthos Initialized")
-	transactionChan = make(chan types.Transaction, 1)
 
+	registerConnectors()
 	registerFunctions()
 
 	js.Global().Call("addEventListener", "beforeunload", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
