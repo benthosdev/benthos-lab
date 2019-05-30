@@ -22,7 +22,6 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -31,19 +30,21 @@ import (
 	"net/url"
 	"sort"
 	"strings"
+	"sync"
 	"syscall/js"
 	"time"
 
 	"github.com/Jeffail/benthos/lib/cache"
 	"github.com/Jeffail/benthos/lib/config"
+	"github.com/Jeffail/benthos/lib/input"
 	"github.com/Jeffail/benthos/lib/log"
 	"github.com/Jeffail/benthos/lib/manager"
 	"github.com/Jeffail/benthos/lib/message"
 	"github.com/Jeffail/benthos/lib/metrics"
 	"github.com/Jeffail/benthos/lib/output"
-	"github.com/Jeffail/benthos/lib/pipeline"
 	"github.com/Jeffail/benthos/lib/processor"
 	"github.com/Jeffail/benthos/lib/ratelimit"
+	"github.com/Jeffail/benthos/lib/stream"
 	"github.com/Jeffail/benthos/lib/types"
 	uconf "github.com/Jeffail/benthos/lib/util/config"
 	"github.com/benthosdev/benthos-lab/lib/connectors"
@@ -68,12 +69,109 @@ func reportLints(msg []string) {
 
 //------------------------------------------------------------------------------
 
-// closeFn contains all cleanup logic for the current stream pipeline (if there
-// is one.)
-var closeFn = func() {}
-var transactionChan chan types.Transaction
+type streamState struct {
+	str           *stream.Type
+	mgr           *manager.Type
+	consumerChans []chan types.Message
+
+	sync.RWMutex
+}
+
+func (s *streamState) Register(c chan types.Message) {
+	s.Lock()
+	s.consumerChans = append(s.consumerChans, c)
+	s.Unlock()
+}
+
+func (s *streamState) SendAll(msgs []types.Message) {
+	s.RLock()
+	defer s.RUnlock()
+	for _, inputMsg := range msgs {
+		if inputMsg.Len() == 0 {
+			continue
+		}
+
+		for _, c := range s.consumerChans {
+			select {
+			case c <- inputMsg:
+			case <-time.After(time.Second * 30):
+				reportErr("failed to execute: %v\n", errors.New("send timed out"))
+				return
+			}
+		}
+	}
+}
+
+func (s *streamState) Clear() {
+	s.Lock()
+	for _, c := range s.consumerChans {
+		close(c)
+	}
+	s.consumerChans = nil
+	if s.str != nil {
+		exitTimeout := time.Second * 30
+		timesOut := time.Now().Add(exitTimeout)
+		if err := s.str.Stop(time.Until(timesOut)); err != nil {
+			reportErr("failed to cleanly shut down pipeline: %v\n", err)
+		}
+		s.str = nil
+	}
+	if s.mgr != nil {
+		s.mgr.CloseAsync()
+		s.mgr = nil
+	}
+	s.Unlock()
+}
+
+func (s *streamState) Set(str *stream.Type, mgr *manager.Type) {
+	s.Lock()
+	s.str = str
+	s.mgr = mgr
+	s.Unlock()
+}
+
+var state = &streamState{}
+
+//------------------------------------------------------------------------------
 
 func registerConnectors() {
+	input.RegisterPlugin(
+		"benthos_lab",
+		func() interface{} {
+			s := struct{}{}
+			return &s
+		},
+		func(_ interface{}, _ types.Manager, logger log.Modular, stats metrics.Type) (types.Input, error) {
+			batchChan := make(chan types.Message)
+			state.Register(batchChan)
+			rdr := connectors.NewRoundTripReader(func() (types.Message, error) {
+				select {
+				case m, open := <-batchChan:
+					if open {
+						return m, nil
+					}
+				}
+				return nil, types.ErrTypeClosed
+			}, func(msgs []types.Message, err error) {
+				if err != nil {
+					reportErr("pipeline error: %v\n", err)
+					return
+				}
+				if len(msgs) == 0 {
+					writeOutput("Pipeline execution resulted in zero messages.\n", "infoMessage")
+					return
+				}
+				for _, m := range msgs {
+					for _, out := range message.GetAllBytes(m) {
+						writeOutput(string(out)+"\n", "")
+					}
+					writeOutput("\n", "")
+				}
+			})
+			return input.NewReader("benthos_lab", rdr, logger, stats)
+		},
+	)
+	input.DocumentPlugin("benthos_lab", "", func(conf interface{}) interface{} { return nil })
 	output.RegisterPlugin(
 		"benthos_lab",
 		func() interface{} {
@@ -89,7 +187,11 @@ func registerConnectors() {
 }
 
 func compile(this js.Value, args []js.Value) interface{} {
-	closeFn()
+	executeBtn := js.Global().Get("document").Call("getElementById", "executeBtn")
+	executeClassList := executeBtn.Get("classList")
+	executeClassList.Call("remove", "btn-primary")
+	executeClassList.Call("add", "btn-disabled")
+	executeBtn.Set("disabled", true)
 
 	contents := js.Global().Get("configSession").Call("getValue").String()
 	conf, err := unmarshalConfig(contents)
@@ -98,81 +200,46 @@ func compile(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	logger := log.WrapAtLevel(logWriter{}, log.LogInfo)
-	mgr, err := manager.New(conf.Manager, types.NoopMgr(), logger, metrics.Noop())
-	if err != nil {
-		reportErr("failed to create pipeline resources: %v\n", err)
-		return nil
-	}
+	go func() {
+		state.Clear()
 
-	tChan := make(chan types.Transaction, 1)
-	var pipelineLayer types.Pipeline
-	var outputLayer types.Output
-
-	if pipelineLayer, err = pipeline.New(conf.Pipeline, mgr, logger, metrics.Noop()); err == nil {
-		err = pipelineLayer.Consume(tChan)
-	}
-	if err == nil {
-		if outputLayer, err = output.New(conf.Output, mgr, logger, metrics.Noop()); err == nil {
-			err = outputLayer.Consume(pipelineLayer.TransactionChan())
-		}
-	}
-	if err != nil {
-		mgr.CloseAsync()
-		reportErr("failed to create pipeline: %v\n", err)
-		return nil
-	}
-	if lints, err := config.Lint([]byte(contents), conf); err != nil {
-		reportErr("failed to parse config for linter: %v\n", err)
-	} else if len(lints) > 0 {
-		reportLints(lints)
-	}
-
-	writeOutput("Compiled successfully.\n", "infoMessage")
-	compileBtn := js.Global().Get("document").Call("getElementById", "compileBtn")
-	compileBtnClassList := compileBtn.Get("classList")
-	compileBtnClassList.Call("add", "btn-disabled")
-	compileBtnClassList.Call("remove", "btn-primary")
-	compileBtn.Set("disabled", true)
-
-	executeBtn := js.Global().Get("document").Call("getElementById", "executeBtn")
-	executeClassList := executeBtn.Get("classList")
-	executeClassList.Call("add", "btn-primary")
-	executeClassList.Call("remove", "btn-disabled")
-	executeBtn.Set("disabled", false)
-
-	transactionChan = tChan
-	closeFn = func() {
-		if tChan == nil {
+		logger := log.WrapAtLevel(logWriter{}, log.LogInfo)
+		mgr, err := manager.New(conf.Manager, types.NoopMgr(), logger, metrics.Noop())
+		if err != nil {
+			reportErr("failed to create pipeline resources: %v\n", err)
 			return
 		}
-		close(tChan)
-		tChan = nil
-		transactionChan = nil
-		exitTimeout := time.Second * 30
-		timesOut := time.Now().Add(exitTimeout)
-		pipelineLayer.CloseAsync()
-		outputLayer.CloseAsync()
-		if err := pipelineLayer.WaitForClose(time.Until(timesOut)); err != nil {
-			reportErr("failed to shut down pipeline: %v\n", err)
+
+		str, err := stream.New(conf.Config, stream.OptSetLogger(logger), stream.OptSetManager(mgr))
+		if err != nil {
+			mgr.CloseAsync()
+			reportErr("failed to create pipeline: %v\n", err)
+			return
 		}
-		if err := outputLayer.WaitForClose(time.Until(timesOut)); err != nil {
-			reportErr("failed to shut down output layer: %v\n", err)
+
+		state.Set(str, mgr)
+
+		if lints, err := config.Lint([]byte(contents), conf); err != nil {
+			reportErr("failed to parse config for linter: %v\n", err)
+		} else if len(lints) > 0 {
+			reportLints(lints)
 		}
-		mgr.CloseAsync()
-	}
+
+		writeOutput("Compiled successfully.\n", "infoMessage")
+		compileBtn := js.Global().Get("document").Call("getElementById", "compileBtn")
+		compileBtnClassList := compileBtn.Get("classList")
+		compileBtnClassList.Call("add", "btn-disabled")
+		compileBtnClassList.Call("remove", "btn-primary")
+		compileBtn.Set("disabled", true)
+
+		executeClassList.Call("add", "btn-primary")
+		executeClassList.Call("remove", "btn-disabled")
+		executeBtn.Set("disabled", false)
+	}()
 	return nil
 }
 
 func execute(this js.Value, args []js.Value) interface{} {
-	if transactionChan == nil {
-		reportErr("failed to execute: %v\n", errors.New("pipeline must be compiled first"))
-		return nil
-	}
-
-	resStore := connectors.NewResultStore()
-	resStoreCtx := context.WithValue(context.Background(), connectors.ResultStoreKey, resStore)
-
 	inputContent := js.Global().Get("inputSession").Call("getValue").String()
 	lines := strings.Split(inputContent, "\n")
 
@@ -185,42 +252,10 @@ func execute(this js.Value, args []js.Value) interface{} {
 			}
 			continue
 		}
-		inputMsgs[len(inputMsgs)-1].Append(message.WithContext(resStoreCtx, message.NewPart([]byte(line))))
+		inputMsgs[len(inputMsgs)-1].Append(message.NewPart([]byte(line)))
 	}
 
-	go func(tChan chan types.Transaction) {
-		resChan := make(chan types.Response, 1)
-		for _, inputMsg := range inputMsgs {
-			if inputMsg.Len() == 0 {
-				continue
-			}
-
-			select {
-			case tChan <- types.NewTransaction(inputMsg, resChan):
-			case <-time.After(time.Second * 30):
-				reportErr("failed to execute: %v\n", errors.New("request timed out"))
-				return
-			}
-
-			select {
-			case res := <-resChan:
-				if res.Error() != nil {
-					reportErr("failed to execute: %v\n", res.Error())
-				}
-			case <-time.After(time.Second * 30):
-				reportErr("failed to execute: %v\n", errors.New("response 3 timed out"))
-				closeFn()
-				return
-			}
-
-			for _, batch := range resStore.Get() {
-				for _, out := range message.GetAllBytes(batch) {
-					writeOutput(string(out)+"\n", "")
-				}
-				writeOutput("\n", "")
-			}
-		}
-	}(transactionChan)
+	go state.SendAll(inputMsgs)
 	return nil
 }
 
@@ -253,6 +288,8 @@ func unmarshalConfig(confStr string) (config.Type, error) {
 }
 
 type normalisedLabConfig struct {
+	Input     interface{} `yaml:"input"`
+	Buffer    interface{} `yaml:"buffer"`
 	Pipeline  interface{} `yaml:"pipeline"`
 	Output    interface{} `yaml:"output"`
 	Resources interface{} `yaml:"resources"`
@@ -264,16 +301,13 @@ func marshalConfig(conf config.Type) ([]byte, error) {
 		return nil, err
 	}
 
-	sanitBytes, err := uconf.MarshalYAML(normalisedLabConfig{
+	return uconf.MarshalYAML(normalisedLabConfig{
+		Input:     sanit.Input,
+		Buffer:    sanit.Buffer,
 		Pipeline:  sanit.Pipeline,
 		Output:    sanit.Output,
 		Resources: sanit.Manager,
 	})
-	if err != nil {
-		return nil, err
-	}
-
-	return sanitBytes, nil
 }
 
 func normalise(this js.Value, args []js.Value) interface{} {

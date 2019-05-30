@@ -21,6 +21,7 @@
 package connectors
 
 import (
+	"context"
 	"time"
 
 	"github.com/Jeffail/benthos/lib/message"
@@ -29,43 +30,68 @@ import (
 
 //------------------------------------------------------------------------------
 
-// FuncReader is a reader implementation that simply wraps a closure providing
-// message contents.
-type FuncReader struct {
-	read func() ([][]byte, error)
+// RoundTripReader is a reader implementation that allows you to define a
+// closure for producing messages and another for processing the result.
+//
+// The mechanism for receiving results is implemented using a ResultStore, and
+// therefore is subject to pipelines that preserve context and one or more
+// outputs destinations storing their results.
+type RoundTripReader struct {
+	read           func() (types.Message, error)
+	processResults func([]types.Message, error)
+
+	store ResultStore
 }
 
-// NewFuncReader returns a FuncReader.
-func NewFuncReader(read func() ([][]byte, error)) FuncReader {
-	return FuncReader{
-		read: read,
+// NewRoundTripReader returns a RoundTripReader.
+func NewRoundTripReader(
+	read func() (types.Message, error),
+	processResults func([]types.Message, error),
+) *RoundTripReader {
+	return &RoundTripReader{
+		read:           read,
+		processResults: processResults,
+		store:          NewResultStore(),
 	}
 }
 
 // Connect is a noop.
-func (f FuncReader) Connect() error {
+func (f *RoundTripReader) Connect() error {
 	return nil
 }
 
 // Acknowledge is a noop.
-func (f FuncReader) Acknowledge(err error) error {
+func (f *RoundTripReader) Acknowledge(err error) error {
+	msgs := f.store.Get()
+	f.processResults(msgs, err)
+	f.store.Clear()
 	return nil
 }
 
 // Read returns a message result from the provided closure.
-func (f FuncReader) Read() (types.Message, error) {
-	contents, err := f.read()
+func (f *RoundTripReader) Read() (types.Message, error) {
+	msg, err := f.read()
 	if err != nil {
 		return nil, err
 	}
-	return message.New(contents), nil
+
+	parts := make([]types.Part, msg.Len())
+	msg.Iter(func(i int, p types.Part) error {
+		ctx := message.GetContext(p)
+		parts[i] = message.WithContext(context.WithValue(ctx, ResultStoreKey, f.store), p)
+		return nil
+	})
+
+	msg = message.New(nil)
+	msg.SetAll(parts)
+	return msg, nil
 }
 
 // CloseAsync is a noop.
-func (f FuncReader) CloseAsync() {}
+func (f *RoundTripReader) CloseAsync() {}
 
 // WaitForClose is a noop.
-func (f FuncReader) WaitForClose(time.Duration) error {
+func (f *RoundTripReader) WaitForClose(time.Duration) error {
 	return nil
 }
 

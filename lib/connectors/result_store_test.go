@@ -55,6 +55,11 @@ func TestResultStore(t *testing.T) {
 	if store := message.GetContext(results[0].Get(0)).Value(ResultStoreKey); store != nil {
 		t.Error("Unexpected nested result store")
 	}
+
+	impl.Clear()
+	if exp, act := len(impl.Get()), 0; exp != act {
+		t.Errorf("Unexpected count of stored messages: %v != %v", act, exp)
+	}
 }
 
 func TestStoreWriter(t *testing.T) {

@@ -59,6 +59,9 @@ type ResultStore interface {
 
 	// Get the stored slice of messages.
 	Get() []types.Message
+
+	// Clear any currently stored messages.
+	Clear()
 }
 
 //------------------------------------------------------------------------------
@@ -84,6 +87,12 @@ func (r *resultStoreImpl) Get() []types.Message {
 	r.RLock()
 	defer r.RUnlock()
 	return r.payloads
+}
+
+func (r *resultStoreImpl) Clear() {
+	r.Lock()
+	r.payloads = nil
+	r.Unlock()
 }
 
 //------------------------------------------------------------------------------
