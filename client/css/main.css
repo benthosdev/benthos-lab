@@ -275,6 +275,10 @@ select {
     right: 0px;
     margin-right: 5px;
   }
+
+  #profBanner {
+    display: none;
+  }
 }
 
 @media (max-width: 60rem) {

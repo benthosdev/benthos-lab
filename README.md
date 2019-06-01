@@ -20,7 +20,7 @@ docker pull jeffail/benthos-lab
 
 ``` sh
 # Build client
-GOOS=js GOARCH=wasm go build -o ./client/wasm/benthos-lab.wasm ./client/wasm/benthos-lab.go
+GOOS=js GOARCH=wasm go build -ldflags='-s -w' -o ./client/wasm/benthos-lab.wasm ./client/wasm/benthos-lab.go
 
 # Install server
 go install ./server/benthos-lab

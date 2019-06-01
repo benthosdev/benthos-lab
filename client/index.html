@@ -62,7 +62,7 @@
   <div id="editor"></div>
   <div id="editorOutput">
     <div style="text-align:center;">
-      <img style="max-width:50%;" src="/img/logo.svg"/>
+      <img id="profBanner" style="max-width:50%;" src="/img/logo.svg"/>
     </div>
   </div>
   <div id="settings" class="hidden">
@@ -96,6 +96,19 @@
   <script src="/vendor/ace/ace.js" type="text/javascript" charset="utf-8"></script>
   <script>
       var editor = ace.edit("editor");
+
+      editor.commands.addCommand({
+        name: 'saveFile',
+        bindKey: {
+          win: 'Ctrl-S', mac: 'Command-S',
+          sender: 'editor|cli'
+        },
+        exec: function (env, args, request) {
+          var shareBtn = document.getElementById("shareBtn");
+          shareBtn.click();
+        }
+      });
+
       useSetting("keymapSelect", function(e) {
         editor.setKeyboardHandler(e.value);
       });

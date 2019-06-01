@@ -277,10 +277,15 @@ func (l logWriter) Println(v ...interface{}) {
 
 //------------------------------------------------------------------------------
 
-func unmarshalConfig(confStr string) (config.Type, error) {
+func newConfig() config.Type {
 	conf := config.New()
 	conf.Input.Type = "benthos_lab"
 	conf.Output.Type = "benthos_lab"
+	return conf
+}
+
+func unmarshalConfig(confStr string) (config.Type, error) {
+	conf := newConfig()
 	if err := yaml.Unmarshal([]byte(confStr), &conf); err != nil {
 		return conf, err
 	}
@@ -396,7 +401,7 @@ func addProc(this js.Value, args []js.Value) interface{} {
 	session := js.Global().Get("configSession")
 	contents := session.Call("getValue").String()
 
-	conf := config.New()
+	conf := newConfig()
 	if err := yaml.Unmarshal([]byte(contents), &conf); err != nil {
 		reportErr("Failed to unmarshal current config: %v\n", err)
 		return nil
@@ -426,7 +431,7 @@ func addCache(this js.Value, args []js.Value) interface{} {
 	session := js.Global().Get("configSession")
 	contents := session.Call("getValue").String()
 
-	conf := config.New()
+	conf := newConfig()
 	if err := yaml.Unmarshal([]byte(contents), &conf); err != nil {
 		reportErr("Failed to unmarshal current config: %v\n", err)
 		return nil
@@ -474,7 +479,7 @@ func addRatelimit(this js.Value, args []js.Value) interface{} {
 	session := js.Global().Get("configSession")
 	contents := session.Call("getValue").String()
 
-	conf := config.New()
+	conf := newConfig()
 	if err := yaml.Unmarshal([]byte(contents), &conf); err != nil {
 		reportErr("Failed to unmarshal current config: %v\n", err)
 		return nil
