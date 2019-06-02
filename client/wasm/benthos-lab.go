@@ -21,13 +21,8 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"net/url"
 	"sort"
 	"strings"
 	"sync"
@@ -53,8 +48,10 @@ import (
 
 //------------------------------------------------------------------------------
 
+var writeFunc js.Value
+
 func writeOutput(msg, style string) {
-	js.Global().Call("writeOutput", msg, style)
+	writeFunc.Invoke(msg, style)
 }
 
 func reportErr(msg string, err error) {
@@ -187,19 +184,14 @@ func registerConnectors() {
 }
 
 func compile(this js.Value, args []js.Value) interface{} {
-	executeBtn := js.Global().Get("document").Call("getElementById", "executeBtn")
-	executeClassList := executeBtn.Get("classList")
-	executeClassList.Call("remove", "btn-primary")
-	executeClassList.Call("add", "btn-disabled")
-	executeBtn.Set("disabled", true)
-
-	contents := js.Global().Get("configSession").Call("getValue").String()
+	contents := args[0].String()
 	conf, err := unmarshalConfig(contents)
 	if err != nil {
 		reportErr("failed to create pipeline: %v\n", err)
 		return nil
 	}
 
+	successFunc := args[1]
 	go func() {
 		state.Clear()
 
@@ -226,21 +218,15 @@ func compile(this js.Value, args []js.Value) interface{} {
 		}
 
 		writeOutput("Compiled successfully.\n", "infoMessage")
-		compileBtn := js.Global().Get("document").Call("getElementById", "compileBtn")
-		compileBtnClassList := compileBtn.Get("classList")
-		compileBtnClassList.Call("add", "btn-disabled")
-		compileBtnClassList.Call("remove", "btn-primary")
-		compileBtn.Set("disabled", true)
-
-		executeClassList.Call("add", "btn-primary")
-		executeClassList.Call("remove", "btn-disabled")
-		executeBtn.Set("disabled", false)
+		if successFunc.Type() == js.TypeFunction {
+			successFunc.Invoke()
+		}
 	}()
 	return nil
 }
 
 func execute(this js.Value, args []js.Value) interface{} {
-	inputContent := js.Global().Get("inputSession").Call("getValue").String()
+	inputContent := args[0].String()
 	lines := strings.Split(inputContent, "\n")
 
 	inputMsgs := []types.Message{}
@@ -316,8 +302,7 @@ func marshalConfig(conf config.Type) ([]byte, error) {
 }
 
 func normalise(this js.Value, args []js.Value) interface{} {
-	session := js.Global().Get("configSession")
-	contents := session.Call("getValue").String()
+	contents := args[0].String()
 	conf, err := unmarshalConfig(contents)
 	if err != nil {
 		reportErr("failed to create pipeline: %v\n", err)
@@ -330,76 +315,19 @@ func normalise(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	js.Global().Call("writeConfig", string(sanitBytes))
-	return nil
+	return string(sanitBytes)
 }
 
 //------------------------------------------------------------------------------
 
-func share(this js.Value, args []js.Value) interface{} {
-	config := js.Global().Get("configSession").Call("getValue").String()
-	input := js.Global().Get("inputSession").Call("getValue").String()
-	href := js.Global().Get("window").Get("location").Get("href").String()
-
-	currentURL, err := url.Parse(href)
-	if err != nil {
-		reportErr("failed to parse current url: %v\n", err)
-		return nil
-	}
-	currentURL.Path = "/share"
-
-	state := struct {
-		Config string `json:"config"`
-		Input  string `json:"input"`
-	}{
-		Config: config,
-		Input:  input,
-	}
-
-	stateBytes, err := json.Marshal(state)
-	if err != nil {
-		reportErr("failed to marshal state: %v\n", err)
-		return nil
-	}
-
-	go func() {
-		res, err := http.Post(currentURL.String(), "application/json", bytes.NewReader(stateBytes))
-		if err != nil {
-			reportErr("failed to save state: %v\n", err)
-			return
-		}
-
-		resBytes, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			reportErr("failed to read save response: %v\n", err)
-			return
-		}
-
-		if res.StatusCode != 200 {
-			reportErr("failed to save state: %v\n", errors.New(string(resBytes)))
-			return
-		}
-
-		currentURL.Path = "/l/" + string(resBytes)
-		js.Global().Call("setShareURL", currentURL.String())
-	}()
-	return nil
-}
-
-//------------------------------------------------------------------------------
-
-func addProc(this js.Value, args []js.Value) interface{} {
-	value := this.Get("value").String()
-	this.Set("value", "")
-	if _, ok := processor.Constructors[value]; !ok {
-		reportErr("Failed to add processor: %v\n", fmt.Errorf("processor type '%v' not recognised", value))
+func addProcessor(this js.Value, args []js.Value) interface{} {
+	procType, contents := args[0].String(), args[1].String()
+	if _, ok := processor.Constructors[procType]; !ok {
+		reportErr("Failed to add processor: %v\n", fmt.Errorf("processor type '%v' not recognised", procType))
 		return nil
 	}
 	procConf := processor.NewConfig()
-	procConf.Type = value
-
-	session := js.Global().Get("configSession")
-	contents := session.Call("getValue").String()
+	procConf.Type = procType
 
 	conf := newConfig()
 	if err := yaml.Unmarshal([]byte(contents), &conf); err != nil {
@@ -413,23 +341,17 @@ func addProc(this js.Value, args []js.Value) interface{} {
 		reportErr("failed to normalise config: %v\n", err)
 		return nil
 	}
-
-	js.Global().Call("writeConfig", string(resultBytes))
-	return nil
+	return string(resultBytes)
 }
 
 func addCache(this js.Value, args []js.Value) interface{} {
-	value := this.Get("value").String()
-	this.Set("value", "")
-	if _, ok := cache.Constructors[value]; !ok {
-		reportErr("Failed to add cache: %v\n", fmt.Errorf("cache type '%v' not recognised", value))
+	procType, contents := args[0].String(), args[1].String()
+	if _, ok := cache.Constructors[procType]; !ok {
+		reportErr("Failed to add cache: %v\n", fmt.Errorf("cache type '%v' not recognised", procType))
 		return nil
 	}
 	cacheConf := cache.NewConfig()
-	cacheConf.Type = value
-
-	session := js.Global().Get("configSession")
-	contents := session.Call("getValue").String()
+	cacheConf.Type = procType
 
 	conf := newConfig()
 	if err := yaml.Unmarshal([]byte(contents), &conf); err != nil {
@@ -462,22 +384,17 @@ func addCache(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	js.Global().Call("writeConfig", string(resultBytes))
-	return nil
+	return string(resultBytes)
 }
 
 func addRatelimit(this js.Value, args []js.Value) interface{} {
-	value := this.Get("value").String()
-	this.Set("value", "")
-	if _, ok := ratelimit.Constructors[value]; !ok {
-		reportErr("Failed to add ratelimit: %v\n", fmt.Errorf("ratelimit type '%v' not recognised", value))
+	procType, contents := args[0].String(), args[1].String()
+	if _, ok := ratelimit.Constructors[procType]; !ok {
+		reportErr("Failed to add ratelimit: %v\n", fmt.Errorf("ratelimit type '%v' not recognised", procType))
 		return nil
 	}
 	ratelimitConf := ratelimit.NewConfig()
-	ratelimitConf.Type = value
-
-	session := js.Global().Get("configSession")
-	contents := session.Call("getValue").String()
+	ratelimitConf.Type = procType
 
 	conf := newConfig()
 	if err := yaml.Unmarshal([]byte(contents), &conf); err != nil {
@@ -510,98 +427,95 @@ func addRatelimit(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	js.Global().Call("writeConfig", string(resultBytes))
-	return nil
+	return string(resultBytes)
 }
 
 //------------------------------------------------------------------------------
 
-func addProcSelectOptions() {
-	procSelect := js.Global().Get("document").Call("getElementById", "procSelect")
-	procSelect.Call("addEventListener", "change", js.FuncOf(addProc))
-
+func getProcessors(this js.Value, args []js.Value) interface{} {
 	procs := []string{}
 	for k := range processor.Constructors {
 		procs = append(procs, k)
 	}
 	sort.Strings(procs)
-	for _, k := range procs {
-		option := js.Global().Get("document").Call("createElement", "option")
-		option.Set("text", k)
-		option.Set("value", k)
-		procSelect.Get("options").Call("add", option)
+	generic := make([]interface{}, len(procs))
+	for i, v := range procs {
+		generic[i] = v
 	}
+	return generic
 }
 
-func addCacheSelectOptions() {
-	cacheSelect := js.Global().Get("document").Call("getElementById", "cacheSelect")
-	cacheSelect.Call("addEventListener", "change", js.FuncOf(addCache))
-
+func getCaches(this js.Value, args []js.Value) interface{} {
 	caches := []string{}
 	for k := range cache.Constructors {
 		caches = append(caches, k)
 	}
 	sort.Strings(caches)
-	for _, k := range caches {
-		option := js.Global().Get("document").Call("createElement", "option")
-		option.Set("text", k)
-		option.Set("value", k)
-		cacheSelect.Get("options").Call("add", option)
+	generic := make([]interface{}, len(caches))
+	for i, v := range caches {
+		generic[i] = v
 	}
+	return generic
 }
 
-func addRatelimitSelectOptions() {
-	ratelimitSelect := js.Global().Get("document").Call("getElementById", "ratelimitSelect")
-	ratelimitSelect.Call("addEventListener", "change", js.FuncOf(addRatelimit))
-
+func getRatelimits(this js.Value, args []js.Value) interface{} {
 	ratelimits := []string{}
 	for k := range ratelimit.Constructors {
 		ratelimits = append(ratelimits, k)
 	}
 	sort.Strings(ratelimits)
-	for _, k := range ratelimits {
-		option := js.Global().Get("document").Call("createElement", "option")
-		option.Set("text", k)
-		option.Set("value", k)
-		ratelimitSelect.Get("options").Call("add", option)
+	generic := make([]interface{}, len(ratelimits))
+	for i, v := range ratelimits {
+		generic[i] = v
 	}
+	return generic
 }
 
 //------------------------------------------------------------------------------
 
+var onLoad func()
+
 func registerFunctions() {
-	executeFunc := js.FuncOf(execute)
-	normaliseFunc := js.FuncOf(normalise)
-	compileFunc := js.FuncOf(compile)
-	shareFunc := js.FuncOf(share)
+	benthosLab := js.Global().Get("benthosLab")
+	if benthosLab.Type() == js.TypeUndefined {
+		benthosLab = js.ValueOf(map[string]interface{}{})
+		js.Global().Set("benthosLab", benthosLab)
+	}
 
-	js.Global().Get("document").Call("getElementById", "normaliseBtn").Call("addEventListener", "click", normaliseFunc)
-	js.Global().Get("document").Call("getElementById", "executeBtn").Call("addEventListener", "click", executeFunc)
-	js.Global().Get("document").Call("getElementById", "shareBtn").Call("addEventListener", "click", shareFunc)
+	if print := benthosLab.Get("print"); print.Type() == js.TypeFunction {
+		writeFunc = print
+	} else {
+		writeFunc = js.Global().Get("console").Get("log")
+		benthosLab.Set("print", writeFunc)
+	}
 
-	compileBtn := js.Global().Get("document").Call("getElementById", "compileBtn")
-	compileBtn.Call("addEventListener", "click", compileFunc)
-	compileBtnClassList := compileBtn.Get("classList")
+	if onLoadVal := benthosLab.Get("onLoad"); onLoadVal.Type() == js.TypeFunction {
+		onLoad = func() {
+			onLoadVal.Invoke()
+		}
+	} else {
+		onLoad = func() {}
+	}
 
-	js.Global().Get("configSession").Call("on", "change", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		compileBtnClassList.Call("add", "btn-primary")
-		compileBtnClassList.Call("remove", "btn-disabled")
-		compileBtn.Set("disabled", false)
-		return nil
-	}))
-
-	addProcSelectOptions()
-	addCacheSelectOptions()
-	addRatelimitSelectOptions()
+	benthosLab.Set("getProcessors", js.FuncOf(getProcessors))
+	benthosLab.Set("getCaches", js.FuncOf(getCaches))
+	benthosLab.Set("getRatelimits", js.FuncOf(getRatelimits))
+	benthosLab.Set("addProcessor", js.FuncOf(addProcessor))
+	benthosLab.Set("addCache", js.FuncOf(addCache))
+	benthosLab.Set("addRatelimit", js.FuncOf(addRatelimit))
+	benthosLab.Set("normalise", js.FuncOf(normalise))
+	benthosLab.Set("compile", js.FuncOf(compile))
+	benthosLab.Set("execute", js.FuncOf(execute))
 }
 
 func main() {
 	c := make(chan struct{}, 0)
 
-	println("WASM Benthos Initialized")
-
 	registerConnectors()
 	registerFunctions()
+
+	println("WASM Benthos Initialized")
+	onLoad()
 
 	js.Global().Call("addEventListener", "beforeunload", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		c <- struct{}{}

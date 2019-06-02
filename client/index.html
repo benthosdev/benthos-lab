@@ -45,7 +45,7 @@
       <button id="inputTab" class="tab">Input</button>
       <button id="settingsTab" class="tab">Settings</button>
     </div>
-    <div class="button-group" id="happyGroup">
+    <div class="button-group hidden" id="happyGroup">
       <button id="compileBtn" class="btn btn-primary">Compile</button>
       <button id="executeBtn" class="btn btn-disabled" disabled>Execute</button>
     </div>
@@ -64,6 +64,10 @@
     <div style="text-align:center;">
       <img id="profBanner" style="max-width:50%;" src="/img/logo.svg"/>
     </div>
+    <div id="failedText" class="lintMessage">
+      <p>Attempting to initialise Benthos engine...</p>
+      <p>If this message does not disappear then something went wrong, but you can still edit your config as usual.</p>
+    </div>
   </div>
   <div id="settings" class="hidden">
     <h2>Settings</h2>
@@ -78,7 +82,7 @@
       </div>
     </div>
   </div>
-  <div id="addComponentWindow">
+  <div id="addComponentWindow" class="hidden">
     <select id="procSelect" name="processor-selector">
       <option value="" selected>Add processor</option>
     </select>
@@ -123,8 +127,6 @@
       editor.setTheme("ace/theme/monokai");
       editor.setSession(configSession);
       editor.setShowPrintMargin(false);
-
-      initLabControls();
   </script>
 </body>
 
