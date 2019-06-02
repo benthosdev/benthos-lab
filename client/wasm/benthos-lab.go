@@ -41,9 +41,8 @@ import (
 	"github.com/Jeffail/benthos/lib/ratelimit"
 	"github.com/Jeffail/benthos/lib/stream"
 	"github.com/Jeffail/benthos/lib/types"
-	uconf "github.com/Jeffail/benthos/lib/util/config"
+	labConfig "github.com/benthosdev/benthos-lab/lib/config"
 	"github.com/benthosdev/benthos-lab/lib/connectors"
-	"gopkg.in/yaml.v3"
 )
 
 //------------------------------------------------------------------------------
@@ -185,7 +184,7 @@ func registerConnectors() {
 
 func compile(this js.Value, args []js.Value) interface{} {
 	contents := args[0].String()
-	conf, err := unmarshalConfig(contents)
+	conf, err := labConfig.Unmarshal(contents)
 	if err != nil {
 		reportErr("failed to create pipeline: %v\n", err)
 		return nil
@@ -263,80 +262,42 @@ func (l logWriter) Println(v ...interface{}) {
 
 //------------------------------------------------------------------------------
 
-func newConfig() config.Type {
-	conf := config.New()
-	conf.Input.Type = "benthos_lab"
-	conf.Output.Type = "benthos_lab"
-	return conf
-}
-
-func unmarshalConfig(confStr string) (config.Type, error) {
-	conf := newConfig()
-	if err := yaml.Unmarshal([]byte(confStr), &conf); err != nil {
-		return conf, err
-	}
-	return conf, nil
-}
-
-type normalisedLabConfig struct {
-	Input     interface{} `yaml:"input"`
-	Buffer    interface{} `yaml:"buffer"`
-	Pipeline  interface{} `yaml:"pipeline"`
-	Output    interface{} `yaml:"output"`
-	Resources interface{} `yaml:"resources"`
-}
-
-func marshalConfig(conf config.Type) ([]byte, error) {
-	sanit, err := conf.Sanitised()
-	if err != nil {
-		return nil, err
-	}
-
-	return uconf.MarshalYAML(normalisedLabConfig{
-		Input:     sanit.Input,
-		Buffer:    sanit.Buffer,
-		Pipeline:  sanit.Pipeline,
-		Output:    sanit.Output,
-		Resources: sanit.Manager,
-	})
-}
-
 func normalise(this js.Value, args []js.Value) interface{} {
 	contents := args[0].String()
-	conf, err := unmarshalConfig(contents)
+	conf, err := labConfig.Unmarshal(contents)
 	if err != nil {
 		reportErr("failed to create pipeline: %v\n", err)
 		return nil
 	}
 
-	sanitBytes, err := marshalConfig(conf)
+	sanitBytes, err := labConfig.Marshal(conf)
 	if err != nil {
 		reportErr("failed to normalise config: %v\n", err)
 		return nil
 	}
 
-	return string(sanitBytes)
+	if args[1].Type() == js.TypeFunction {
+		args[1].Invoke(string(sanitBytes))
+	}
+	return nil
 }
 
 //------------------------------------------------------------------------------
 
 func addProcessor(this js.Value, args []js.Value) interface{} {
 	procType, contents := args[0].String(), args[1].String()
-	if _, ok := processor.Constructors[procType]; !ok {
-		reportErr("Failed to add processor: %v\n", fmt.Errorf("processor type '%v' not recognised", procType))
-		return nil
-	}
-	procConf := processor.NewConfig()
-	procConf.Type = procType
-
-	conf := newConfig()
-	if err := yaml.Unmarshal([]byte(contents), &conf); err != nil {
+	conf, err := labConfig.Unmarshal(contents)
+	if err != nil {
 		reportErr("Failed to unmarshal current config: %v\n", err)
 		return nil
 	}
 
-	conf.Pipeline.Processors = append(conf.Pipeline.Processors, procConf)
-	resultBytes, err := marshalConfig(conf)
+	if err := labConfig.AddProcessor(procType, &conf); err != nil {
+		reportErr("Failed to add processor: %v\n", err)
+		return nil
+	}
+
+	resultBytes, err := labConfig.Marshal(conf)
 	if err != nil {
 		reportErr("failed to normalise config: %v\n", err)
 		return nil
@@ -346,39 +307,18 @@ func addProcessor(this js.Value, args []js.Value) interface{} {
 
 func addCache(this js.Value, args []js.Value) interface{} {
 	procType, contents := args[0].String(), args[1].String()
-	if _, ok := cache.Constructors[procType]; !ok {
-		reportErr("Failed to add cache: %v\n", fmt.Errorf("cache type '%v' not recognised", procType))
-		return nil
-	}
-	cacheConf := cache.NewConfig()
-	cacheConf.Type = procType
-
-	conf := newConfig()
-	if err := yaml.Unmarshal([]byte(contents), &conf); err != nil {
+	conf, err := labConfig.Unmarshal(contents)
+	if err != nil {
 		reportErr("Failed to unmarshal current config: %v\n", err)
 		return nil
 	}
 
-	var cacheID string
-	for i := 0; i < 10000; i++ {
-		var candidate string
-		if i == 0 {
-			candidate = "example"
-		} else {
-			candidate = fmt.Sprintf("example%v", i)
-		}
-		if _, exists := conf.Manager.Caches[candidate]; !exists {
-			cacheID = candidate
-			break
-		}
-	}
-	if len(cacheID) == 0 {
-		reportErr("Failed to find an ID for your new cache", errors.New("what the hell are you doing?"))
+	if err := labConfig.AddCache(procType, &conf); err != nil {
+		reportErr("Failed to add cache: %v\n", err)
 		return nil
 	}
 
-	conf.Manager.Caches[cacheID] = cacheConf
-	resultBytes, err := marshalConfig(conf)
+	resultBytes, err := labConfig.Marshal(conf)
 	if err != nil {
 		reportErr("failed to normalise config: %v\n", err)
 		return nil
@@ -389,39 +329,18 @@ func addCache(this js.Value, args []js.Value) interface{} {
 
 func addRatelimit(this js.Value, args []js.Value) interface{} {
 	procType, contents := args[0].String(), args[1].String()
-	if _, ok := ratelimit.Constructors[procType]; !ok {
-		reportErr("Failed to add ratelimit: %v\n", fmt.Errorf("ratelimit type '%v' not recognised", procType))
-		return nil
-	}
-	ratelimitConf := ratelimit.NewConfig()
-	ratelimitConf.Type = procType
-
-	conf := newConfig()
-	if err := yaml.Unmarshal([]byte(contents), &conf); err != nil {
+	conf, err := labConfig.Unmarshal(contents)
+	if err != nil {
 		reportErr("Failed to unmarshal current config: %v\n", err)
 		return nil
 	}
 
-	var ratelimitID string
-	for i := 0; i < 10000; i++ {
-		var candidate string
-		if i == 0 {
-			candidate = "example"
-		} else {
-			candidate = fmt.Sprintf("example%v", i)
-		}
-		if _, exists := conf.Manager.RateLimits[candidate]; !exists {
-			ratelimitID = candidate
-			break
-		}
-	}
-	if len(ratelimitID) == 0 {
-		reportErr("Failed to find an ID for your new ratelimit", errors.New("what the hell are you doing?"))
+	if err := labConfig.AddRatelimit(procType, &conf); err != nil {
+		reportErr("Failed to add cache: %v\n", err)
 		return nil
 	}
 
-	conf.Manager.RateLimits[ratelimitID] = ratelimitConf
-	resultBytes, err := marshalConfig(conf)
+	resultBytes, err := labConfig.Marshal(conf)
 	if err != nil {
 		reportErr("failed to normalise config: %v\n", err)
 		return nil

@@ -38,9 +38,11 @@ import (
 	"time"
 
 	"github.com/Jeffail/benthos/lib/cache"
+	"github.com/Jeffail/benthos/lib/config"
 	"github.com/Jeffail/benthos/lib/log"
 	"github.com/Jeffail/benthos/lib/metrics"
 	"github.com/Jeffail/benthos/lib/types"
+	labConfig "github.com/benthosdev/benthos-lab/lib/config"
 )
 
 //------------------------------------------------------------------------------
@@ -214,6 +216,8 @@ func main() {
 	mWASMGet200 := httpStats.GetCounter("wasm.get.200")
 	mWASMGet304 := httpStats.GetCounter("wasm.get.304")
 	mWASMGetNoGZIP := httpStats.GetCounter("wasm.no_gzip")
+	normaliseCtr := httpStats.GetCounter("normalise")
+	shareCtr := httpStats.GetCounter("share")
 
 	notFoundHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Del("Content-Type")
@@ -295,7 +299,40 @@ func main() {
 		w.Write(index)
 	})
 
+	mux.HandleFunc("/normalise", func(w http.ResponseWriter, r *http.Request) {
+		normaliseCtr.Incr(1)
+		if r.Method != "POST" {
+			http.Error(w, "Method not supported", http.StatusBadRequest)
+			log.Warnf("Bad method: %v\n", r.Method)
+			return
+		}
+		reqBody, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Failed to read body", http.StatusBadRequest)
+			log.Errorf("Failed to read request body: %v\n", err)
+			return
+		}
+		defer r.Body.Close()
+
+		var conf config.Type
+		if conf, err = labConfig.Unmarshal(string(reqBody)); err != nil {
+			http.Error(w, "Failed to parse body", http.StatusBadRequest)
+			log.Errorf("Failed to parse request body: %v\n", err)
+			return
+		}
+
+		var resBytes []byte
+		if resBytes, err = labConfig.Marshal(conf); err != nil {
+			http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
+			log.Errorf("Failed to marshal response body: %v\n", err)
+			return
+		}
+
+		w.Write(resBytes)
+	})
+
 	mux.HandleFunc("/share", func(w http.ResponseWriter, r *http.Request) {
+		shareCtr.Incr(1)
 		if r.Method != "POST" {
 			http.Error(w, "Method not supported", http.StatusBadRequest)
 			log.Warnf("Bad method: %v\n", r.Method)

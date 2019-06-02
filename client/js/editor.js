@@ -110,6 +110,12 @@ window.onload = function() {
         share(getInput(), getConfig(), setShareURL);
     };
 
+    document.getElementById("normaliseBtn").onclick = function() {
+        benthosLab.normalise(getConfig(), function(conf) {
+            setConfig(conf);
+        });
+    };
+
     writeOutputElement(aboutContent);
     writeOutputElement(aboutContent3);
 };
@@ -162,6 +168,20 @@ var share = function(input, config, success) {
     }));
 };
 
+var normaliseViaAPI = function(config, success) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/normalise');
+    xhr.setRequestHeader('Content-Type', 'text/yaml');
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            success(xhr.responseText);
+        } else {
+            writeOutput("Error: Normalise request failed with status: " + xhr.status + "\n", "errorMessage");
+        }
+    };
+    xhr.send(config);
+}
+
 var setConfig = function(value) {
     var session = configSession;
     var length = session.getLength();
@@ -213,10 +233,9 @@ let initLabControls = function() {
     populateInsertSelect(benthosLab.getRatelimits(), benthosLab.addRatelimit, "ratelimitSelect");
 
     document.getElementById("normaliseBtn").onclick = function() {
-        let result = benthosLab.normalise(getConfig());
-        if ( typeof(result) === "string" ) {
+        benthosLab.normalise(getConfig(), function(result) {
             setConfig(result);
-        }
+        });
     };
 
     let executeBtn = document.getElementById("executeBtn");
@@ -249,6 +268,7 @@ let initLabControls = function() {
 benthosLab = {
     onLoad: initLabControls,
     print: writeOutput,
+    normalise: normaliseViaAPI,
 };
 
 })();
