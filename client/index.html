@@ -83,15 +83,19 @@
     </div>
   </div>
   <div id="addComponentWindow" class="hidden">
-    <select id="procSelect" name="processor-selector">
-      <option value="" selected>Add processor</option>
-    </select>
-    <select id="cacheSelect" name="cache-selector">
-      <option value="" selected>Add cache</option>
-    </select>
-    <select id="ratelimitSelect" name="ratelimit-selector">
-      <option value="" selected>Add rate limit</option>
-    </select>
+    <button class="btn-passive hidden" id="expandAddComponentSelects">+</button>
+    <button class="btn-passive" id="collapseAddComponentSelects">-</button>
+    <div id="addComponentSelects">
+      <select id="procSelect" name="processor-selector">
+        <option value="" selected>Add processor</option>
+      </select>
+      <select id="cacheSelect" name="cache-selector">
+        <option value="" selected>Add cache</option>
+      </select>
+      <select id="ratelimitSelect" name="ratelimit-selector">
+        <option value="" selected>Add rate limit</option>
+      </select>
+    </div>
   </div>
 
   <img class="prof-img" src="/img/prof.png"/>

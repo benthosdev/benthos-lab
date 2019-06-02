@@ -135,9 +135,23 @@ a {
   top: 50px;
   right: 50%;
   margin-right: 5px;
+  text-align: right;
 }
 
-#addComponentWindow > * {
+#addComponentWindow > button {
+  font-size: 14pt;
+  min-width: 30px;
+  margin: 0px;
+  margin-bottom: 3px;
+  padding: 2px 8px;
+  border: 0px;
+  border-radius: 3px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.5s, border-color 0.5s;
+}
+
+#addComponentSelects > select {
   min-width: 160px;
   display: block;
   margin-bottom: 5px;
@@ -204,6 +218,16 @@ select {
 .btn-primary:hover {
   background-color: rgb(18, 151, 96);
   border-color: rgb(18, 151, 96);
+}
+
+.btn-passive {
+  background-color: rgb(226, 226, 226);
+  border-color: rgb(226, 226, 226);
+}
+
+.btn-passive:hover {
+  background-color: rgb(220, 220, 220);
+  border-color: rgb(220, 220, 220);
 }
 
 .btn-secondary {

@@ -116,6 +116,30 @@ window.onload = function() {
         });
     };
 
+    var expandAddCompBtn = document.getElementById("expandAddComponentSelects");
+    var collapseAddCompBtn = document.getElementById("collapseAddComponentSelects");
+    var selects = document.getElementById("addComponentSelects");
+
+    expandAddCompBtn.onclick = function() {
+        expandAddCompBtn.classList.add("hidden");
+        collapseAddCompBtn.classList.remove("hidden");
+        selects.classList.remove("hidden");
+        window.Cookies.set("collapseAddComponents", "false", { expires: 30 });
+    };
+    collapseAddCompBtn.onclick = function() {
+        expandAddCompBtn.classList.remove("hidden");
+        collapseAddCompBtn.classList.add("hidden");
+        selects.classList.add("hidden");
+        window.Cookies.set("collapseAddComponents", "true", { expires: 30 });
+    };
+
+    var collapseAddComps = window.Cookies.get("collapseAddComponents");
+    if ( typeof(collapseAddComps) === "string" && collapseAddComps === "true" ) {
+        collapseAddCompBtn.click();
+    } else {
+        expandAddCompBtn.click();
+    }
+
     writeOutputElement(aboutContent);
     writeOutputElement(aboutContent3);
 };
