@@ -436,6 +436,18 @@ func main() {
 	println("WASM Benthos Initialized")
 	onLoad()
 
+	/*
+		TODO: Add this when Benthos stops being naughty.
+		info, ok := debug.ReadBuildInfo()
+		if ok {
+			for _, mod := range info.Deps {
+				if mod.Path == "github.com/Jeffail/benthos" {
+					writeOutput(fmt.Sprintf("Benthos version: %v\n", mod.Version), "infoMessage")
+				}
+			}
+		}
+	*/
+
 	js.Global().Call("addEventListener", "beforeunload", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		c <- struct{}{}
 		return nil
