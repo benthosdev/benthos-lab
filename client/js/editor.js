@@ -25,6 +25,11 @@ var aboutContent = document.createElement("div");
 aboutContent.innerHTML = `<p>
 Welcome to the Benthos Lab, a place where you can experiment with Benthos
 pipeline configurations and share them with others.
+</p>
+
+<p>
+WARNING: This application is still experimental and your shared sessions are
+subject to deletion at any time.
 </p>`;
 
 var aboutContent2 = document.createElement("div");
@@ -88,7 +93,7 @@ var openSettings = function() {
     settingsTab.classList.add("openTab");
 };
 
-window.onload = function() {
+var initTabs = function() {
     configTab = document.getElementById("configTab");
     inputTab = document.getElementById("inputTab");
     settingsTab = document.getElementById("settingsTab");
@@ -97,6 +102,14 @@ window.onload = function() {
     configTab.onclick = openConfig;
     inputTab.onclick = openInput;
     settingsTab.onclick = openSettings;
+
+    if ( window.location.hash === "#input" ) {
+        openInput();
+    }
+};
+
+window.onload = function() {
+    initTabs();
 
     let setWelcomeText = function() {
         writeOutputElement(aboutContent);
