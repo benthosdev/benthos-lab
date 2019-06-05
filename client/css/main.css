@@ -89,7 +89,7 @@ h1 > a, h2 > a, h3 > a, h4 > a {
 #editor, #settings {
   position: absolute;
   top: 50px;
-  width: 50%;
+  width: 55%;
   bottom: 0px;
   left: 0px;
 }
@@ -97,7 +97,7 @@ h1 > a, h2 > a, h3 > a, h4 > a {
 #editorOutput {
   position: absolute;
   top: 50px;
-  width: 50%;
+  width: 45%;
   bottom: 0px;
   right: 0px;
   font-size: 11pt;
@@ -133,17 +133,21 @@ a {
 #addComponentWindow {
   position: absolute;
   top: 50px;
-  right: 50%;
+  right: 45%;
   margin-right: 5px;
   text-align: right;
+  background-color: #272822;
+  border: 2px solid #5a5a5a;
+  padding: 3px;
+  border-radius: 5px;
 }
 
 #addComponentWindow > button {
-  font-size: 14pt;
-  min-width: 30px;
+  font-size: 12pt;
+  min-width: 2em;
+  text-align: center;
   margin: 0px;
-  margin-bottom: 3px;
-  padding: 2px 8px;
+  padding: 2px 0px;
   border: 0px;
   border-radius: 3px;
   font-weight: bold;
@@ -154,7 +158,7 @@ a {
 #addComponentSelects > select {
   min-width: 160px;
   display: block;
-  margin-bottom: 5px;
+  margin-top: 5px;
 }
 
 select {
@@ -182,6 +186,7 @@ select {
   border-bottom-right-radius: 0px;
   position: relative;
   bottom: -5px;
+  cursor: pointer;
 }
 
 .tab:hover {

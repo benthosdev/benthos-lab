@@ -47,6 +47,13 @@ import (
 
 //------------------------------------------------------------------------------
 
+// Build stamps.
+var (
+	Version string
+)
+
+//------------------------------------------------------------------------------
+
 var writeFunc js.Value
 
 func writeOutput(msg, style string) {
@@ -130,7 +137,7 @@ var state = &streamState{}
 
 //------------------------------------------------------------------------------
 
-func registerConnectors() {
+func registerConnectors() func() {
 	input.RegisterPlugin(
 		"benthos_lab",
 		func() interface{} {
@@ -180,6 +187,10 @@ func registerConnectors() {
 		},
 	)
 	output.DocumentPlugin("benthos_lab", "", func(conf interface{}) interface{} { return nil })
+
+	return func() {
+		state.Clear()
+	}
 }
 
 func compile(this js.Value, args []js.Value) interface{} {
@@ -394,12 +405,17 @@ func getRatelimits(this js.Value, args []js.Value) interface{} {
 
 var onLoad func()
 
-func registerFunctions() {
+func registerFunctions() func() {
 	benthosLab := js.Global().Get("benthosLab")
 	if benthosLab.Type() == js.TypeUndefined {
 		benthosLab = js.ValueOf(map[string]interface{}{})
 		js.Global().Set("benthosLab", benthosLab)
 	}
+
+	if len(Version) == 0 {
+		Version = "Unknown"
+	}
+	benthosLab.Set("version", Version)
 
 	if print := benthosLab.Get("print"); print.Type() == js.TypeFunction {
 		writeFunc = print
@@ -416,22 +432,39 @@ func registerFunctions() {
 		onLoad = func() {}
 	}
 
-	benthosLab.Set("getProcessors", js.FuncOf(getProcessors))
-	benthosLab.Set("getCaches", js.FuncOf(getCaches))
-	benthosLab.Set("getRatelimits", js.FuncOf(getRatelimits))
-	benthosLab.Set("addProcessor", js.FuncOf(addProcessor))
-	benthosLab.Set("addCache", js.FuncOf(addCache))
-	benthosLab.Set("addRatelimit", js.FuncOf(addRatelimit))
-	benthosLab.Set("normalise", js.FuncOf(normalise))
-	benthosLab.Set("compile", js.FuncOf(compile))
-	benthosLab.Set("execute", js.FuncOf(execute))
+	var fields []string
+	var funcs []js.Func
+	addLabFunction := func(name string, fn js.Func) {
+		funcs = append(funcs, fn)
+		fields = append(fields, name)
+		benthosLab.Set(name, fn)
+	}
+
+	addLabFunction("getProcessors", js.FuncOf(getProcessors))
+	addLabFunction("getCaches", js.FuncOf(getCaches))
+	addLabFunction("getRatelimits", js.FuncOf(getRatelimits))
+	addLabFunction("addProcessor", js.FuncOf(addProcessor))
+	addLabFunction("addCache", js.FuncOf(addCache))
+	addLabFunction("addRatelimit", js.FuncOf(addRatelimit))
+	addLabFunction("normalise", js.FuncOf(normalise))
+	addLabFunction("compile", js.FuncOf(compile))
+	addLabFunction("execute", js.FuncOf(execute))
+
+	return func() {
+		for _, field := range fields {
+			benthosLab.Set(field, js.Undefined())
+		}
+		for _, fn := range funcs {
+			fn.Release()
+		}
+	}
 }
 
 func main() {
 	c := make(chan struct{}, 0)
 
-	registerConnectors()
-	registerFunctions()
+	defer registerConnectors()()
+	defer registerFunctions()()
 
 	println("WASM Benthos Initialized")
 	onLoad()

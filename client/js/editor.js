@@ -24,12 +24,8 @@ function useSetting(id, onchange) {
 var aboutContent = document.createElement("div");
 aboutContent.innerHTML = `<p>
 Welcome to the Benthos Lab, a place where you can experiment with Benthos
-pipeline configurations and share them with others.
-</p>
-
-<p>
-WARNING: This application is still experimental and your shared sessions are
-subject to deletion at any time.
+pipeline configurations and share them with others. This site is graciously
+hosted by <a href="https://underthehood.meltwater.com/">Meltwater</a>.
 </p>`;
 
 var aboutContent2 = document.createElement("div");
@@ -55,7 +51,7 @@ still write and share configs that use them.
 </p>`;
 
 var aboutContent3 = document.createElement("div");
-aboutContent3.innerHTML = `<p class="infoMessage">
+aboutContent3.innerHTML = `<p>
 For more information about Benthos check out the website at
 <a href="https://www.benthos.dev/" target="_blank">https://www.benthos.dev/</a>.
 </p>`;
@@ -299,7 +295,9 @@ let initLabControls = function() {
 		compileBtn.classList.remove("btn-disabled");
 		compileBtn.classList.add("btn-primary");
 		compileBtn.disabled = false;
-	})
+    })
+
+    writeOutput("Running Benthos version: " + benthosLab.version + "\n", "infoMessage");
 };
 
 benthosLab = {
