@@ -41,6 +41,7 @@ import (
 	"github.com/Jeffail/benthos/lib/config"
 	"github.com/Jeffail/benthos/lib/log"
 	"github.com/Jeffail/benthos/lib/metrics"
+	"github.com/Jeffail/benthos/lib/ratelimit"
 	"github.com/Jeffail/benthos/lib/types"
 	labConfig "github.com/benthosdev/benthos-lab/lib/config"
 )
@@ -172,6 +173,10 @@ func shareHash(content []byte) []byte {
 
 func main() {
 	cacheConf := cache.NewConfig()
+	ratelimitConf := ratelimit.NewConfig()
+	ratelimitConf.Type = ratelimit.TypeLocal
+	ratelimitConf.Local.Count = 100
+	ratelimitConf.Local.Interval = "1s"
 
 	wwwPath := flag.String(
 		"www", ".", "Path to the directory of client files to serve",
@@ -181,6 +186,14 @@ func main() {
 	)
 	flag.StringVar(
 		&cacheConf.Redis.Expiration, "redis-ttl", cacheConf.Redis.Expiration, "Optional: Redis TTL to use for caching",
+	)
+	flag.IntVar(
+		&ratelimitConf.Local.Count, "rate-limit-count",
+		ratelimitConf.Local.Count, "The count for session access rate limiting",
+	)
+	flag.StringVar(
+		&ratelimitConf.Local.Interval, "rate-limit-interval",
+		ratelimitConf.Local.Interval, "The interval for session access rate limiting",
 	)
 	flag.Parse()
 
@@ -203,6 +216,11 @@ func main() {
 
 	cacheConf.Memory.TTL = 259200
 	cache, err := cache.New(cacheConf, types.DudMgr{}, log.NewModule(".cache"), metrics.Namespaced(stats, "cache"))
+	if err != nil {
+		panic(err)
+	}
+
+	rlimit, err := ratelimit.New(ratelimitConf, types.DudMgr{}, log.NewModule(".ratelimit"), metrics.Namespaced(stats, "ratelimit"))
 	if err != nil {
 		panic(err)
 	}
@@ -273,6 +291,24 @@ func main() {
 			http.Error(w, "Path required", http.StatusBadRequest)
 			log.Warnf("Bad path: %v\n", path)
 			return
+		}
+
+		for {
+			tout, err := rlimit.Access()
+			if err != nil {
+				http.Error(w, "Server failed", http.StatusBadGateway)
+				log.Errorf("Failed to access rate limit: %v\n", err)
+				return
+			}
+			if tout == 0 {
+				break
+			}
+			select {
+			case <-time.After(tout):
+			case <-r.Context().Done():
+				http.Error(w, "Timed out", http.StatusRequestTimeout)
+				return
+			}
 		}
 
 		stateBody, err := cache.Get(path)
@@ -361,6 +397,24 @@ func main() {
 			http.Error(w, "Failed to parse body", http.StatusBadRequest)
 			log.Errorf("Failed to normalise request body: %v\n", err)
 			return
+		}
+
+		for {
+			tout, err := rlimit.Access()
+			if err != nil {
+				http.Error(w, "Server failed", http.StatusBadGateway)
+				log.Errorf("Failed to access rate limit: %v\n", err)
+				return
+			}
+			if tout == 0 {
+				break
+			}
+			select {
+			case <-time.After(tout):
+			case <-r.Context().Done():
+				http.Error(w, "Timed out", http.StatusRequestTimeout)
+				return
+			}
 		}
 
 		hashBytes := shareHash(reqBody)
