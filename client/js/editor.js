@@ -256,7 +256,7 @@ var populateInsertSelect = function(list, addFunc, selectId) {
 
 let initLabControls = function() {
     document.getElementById("failedText").classList.add("hidden");
-    if (configTab == null || !configTab.classList.contains("hidden")) {
+    if (configTab == null || configTab.classList.contains("openTab")) {
         document.getElementById("addComponentWindow").classList.remove("hidden");
     }
     document.getElementById("happyGroup").classList.remove("hidden");
@@ -271,30 +271,38 @@ let initLabControls = function() {
         });
     };
 
-    let executeBtn = document.getElementById("executeBtn");
-    executeBtn.onclick = function() {
-        benthosLab.execute(getInput());
-    };
-
-    let compileBtn = document.getElementById("compileBtn");
-    compileBtn.onclick = function() {
-        executeBtn.classList.add("btn-disabled");
-        executeBtn.classList.remove("btn-primary");
-        executeBtn.disabled = true;
+    var hasCompiled = false;
+    var compile = function(onSuccess) {
         benthosLab.compile(getConfig(), function() {
-            executeBtn.classList.remove("btn-disabled");
-            executeBtn.classList.add("btn-primary");
-            executeBtn.disabled = false;
+            hasCompiled = true;
             compileBtn.classList.add("btn-disabled");
             compileBtn.classList.remove("btn-primary");
             compileBtn.disabled = true;
+            if ( typeof(onSuccess) === "function" ) {
+                onSuccess();
+            }
         });
     };
+
+    let executeBtn = document.getElementById("executeBtn");
+    executeBtn.onclick = function() {
+        if (!hasCompiled) {
+            compile(function() {
+                benthosLab.execute(getInput());
+            });
+        } else {
+            benthosLab.execute(getInput());
+        }
+    };
+
+    let compileBtn = document.getElementById("compileBtn");
+    compileBtn.onclick = compile;
 
     configSession.on("change", function() {
 		compileBtn.classList.remove("btn-disabled");
 		compileBtn.classList.add("btn-primary");
-		compileBtn.disabled = false;
+        compileBtn.disabled = false;
+        hasCompiled = false;
     })
 
     writeOutput("Running Benthos version: " + benthosLab.version + "\n", "infoMessage");
