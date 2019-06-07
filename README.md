@@ -2,11 +2,13 @@
 
 [![Build Status](https://cloud.drone.io/api/badges/benthosdev/benthos-lab/status.svg)](https://cloud.drone.io/benthosdev/benthos-lab)
 
-This is an experimental site using a WASM build of
-[Benthos](https://www.benthos.dev/) for testing pipelines in the browser.
+Benthos Lab is a web application for building, formatting, testing and sharing
+[Benthos](https://www.benthos.dev/) pipeline configurations.
 
-This repo is subject to stagnation, modification beyond recognition, outright
-deletion. I'm basically just messing about for fun, please don't get mad.
+It contains a full version of the Benthos streaming engine compiled to Web
+Assembly. This allows it to run natively within the browser sandbox rather than
+on a hosted instance, this allows us to be relaxed in regards to allowing
+certain processors and connectors to execute.
 
 ### Install
 
