@@ -117,6 +117,18 @@
         }
       });
 
+      editor.commands.addCommand({
+        name: 'execute',
+        bindKey: {
+          win: 'Shift-Enter', mac: 'Shift-Enter',
+          sender: 'editor|cli'
+        },
+        exec: function (env, args, request) {
+          var executeBtn = document.getElementById("executeBtn");
+          executeBtn.click();
+        }
+      });
+
       useSetting("keymapSelect", function(e) {
         editor.setKeyboardHandler(e.value);
       });
