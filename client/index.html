@@ -86,8 +86,14 @@
     <button class="btn-passive hidden" id="expandAddComponentSelects">+</button>
     <button class="btn-passive" id="collapseAddComponentSelects">-</button>
     <div id="addComponentSelects">
+      <select id="inputSelect" name="input-selector">
+        <option value="" selected>Add input</option>
+      </select>
       <select id="procSelect" name="processor-selector">
         <option value="" selected>Add processor</option>
+      </select>
+      <select id="outputSelect" name="output-selector">
+        <option value="" selected>Add output</option>
       </select>
       <select id="cacheSelect" name="cache-selector">
         <option value="" selected>Add cache</option>
@@ -120,7 +126,7 @@
       editor.commands.addCommand({
         name: 'execute',
         bindKey: {
-          win: 'Shift-Enter', mac: 'Shift-Enter',
+          win: 'Ctrl-Enter', mac: 'Command-Enter',
           sender: 'editor|cli'
         },
         exec: function (env, args, request) {

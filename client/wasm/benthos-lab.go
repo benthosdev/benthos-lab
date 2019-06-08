@@ -295,6 +295,27 @@ func normalise(this js.Value, args []js.Value) interface{} {
 
 //------------------------------------------------------------------------------
 
+func addInput(this js.Value, args []js.Value) interface{} {
+	inputType, contents := args[0].String(), args[1].String()
+	conf, err := labConfig.Unmarshal(contents)
+	if err != nil {
+		reportErr("Failed to unmarshal current config: %v\n", err)
+		return nil
+	}
+
+	if err := labConfig.AddInput(inputType, &conf); err != nil {
+		reportErr("Failed to add input: %v\n", err)
+		return nil
+	}
+
+	resultBytes, err := labConfig.Marshal(conf)
+	if err != nil {
+		reportErr("failed to normalise config: %v\n", err)
+		return nil
+	}
+	return string(resultBytes)
+}
+
 func addProcessor(this js.Value, args []js.Value) interface{} {
 	procType, contents := args[0].String(), args[1].String()
 	conf, err := labConfig.Unmarshal(contents)
@@ -305,6 +326,27 @@ func addProcessor(this js.Value, args []js.Value) interface{} {
 
 	if err := labConfig.AddProcessor(procType, &conf); err != nil {
 		reportErr("Failed to add processor: %v\n", err)
+		return nil
+	}
+
+	resultBytes, err := labConfig.Marshal(conf)
+	if err != nil {
+		reportErr("failed to normalise config: %v\n", err)
+		return nil
+	}
+	return string(resultBytes)
+}
+
+func addOutput(this js.Value, args []js.Value) interface{} {
+	outputType, contents := args[0].String(), args[1].String()
+	conf, err := labConfig.Unmarshal(contents)
+	if err != nil {
+		reportErr("Failed to unmarshal current config: %v\n", err)
+		return nil
+	}
+
+	if err := labConfig.AddOutput(outputType, &conf); err != nil {
+		reportErr("Failed to add output: %v\n", err)
 		return nil
 	}
 
@@ -362,6 +404,19 @@ func addRatelimit(this js.Value, args []js.Value) interface{} {
 
 //------------------------------------------------------------------------------
 
+func getInputs(this js.Value, args []js.Value) interface{} {
+	inputs := []string{"benthos_lab"}
+	for k := range input.Constructors {
+		inputs = append(inputs, k)
+	}
+	sort.Strings(inputs)
+	generic := make([]interface{}, len(inputs))
+	for i, v := range inputs {
+		generic[i] = v
+	}
+	return generic
+}
+
 func getProcessors(this js.Value, args []js.Value) interface{} {
 	procs := []string{}
 	for k := range processor.Constructors {
@@ -370,6 +425,19 @@ func getProcessors(this js.Value, args []js.Value) interface{} {
 	sort.Strings(procs)
 	generic := make([]interface{}, len(procs))
 	for i, v := range procs {
+		generic[i] = v
+	}
+	return generic
+}
+
+func getOutputs(this js.Value, args []js.Value) interface{} {
+	outputs := []string{"benthos_lab"}
+	for k := range output.Constructors {
+		outputs = append(outputs, k)
+	}
+	sort.Strings(outputs)
+	generic := make([]interface{}, len(outputs))
+	for i, v := range outputs {
 		generic[i] = v
 	}
 	return generic
@@ -440,10 +508,14 @@ func registerFunctions() func() {
 		benthosLab.Set(name, fn)
 	}
 
+	addLabFunction("getInputs", js.FuncOf(getInputs))
 	addLabFunction("getProcessors", js.FuncOf(getProcessors))
+	addLabFunction("getOutputs", js.FuncOf(getOutputs))
 	addLabFunction("getCaches", js.FuncOf(getCaches))
 	addLabFunction("getRatelimits", js.FuncOf(getRatelimits))
+	addLabFunction("addInput", js.FuncOf(addInput))
 	addLabFunction("addProcessor", js.FuncOf(addProcessor))
+	addLabFunction("addOutput", js.FuncOf(addOutput))
 	addLabFunction("addCache", js.FuncOf(addCache))
 	addLabFunction("addRatelimit", js.FuncOf(addRatelimit))
 	addLabFunction("normalise", js.FuncOf(normalise))

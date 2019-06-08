@@ -261,7 +261,9 @@ let initLabControls = function() {
     }
     document.getElementById("happyGroup").classList.remove("hidden");
 
+    populateInsertSelect(benthosLab.getInputs(), benthosLab.addInput, "inputSelect");
     populateInsertSelect(benthosLab.getProcessors(), benthosLab.addProcessor, "procSelect");
+    populateInsertSelect(benthosLab.getOutputs(), benthosLab.addOutput, "outputSelect");
     populateInsertSelect(benthosLab.getCaches(), benthosLab.addCache, "cacheSelect");
     populateInsertSelect(benthosLab.getRatelimits(), benthosLab.addRatelimit, "ratelimitSelect");
 
