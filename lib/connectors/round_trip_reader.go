@@ -21,10 +21,9 @@
 package connectors
 
 import (
-	"context"
 	"time"
 
-	"github.com/Jeffail/benthos/lib/message"
+	"github.com/Jeffail/benthos/lib/message/roundtrip"
 	"github.com/Jeffail/benthos/lib/types"
 )
 
@@ -40,7 +39,7 @@ type RoundTripReader struct {
 	read           func() (types.Message, error)
 	processResults func([]types.Message, error)
 
-	store ResultStore
+	store roundtrip.ResultStore
 }
 
 // NewRoundTripReader returns a RoundTripReader.
@@ -51,7 +50,7 @@ func NewRoundTripReader(
 	return &RoundTripReader{
 		read:           read,
 		processResults: processResults,
-		store:          NewResultStore(),
+		store:          roundtrip.NewResultStore(),
 	}
 }
 
@@ -75,15 +74,7 @@ func (f *RoundTripReader) Read() (types.Message, error) {
 		return nil, err
 	}
 
-	parts := make([]types.Part, msg.Len())
-	msg.Iter(func(i int, p types.Part) error {
-		ctx := message.GetContext(p)
-		parts[i] = message.WithContext(context.WithValue(ctx, ResultStoreKey, f.store), p)
-		return nil
-	})
-
-	msg = message.New(nil)
-	msg.SetAll(parts)
+	roundtrip.AddResultStore(msg, f.store)
 	return msg, nil
 }
 

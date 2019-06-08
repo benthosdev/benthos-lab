@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/Jeffail/benthos/lib/message"
+	"github.com/Jeffail/benthos/lib/message/roundtrip"
 	"github.com/Jeffail/benthos/lib/types"
 )
 
@@ -163,7 +164,7 @@ func TestRoundTripReaderResponse(t *testing.T) {
 	}
 
 	ctx := message.GetContext(msg.Get(0))
-	store, ok := ctx.Value(ResultStoreKey).(ResultStore)
+	store, ok := ctx.Value(roundtrip.ResultStoreKey).(roundtrip.ResultStore)
 	if !ok {
 		t.Fatalf("Wrong type returned from context: %T", store)
 	}

@@ -35,6 +35,7 @@ import (
 	"github.com/Jeffail/benthos/lib/log"
 	"github.com/Jeffail/benthos/lib/manager"
 	"github.com/Jeffail/benthos/lib/message"
+	"github.com/Jeffail/benthos/lib/message/roundtrip"
 	"github.com/Jeffail/benthos/lib/metrics"
 	"github.com/Jeffail/benthos/lib/output"
 	"github.com/Jeffail/benthos/lib/processor"
@@ -182,7 +183,7 @@ func registerConnectors() func() {
 			return &s
 		},
 		func(_ interface{}, _ types.Manager, logger log.Modular, stats metrics.Type) (types.Output, error) {
-			wtr := connectors.StoreWriter{}
+			wtr := roundtrip.Writer{}
 			return output.NewWriter("benthos_lab", wtr, logger, stats)
 		},
 	)
