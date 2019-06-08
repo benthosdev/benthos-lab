@@ -4,6 +4,7 @@ body {
   color: #fff;
   padding: 0px;
   margin: 0px;
+  font-size: 12pt;
 }
 
 h1, h2, h3, h4 {
@@ -12,6 +13,11 @@ h1, h2, h3, h4 {
 
 h1 > a, h2 > a, h3 > a, h4 > a {
   color: rgb(209, 252, 124) !important;
+}
+
+hr {
+  color: rgb(209, 252, 124, 0.5);
+  max-width: 240px;
 }
 
 .normal-mode .ace_hidden-cursors .ace_cursor {
@@ -53,13 +59,20 @@ h1 > a, h2 > a, h3 > a, h4 > a {
   background-color: #33352e;
 }
 
-.navbar > h4 {
+.navbar > h3 {
   display: inline-block;
   margin: 0px;
-  padding-top: 6px;
 }
 
-.prof-img {
+.benthos-img {
+  position: absolute;
+  height: 28px;
+  right: 56px;
+  top: 8px;
+  z-index: 10;
+}
+
+.github-img {
   position: absolute;
   height: 32px;
   right: 10px;
@@ -69,7 +82,22 @@ h1 > a, h2 > a, h3 > a, h4 > a {
 
 #settings {
   padding: 10px;
-  text-align: center
+  text-align: center;
+  overflow: auto;
+}
+
+#settings > hr {
+  margin: 30px auto 0px auto;
+}
+
+#settings > h2 {
+  margin: 30px 0px 5px 0px;
+}
+
+#settings > h3 {
+  font-weight: normal;
+  font-size: 1em;
+  margin: 0px 0px 20px 0px;
 }
 
 #settings > div {
@@ -80,10 +108,6 @@ h1 > a, h2 > a, h3 > a, h4 > a {
 .setting {
   margin-bottom: 10px;
   text-align: left;
-}
-
-#settings > h2 {
-  text-align: center;
 }
 
 #editor, #settings {
@@ -100,7 +124,6 @@ h1 > a, h2 > a, h3 > a, h4 > a {
   width: 45%;
   bottom: 0px;
   right: 0px;
-  font-size: 11pt;
   border-left: 2px solid #202020;
   overflow: auto;
   font-family: monospace;
@@ -143,7 +166,6 @@ a {
 }
 
 #addComponentWindow > button {
-  font-size: 12pt;
   min-width: 2em;
   text-align: center;
   margin: 0px;
@@ -168,7 +190,6 @@ select {
   color: #fff;
   border-radius: 4px;
   padding: 5px;
-  font-size: 10pt;
 }
 
 .hidden {
@@ -205,7 +226,6 @@ select {
   min-width: 80px;
   display: inline;
   text-decoration: none;
-  font-size: 11pt;
   cursor: pointer;
   transition: background-color 0.5s, border-color 0.5s;
 }
@@ -327,7 +347,7 @@ select {
   }
 }
 
-@media (max-width: 40rem) {
+@media (max-width: 42rem) {
   #addComponentWindow > * {
     min-width: 140px;
   }
@@ -341,7 +361,10 @@ select {
     z-index: 50;
   }
 
-  .prof-img {
+  .benthos-img {
+    display: none;
+  }
+  .github-img {
     display: none;
   }
 }

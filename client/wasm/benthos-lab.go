@@ -237,19 +237,30 @@ func compile(this js.Value, args []js.Value) interface{} {
 }
 
 func execute(this js.Value, args []js.Value) interface{} {
-	inputContent := args[0].String()
-	lines := strings.Split(inputContent, "\n")
+	inputMethod := args[0].String()
+	inputContent := args[1].String()
 
 	inputMsgs := []types.Message{}
-	inputMsgs = append(inputMsgs, message.New(nil))
-	for _, line := range lines {
-		if len(line) == 0 {
-			if inputMsgs[len(inputMsgs)-1].Len() > 0 {
-				inputMsgs = append(inputMsgs, message.New(nil))
+
+	switch inputMethod {
+	case "batches":
+		lines := strings.Split(inputContent, "\n")
+
+		inputMsgs = append(inputMsgs, message.New(nil))
+		for _, line := range lines {
+			if len(line) == 0 {
+				if inputMsgs[len(inputMsgs)-1].Len() > 0 {
+					inputMsgs = append(inputMsgs, message.New(nil))
+				}
+				continue
 			}
-			continue
+			inputMsgs[len(inputMsgs)-1].Append(message.NewPart([]byte(line)))
 		}
-		inputMsgs[len(inputMsgs)-1].Append(message.NewPart([]byte(line)))
+	case "message":
+		inputMsgs = append(inputMsgs, message.New([][]byte{[]byte(inputContent)}))
+	default:
+		reportErr("failed to dispatch message: %v\n", fmt.Errorf("unrecognised input method: %v", inputMethod))
+		return nil
 	}
 
 	go state.SendAll(inputMsgs)

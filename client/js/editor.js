@@ -56,6 +56,27 @@ For more information about Benthos check out the website at
 <a href="https://www.benthos.dev/" target="_blank">https://www.benthos.dev/</a>.
 </p>`;
 
+var sessionSettings = {};
+
+function useSessionSetting(id, defaultVal, onchange) {
+    var currentVal = sessionSettings[id];
+
+    var settingField = document.getElementById(id);
+    if ( typeof(currentVal) === "string" && currentVal.length > 0 ) {
+        settingField.value = currentVal;
+    } else {
+        settingField.value = defaultVal;
+    }
+
+    settingField.onchange = function(e) {
+        sessionSettings[id] = e.target.value;
+        onchange(e.target);
+    };
+
+    sessionSettings[id] = settingField.value;
+    onchange(settingField);
+}
+
 var configTab, inputTab, settingsTab;
 
 var openConfig = function() {
@@ -104,8 +125,18 @@ var initTabs = function() {
     }
 };
 
+let inputMethod = "batches";
+
 window.onload = function() {
+    if ( typeof(model.settings) === "object" ) {
+        sessionSettings = model.settings;
+    }
+
     initTabs();
+
+    useSessionSetting("inputMethodSelect", inputMethod, function(e) {
+        inputMethod = e.value;
+    });
 
     let setWelcomeText = function() {
         writeOutputElement(aboutContent);
@@ -198,6 +229,7 @@ var share = function(input, config, success) {
     xhr.send(JSON.stringify({
         input: input,
         config: config,
+        settings: sessionSettings
     }));
 };
 
@@ -290,10 +322,10 @@ let initLabControls = function() {
     executeBtn.onclick = function() {
         if (!hasCompiled) {
             compile(function() {
-                benthosLab.execute(getInput());
+                benthosLab.execute(inputMethod, getInput());
             });
         } else {
-            benthosLab.execute(getInput());
+            benthosLab.execute(inputMethod, getInput());
         }
     };
 

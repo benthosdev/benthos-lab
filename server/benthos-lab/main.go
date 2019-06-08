@@ -383,8 +383,9 @@ func main() {
 		defer r.Body.Close()
 
 		state := struct {
-			Config string `json:"config"`
-			Input  string `json:"input"`
+			Config   string            `json:"config"`
+			Input    string            `json:"input"`
+			Settings map[string]string `json:"settings"`
 		}{}
 
 		if err = json.Unmarshal(reqBody, &state); err != nil {
