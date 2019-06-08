@@ -386,7 +386,9 @@ func main() {
 			Config   string            `json:"config"`
 			Input    string            `json:"input"`
 			Settings map[string]string `json:"settings"`
-		}{}
+		}{
+			Settings: map[string]string{},
+		}
 
 		if err = json.Unmarshal(reqBody, &state); err != nil {
 			http.Error(w, "Failed to parse body", http.StatusBadRequest)

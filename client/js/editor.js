@@ -128,7 +128,7 @@ var initTabs = function() {
 let inputMethod = "batches";
 
 window.onload = function() {
-    if ( typeof(model.settings) === "object" ) {
+    if ( typeof(model.settings) === "object" && model.settings !== null ) {
         sessionSettings = model.settings;
     }
 
