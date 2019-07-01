@@ -25,6 +25,7 @@ import (
 	"fmt"
 
 	"github.com/Jeffail/benthos/lib/cache"
+	"github.com/Jeffail/benthos/lib/condition"
 	"github.com/Jeffail/benthos/lib/config"
 	"github.com/Jeffail/benthos/lib/input"
 	"github.com/Jeffail/benthos/lib/output"
@@ -65,6 +66,23 @@ func AddProcessor(cType string, conf *config.Type) error {
 	}
 	procConf := processor.NewConfig()
 	procConf.Type = cType
+
+	conf.Pipeline.Processors = append(conf.Pipeline.Processors, procConf)
+	return nil
+}
+
+// AddCondition inserts a filter_parts processor with a default condition of a
+// type to an existing config.
+func AddCondition(cType string, conf *config.Type) error {
+	if _, ok := condition.Constructors[cType]; !ok {
+		return fmt.Errorf("condition type '%v' not recognised", cType)
+	}
+	condConf := condition.NewConfig()
+	condConf.Type = cType
+
+	procConf := processor.NewConfig()
+	procConf.Type = processor.TypeFilterParts
+	procConf.FilterParts.Config = condConf
 
 	conf.Pipeline.Processors = append(conf.Pipeline.Processors, procConf)
 	return nil

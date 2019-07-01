@@ -295,6 +295,7 @@ let initLabControls = function() {
 
     populateInsertSelect(benthosLab.getInputs(), benthosLab.addInput, "inputSelect");
     populateInsertSelect(benthosLab.getProcessors(), benthosLab.addProcessor, "procSelect");
+    populateInsertSelect(benthosLab.getConditions(), benthosLab.addCondition, "condSelect");
     populateInsertSelect(benthosLab.getOutputs(), benthosLab.addOutput, "outputSelect");
     populateInsertSelect(benthosLab.getCaches(), benthosLab.addCache, "cacheSelect");
     populateInsertSelect(benthosLab.getRatelimits(), benthosLab.addRatelimit, "ratelimitSelect");
