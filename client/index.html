@@ -4,7 +4,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Benthos lab allows you to edit, execute and share Benthos pipeline configurations from your browser.">
+  <meta name="description"
+    content="Benthos lab allows you to edit, execute and share Benthos pipeline configurations from your browser.">
   <meta name="keywords" content="benthos lab,benthos,stream processor,go,golang">
   <meta name="author" content="Ashley Jeffs">
 
@@ -21,16 +22,16 @@
 
   <script>
     const model =
-// BENTHOS LAB START
-{
-  config: `pipeline:
+    // BENTHOS LAB START
+    {
+      config: `pipeline:
   processors:
   - jmespath:
       query: '{ message: @, meta: { link_count: length(links) } }'`,
-  input: '{"id":"foo","links":["https://github.com/Jeffail/benthos","https://docs.benthos.dev","https://www.benthos.dev"]}'
-}
-// BENTHOS LAB END
-;
+      input: '{"id":"foo","links":["https://github.com/Jeffail/benthos","https://docs.benthos.dev","https://www.benthos.dev"]}'
+    }
+      // BENTHOS LAB END
+      ;
   </script>
 
 </head>
@@ -62,11 +63,12 @@
   <div id="editor"></div>
   <div id="editorOutput">
     <div style="text-align:center;">
-      <img id="profBanner" style="max-width:50%;" src="/img/logo.svg"/>
+      <img id="profBanner" style="max-width:50%;" src="/img/logo.svg" />
     </div>
     <div id="failedText" class="lintMessage">
       <p>Attempting to initialise Benthos engine...</p>
-      <p>If this message does not disappear then something went wrong, but you can still edit and share your config as usual.</p>
+      <p>If this message does not disappear then something went wrong, but you can still edit and share your config as
+        usual.</p>
     </div>
   </div>
   <div id="settings" class="hidden">
@@ -76,7 +78,8 @@
       <div class="setting">
         <span>Process input as: </span>
         <select id="inputMethodSelect" name="input-method-selector">
-          <option value="batches" selected>each line is a message</option>
+          <option value="batches" selected>each line is a message of a batch</option>
+          <option value="messages">each line is a single message batch</option>
           <option value="message">single message</option>
         </select>
       </div>
@@ -120,52 +123,52 @@
     </div>
   </div>
 
-  <a href="https://www.benthos.dev"><img class="benthos-img" src="/img/benthos_logo.svg"/></a>
-  <a href="https://github.com/benthosdev/benthos-lab"><img class="github-img" src="/img/github_logo.svg"/></a>
+  <a href="https://www.benthos.dev"><img class="benthos-img" src="/img/benthos_logo.svg" /></a>
+  <a href="https://github.com/benthosdev/benthos-lab"><img class="github-img" src="/img/github_logo.svg" /></a>
 
   <!-- ACE Editor -->
   <script src="/vendor/ace/ace.js" type="text/javascript" charset="utf-8"></script>
   <script>
-      var editor = ace.edit("editor");
+    var editor = ace.edit("editor");
 
-      editor.commands.addCommand({
-        name: 'saveFile',
-        bindKey: {
-          win: 'Ctrl-S', mac: 'Command-S',
-          sender: 'editor|cli'
-        },
-        exec: function (env, args, request) {
-          var shareBtn = document.getElementById("shareBtn");
-          shareBtn.click();
-        }
-      });
+    editor.commands.addCommand({
+      name: 'saveFile',
+      bindKey: {
+        win: 'Ctrl-S', mac: 'Command-S',
+        sender: 'editor|cli'
+      },
+      exec: function (env, args, request) {
+        var shareBtn = document.getElementById("shareBtn");
+        shareBtn.click();
+      }
+    });
 
-      editor.commands.addCommand({
-        name: 'execute',
-        bindKey: {
-          win: 'Ctrl-Enter', mac: 'Command-Enter',
-          sender: 'editor|cli'
-        },
-        exec: function (env, args, request) {
-          var executeBtn = document.getElementById("executeBtn");
-          executeBtn.click();
-        }
-      });
+    editor.commands.addCommand({
+      name: 'execute',
+      bindKey: {
+        win: 'Ctrl-Enter', mac: 'Command-Enter',
+        sender: 'editor|cli'
+      },
+      exec: function (env, args, request) {
+        var executeBtn = document.getElementById("executeBtn");
+        executeBtn.click();
+      }
+    });
 
-      useSetting("keymapSelect", function(e) {
-        editor.setKeyboardHandler(e.value);
-      });
+    useSetting("keymapSelect", function (e) {
+      editor.setKeyboardHandler(e.value);
+    });
 
-      var configSession = ace.createEditSession(model.config, "ace/mode/yaml");
-      configSession.setTabSize(2);
+    var configSession = ace.createEditSession(model.config, "ace/mode/yaml");
+    configSession.setTabSize(2);
 
-      var inputSession = ace.createEditSession(model.input, "ace/mode/text");
-      inputSession.setUseWrapMode(true);
+    var inputSession = ace.createEditSession(model.input, "ace/mode/text");
+    inputSession.setUseWrapMode(true);
 
-      editor.setFontSize("13pt");
-      editor.setTheme("ace/theme/monokai");
-      editor.setSession(configSession);
-      editor.setShowPrintMargin(false);
+    editor.setFontSize("13pt");
+    editor.setTheme("ace/theme/monokai");
+    editor.setSession(configSession);
+    editor.setShowPrintMargin(false);
   </script>
 </body>
 

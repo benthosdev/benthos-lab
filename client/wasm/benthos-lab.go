@@ -257,6 +257,11 @@ func execute(this js.Value, args []js.Value) interface{} {
 			}
 			inputMsgs[len(inputMsgs)-1].Append(message.NewPart([]byte(line)))
 		}
+	case "messages":
+		lines := strings.Split(inputContent, "\n")
+		for _, line := range lines {
+			inputMsgs = append(inputMsgs, message.New([][]byte{[]byte(line)}))
+		}
 	case "message":
 		inputMsgs = append(inputMsgs, message.New([][]byte{[]byte(inputContent)}))
 	default:
