@@ -234,8 +234,21 @@ func main() {
 	mWASMGet200 := httpStats.GetCounter("wasm.get.200")
 	mWASMGet304 := httpStats.GetCounter("wasm.get.304")
 	mWASMGetNoGZIP := httpStats.GetCounter("wasm.no_gzip")
-	normaliseCtr := httpStats.GetCounter("normalise")
-	shareCtr := httpStats.GetCounter("share")
+	mNormaliseReq := httpStats.GetCounter("normalise")
+	mShareReq := httpStats.GetCounter("share")
+	mHTTPNormaliseSucc := stats.GetCounter("usage.normalise_http.success")
+	mHTTPNormaliseFail := stats.GetCounter("usage.normalise_http.failed")
+	mShareSucc := stats.GetCounter("usage.share.success")
+	mShareFail := stats.GetCounter("usage.share.failed")
+	mActivity := stats.GetCounter("usage.activity")
+
+	makeMetricHandler := func(path string) http.HandlerFunc {
+		counter := stats.GetCounter(path)
+		return func(w http.ResponseWriter, r *http.Request) {
+			counter.Incr(1)
+			mActivity.Incr(1)
+		}
+	}
 
 	notFoundHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Del("Content-Type")
@@ -253,6 +266,13 @@ func main() {
 			w.Write([]byte("Not found"))
 		}
 	}
+
+	mux.HandleFunc("/usage/compile/success", makeMetricHandler("usage.compile.success"))
+	mux.HandleFunc("/usage/compile/failed", makeMetricHandler("usage.compile.failed"))
+	mux.HandleFunc("/usage/execute/success", makeMetricHandler("usage.execute.success"))
+	mux.HandleFunc("/usage/execute/failed", makeMetricHandler("usage.execute.failed"))
+	mux.HandleFunc("/usage/normalise/success", makeMetricHandler("usage.normalise.success"))
+	mux.HandleFunc("/usage/normalise/failed", makeMetricHandler("usage.normalise.failed"))
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fileServe.ServeHTTP(hijackCode(http.StatusNotFound, w, r, notFoundHandler), r)
@@ -336,16 +356,19 @@ func main() {
 	})
 
 	mux.HandleFunc("/normalise", func(w http.ResponseWriter, r *http.Request) {
-		normaliseCtr.Incr(1)
+		mNormaliseReq.Incr(1)
+		mActivity.Incr(1)
 		if r.Method != "POST" {
 			http.Error(w, "Method not supported", http.StatusBadRequest)
 			log.Warnf("Bad method: %v\n", r.Method)
+			mHTTPNormaliseFail.Incr(1)
 			return
 		}
 		reqBody, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			http.Error(w, "Failed to read body", http.StatusBadRequest)
 			log.Errorf("Failed to read request body: %v\n", err)
+			mHTTPNormaliseFail.Incr(1)
 			return
 		}
 		defer r.Body.Close()
@@ -354,6 +377,7 @@ func main() {
 		if conf, err = labConfig.Unmarshal(string(reqBody)); err != nil {
 			http.Error(w, "Failed to parse body", http.StatusBadRequest)
 			log.Errorf("Failed to parse request body: %v\n", err)
+			mHTTPNormaliseFail.Incr(1)
 			return
 		}
 
@@ -361,23 +385,28 @@ func main() {
 		if resBytes, err = labConfig.Marshal(conf); err != nil {
 			http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
 			log.Errorf("Failed to marshal response body: %v\n", err)
+			mHTTPNormaliseFail.Incr(1)
 			return
 		}
 
+		mHTTPNormaliseSucc.Incr(1)
 		w.Write(resBytes)
 	})
 
 	mux.HandleFunc("/share", func(w http.ResponseWriter, r *http.Request) {
-		shareCtr.Incr(1)
+		mShareReq.Incr(1)
+		mActivity.Incr(1)
 		if r.Method != "POST" {
 			http.Error(w, "Method not supported", http.StatusBadRequest)
 			log.Warnf("Bad method: %v\n", r.Method)
+			mShareFail.Incr(1)
 			return
 		}
 		reqBody, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			http.Error(w, "Failed to read body", http.StatusBadRequest)
 			log.Errorf("Failed to read request body: %v\n", err)
+			mShareFail.Incr(1)
 			return
 		}
 		defer r.Body.Close()
@@ -393,12 +422,14 @@ func main() {
 		if err = json.Unmarshal(reqBody, &state); err != nil {
 			http.Error(w, "Failed to parse body", http.StatusBadRequest)
 			log.Errorf("Failed to parse request body: %v\n", err)
+			mShareFail.Incr(1)
 			return
 		}
 
 		if reqBody, err = json.Marshal(state); err != nil {
 			http.Error(w, "Failed to parse body", http.StatusBadRequest)
 			log.Errorf("Failed to normalise request body: %v\n", err)
+			mShareFail.Incr(1)
 			return
 		}
 
@@ -407,6 +438,7 @@ func main() {
 			if err != nil {
 				http.Error(w, "Server failed", http.StatusBadGateway)
 				log.Errorf("Failed to access rate limit: %v\n", err)
+				mShareFail.Incr(1)
 				return
 			}
 			if tout == 0 {
@@ -416,6 +448,7 @@ func main() {
 			case <-time.After(tout):
 			case <-r.Context().Done():
 				http.Error(w, "Timed out", http.StatusRequestTimeout)
+				mShareFail.Incr(1)
 				return
 			}
 		}
@@ -424,9 +457,11 @@ func main() {
 		if err = cache.Add(string(hashBytes), reqBody); err != nil && err != types.ErrKeyAlreadyExists {
 			http.Error(w, "Save failed", http.StatusBadGateway)
 			log.Errorf("Failed to store request body: %v\n", err)
+			mShareFail.Incr(1)
 			return
 		}
 
+		mShareSucc.Incr(1)
 		w.Write(hashBytes)
 	})
 

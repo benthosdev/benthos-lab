@@ -23,6 +23,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"sort"
 	"strings"
 	"sync"
@@ -70,6 +71,12 @@ func reportLints(msg []string) {
 	for _, m := range msg {
 		writeOutput("Lint: "+m+"\n", "lintMessage")
 	}
+}
+
+//------------------------------------------------------------------------------
+
+func reportUsage(path string) {
+	http.Post("/usage/"+path, "text/plain", nil)
 }
 
 //------------------------------------------------------------------------------
@@ -200,6 +207,7 @@ func compile(this js.Value, args []js.Value) interface{} {
 	conf, err := labConfig.Unmarshal(contents)
 	if err != nil {
 		reportErr("failed to create pipeline: %v\n", err)
+		go reportUsage("compile/failed")
 		return nil
 	}
 
@@ -211,6 +219,7 @@ func compile(this js.Value, args []js.Value) interface{} {
 		mgr, err := manager.New(conf.Manager, types.NoopMgr(), logger, metrics.Noop())
 		if err != nil {
 			reportErr("failed to create pipeline resources: %v\n", err)
+			go reportUsage("compile/failed")
 			return
 		}
 
@@ -218,6 +227,7 @@ func compile(this js.Value, args []js.Value) interface{} {
 		if err != nil {
 			mgr.CloseAsync()
 			reportErr("failed to create pipeline: %v\n", err)
+			go reportUsage("compile/failed")
 			return
 		}
 
@@ -225,10 +235,12 @@ func compile(this js.Value, args []js.Value) interface{} {
 
 		if lints, err := config.Lint([]byte(contents), conf); err != nil {
 			reportErr("failed to parse config for linter: %v\n", err)
+			go reportUsage("compile/failed")
 		} else if len(lints) > 0 {
 			reportLints(lints)
 		}
 
+		go reportUsage("compile/success")
 		writeOutput("Compiled successfully.\n", "infoMessage")
 		if successFunc.Type() == js.TypeFunction {
 			successFunc.Invoke()
@@ -266,9 +278,11 @@ func execute(this js.Value, args []js.Value) interface{} {
 		inputMsgs = append(inputMsgs, message.New([][]byte{[]byte(inputContent)}))
 	default:
 		reportErr("failed to dispatch message: %v\n", fmt.Errorf("unrecognised input method: %v", inputMethod))
+		go reportUsage("execute/failed")
 		return nil
 	}
 
+	go reportUsage("execute/success")
 	go state.SendAll(inputMsgs)
 	return nil
 }
@@ -296,15 +310,18 @@ func normalise(this js.Value, args []js.Value) interface{} {
 	conf, err := labConfig.Unmarshal(contents)
 	if err != nil {
 		reportErr("failed to create pipeline: %v\n", err)
+		go reportUsage("normalise/failed")
 		return nil
 	}
 
 	sanitBytes, err := labConfig.Marshal(conf)
 	if err != nil {
 		reportErr("failed to normalise config: %v\n", err)
+		go reportUsage("normalise/failed")
 		return nil
 	}
 
+	go reportUsage("normalise/success")
 	if args[1].Type() == js.TypeFunction {
 		args[1].Invoke(string(sanitBytes))
 	}
