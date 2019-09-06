@@ -4,11 +4,11 @@ function useSetting(id, onchange) {
     var currentVal = window.Cookies.get(id);
 
     var settingField = document.getElementById(id);
-    if ( typeof(currentVal) === "string" && currentVal.length > 0 ) {
+    if (typeof (currentVal) === "string" && currentVal.length > 0) {
         settingField.value = currentVal;
     }
 
-    settingField.onchange = function(e) {
+    settingField.onchange = function (e) {
         window.Cookies.set(id, e.target.value, { expires: 30 });
         onchange(e.target);
     };
@@ -17,19 +17,19 @@ function useSetting(id, onchange) {
     onchange(settingField);
 }
 
-(function() {
+(function () {
 
-"use strict";
+    "use strict";
 
-var aboutContent = document.createElement("div");
-aboutContent.innerHTML = `<p>
+    var aboutContent = document.createElement("div");
+    aboutContent.innerHTML = `<p>
 Welcome to the Benthos Lab, a place where you can experiment with Benthos
 pipeline configurations and share them with others. This site is graciously
 hosted by <a href="https://underthehood.meltwater.com/">Meltwater</a>.
 </p>`;
 
-var aboutContent2 = document.createElement("div");
-aboutContent2.innerHTML = `<p>
+    var aboutContent2 = document.createElement("div");
+    aboutContent2.innerHTML = `<p>
 Edit your pipeline configuration as well as the input data on the left by
 changing tabs. When you're ready to try your pipeline click 'Compile'.
 </p>
@@ -50,304 +50,339 @@ Some components might not work within the sandbox of your browser, but you can
 still write and share configs that use them.
 </p>`;
 
-var aboutContent3 = document.createElement("div");
-aboutContent3.innerHTML = `<p>
+    var aboutContent3 = document.createElement("div");
+    aboutContent3.innerHTML = `<p>
 For more information about Benthos check out the website at
 <a href="https://www.benthos.dev/" target="_blank">https://www.benthos.dev/</a>.
 </p>`;
 
-var sessionSettings = {};
+    var sessionSettings = {};
 
-function useSessionSetting(id, defaultVal, onchange) {
-    var currentVal = sessionSettings[id];
+    function useSessionSetting(id, defaultVal, onchange) {
+        var currentVal = sessionSettings[id];
 
-    var settingField = document.getElementById(id);
-    if ( typeof(currentVal) === "string" && currentVal.length > 0 ) {
-        settingField.value = currentVal;
-    } else {
-        settingField.value = defaultVal;
+        var settingField = document.getElementById(id);
+        if (typeof (currentVal) === "string" && currentVal.length > 0) {
+            settingField.value = currentVal;
+        } else {
+            settingField.value = defaultVal;
+        }
+
+        settingField.onchange = function (e) {
+            sessionSettings[id] = e.target.value;
+            onchange(e.target);
+        };
+
+        sessionSettings[id] = settingField.value;
+        onchange(settingField);
     }
 
-    settingField.onchange = function(e) {
-        sessionSettings[id] = e.target.value;
-        onchange(e.target);
+    var configTab, inputTab, settingsTab;
+
+    var openConfig = function () {
+        if (benthosLab.addProcessor !== undefined) {
+            document.getElementById("addComponentWindow").classList.remove("hidden");
+        }
+        document.getElementById("editor").classList.remove("hidden");
+        document.getElementById("settings").classList.add("hidden");
+        configTab.classList.add("openTab");
+        inputTab.classList.remove("openTab");
+        settingsTab.classList.remove("openTab");
+        editor.setSession(configSession);
     };
 
-    sessionSettings[id] = settingField.value;
-    onchange(settingField);
-}
+    var openInput = function () {
+        document.getElementById("addComponentWindow").classList.add("hidden");
+        document.getElementById("editor").classList.remove("hidden");
+        document.getElementById("settings").classList.add("hidden");
+        configTab.classList.remove("openTab");
+        inputTab.classList.add("openTab");
+        settingsTab.classList.remove("openTab");
+        editor.setSession(inputSession);
+    };
 
-var configTab, inputTab, settingsTab;
+    var openSettings = function () {
+        document.getElementById("addComponentWindow").classList.add("hidden");
+        document.getElementById("editor").classList.add("hidden");
+        document.getElementById("settings").classList.remove("hidden");
+        configTab.classList.remove("openTab");
+        inputTab.classList.remove("openTab");
+        settingsTab.classList.add("openTab");
+    };
 
-var openConfig = function() {
-    if ( benthosLab.addProcessor !== undefined ) {
-        document.getElementById("addComponentWindow").classList.remove("hidden");
-    }
-    document.getElementById("editor").classList.remove("hidden");
-    document.getElementById("settings").classList.add("hidden");
-    configTab.classList.add("openTab");
-    inputTab.classList.remove("openTab");
-    settingsTab.classList.remove("openTab");
-    editor.setSession(configSession);
-};
+    var initTabs = function () {
+        configTab = document.getElementById("configTab");
+        inputTab = document.getElementById("inputTab");
+        settingsTab = document.getElementById("settingsTab");
+        configTab.classList.add("openTab");
 
-var openInput = function() {
-    document.getElementById("addComponentWindow").classList.add("hidden");
-    document.getElementById("editor").classList.remove("hidden");
-    document.getElementById("settings").classList.add("hidden");
-    configTab.classList.remove("openTab");
-    inputTab.classList.add("openTab");
-    settingsTab.classList.remove("openTab");
-    editor.setSession(inputSession);
-};
+        configTab.onclick = openConfig;
+        inputTab.onclick = openInput;
+        settingsTab.onclick = openSettings;
 
-var openSettings = function() {
-    document.getElementById("addComponentWindow").classList.add("hidden");
-    document.getElementById("editor").classList.add("hidden");
-    document.getElementById("settings").classList.remove("hidden");
-    configTab.classList.remove("openTab");
-    inputTab.classList.remove("openTab");
-    settingsTab.classList.add("openTab");
-};
+        if (window.location.hash === "#input") {
+            openInput();
+        }
+    };
 
-var initTabs = function() {
-    configTab = document.getElementById("configTab");
-    inputTab = document.getElementById("inputTab");
-    settingsTab = document.getElementById("settingsTab");
-    configTab.classList.add("openTab");
+    let inputMethod = "batches";
 
-    configTab.onclick = openConfig;
-    inputTab.onclick = openInput;
-    settingsTab.onclick = openSettings;
+    window.onload = function () {
+        if (typeof (model.settings) === "object" && model.settings !== null) {
+            sessionSettings = model.settings;
+        }
 
-    if ( window.location.hash === "#input" ) {
-        openInput();
-    }
-};
+        initTabs();
 
-let inputMethod = "batches";
+        useSessionSetting("inputMethodSelect", inputMethod, function (e) {
+            inputMethod = e.value;
+        });
 
-window.onload = function() {
-    if ( typeof(model.settings) === "object" && model.settings !== null ) {
-        sessionSettings = model.settings;
-    }
+        let setWelcomeText = function () {
+            writeOutputElement(aboutContent);
+            writeOutputElement(aboutContent2);
+            writeOutputElement(aboutContent3);
+        };
 
-    initTabs();
+        document.getElementById("aboutBtn").onclick = setWelcomeText;
+        document.getElementById("clearOutputBtn").onclick = clearOutput;
+        document.getElementById("shareBtn").onclick = function () {
+            share(getInput(), getConfig(), setShareURL);
+        };
 
-    useSessionSetting("inputMethodSelect", inputMethod, function(e) {
-        inputMethod = e.value;
-    });
+        document.getElementById("normaliseBtn").onclick = function () {
+            benthosLab.normalise(getConfig(), function (conf) {
+                setConfig(conf);
+            });
+        };
 
-    let setWelcomeText = function() {
+        var expandAddCompBtn = document.getElementById("expandAddComponentSelects");
+        var collapseAddCompBtn = document.getElementById("collapseAddComponentSelects");
+        var selects = document.getElementById("addComponentSelects");
+
+        expandAddCompBtn.onclick = function () {
+            expandAddCompBtn.classList.add("hidden");
+            collapseAddCompBtn.classList.remove("hidden");
+            selects.classList.remove("hidden");
+            window.Cookies.set("collapseAddComponents", "false", { expires: 30 });
+        };
+        collapseAddCompBtn.onclick = function () {
+            expandAddCompBtn.classList.remove("hidden");
+            collapseAddCompBtn.classList.add("hidden");
+            selects.classList.add("hidden");
+            window.Cookies.set("collapseAddComponents", "true", { expires: 30 });
+        };
+
+        var collapseAddComps = window.Cookies.get("collapseAddComponents");
+        if (typeof (collapseAddComps) === "string" && collapseAddComps === "true") {
+            collapseAddCompBtn.click();
+        } else {
+            expandAddCompBtn.click();
+        }
+
         writeOutputElement(aboutContent);
-        writeOutputElement(aboutContent2);
         writeOutputElement(aboutContent3);
     };
 
-    document.getElementById("aboutBtn").onclick = setWelcomeText;
-    document.getElementById("clearOutputBtn").onclick = clearOutput;
-    document.getElementById("shareBtn").onclick = function() {
-        share(getInput(), getConfig(), setShareURL);
+    var writeOutput = function (value, style) {
+        var pre = document.createElement("div");
+        if (style) {
+            pre.classList.add(style);
+        }
+        pre.innerText = value;
+        writeOutputElement(pre);
     };
 
-    document.getElementById("normaliseBtn").onclick = function() {
-        benthosLab.normalise(getConfig(), function(conf) {
-            setConfig(conf);
-        });
+    var writeOutputElement = function (element) {
+        var outputDiv = document.getElementById("editorOutput");
+        outputDiv.appendChild(element);
+        outputDiv.scrollTo(0, outputDiv.scrollHeight);
     };
 
-    var expandAddCompBtn = document.getElementById("expandAddComponentSelects");
-    var collapseAddCompBtn = document.getElementById("collapseAddComponentSelects");
-    var selects = document.getElementById("addComponentSelects");
-
-    expandAddCompBtn.onclick = function() {
-        expandAddCompBtn.classList.add("hidden");
-        collapseAddCompBtn.classList.remove("hidden");
-        selects.classList.remove("hidden");
-        window.Cookies.set("collapseAddComponents", "false", { expires: 30 });
-    };
-    collapseAddCompBtn.onclick = function() {
-        expandAddCompBtn.classList.remove("hidden");
-        collapseAddCompBtn.classList.add("hidden");
-        selects.classList.add("hidden");
-        window.Cookies.set("collapseAddComponents", "true", { expires: 30 });
-    };
-
-    var collapseAddComps = window.Cookies.get("collapseAddComponents");
-    if ( typeof(collapseAddComps) === "string" && collapseAddComps === "true" ) {
-        collapseAddCompBtn.click();
-    } else {
-        expandAddCompBtn.click();
+    var setShareURL = function (url) {
+        var span = document.createElement("span");
+        span.innerText = "Session saved at: ";
+        span.classList.add("infoMessage");
+        var a = document.createElement("a");
+        a.href = url;
+        a.innerText = url;
+        a.target = "_blank";
+        var div = document.createElement("div");
+        div.appendChild(span);
+        div.appendChild(a);
+        writeOutputElement(div);
     }
 
-    writeOutputElement(aboutContent);
-    writeOutputElement(aboutContent3);
-};
-
-var writeOutput = function(value, style) {
-    var pre = document.createElement("div");
-    if ( style ) {
-        pre.classList.add(style);
-    }
-    pre.innerText = value;
-    writeOutputElement(pre);
-};
-
-var writeOutputElement = function(element) {
-    var outputDiv = document.getElementById("editorOutput");
-    outputDiv.appendChild(element);
-    outputDiv.scrollTo(0, outputDiv.scrollHeight);
-};
-
-var setShareURL = function(url) {
-    var span = document.createElement("span");
-    span.innerText = "Session saved at: ";
-    span.classList.add("infoMessage");
-    var a = document.createElement("a");
-    a.href = url;
-    a.innerText = url;
-    a.target = "_blank";
-    var div = document.createElement("div");
-    div.appendChild(span);
-    div.appendChild(a);
-    writeOutputElement(div);
-}
-
-var share = function(input, config, success) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/share');
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            let shareURL = new URL(window.location.href);
-            shareURL.pathname = "/l/" + xhr.responseText;
-            success(shareURL.href);
-        } else {
-            writeOutput("Error: Request failed with status: " + xhr.status + "\n", "errorMessage");
-        }
-    };
-    xhr.send(JSON.stringify({
-        input: input,
-        config: config,
-        settings: sessionSettings
-    }));
-};
-
-var normaliseViaAPI = function(config, success) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/normalise');
-    xhr.setRequestHeader('Content-Type', 'text/yaml');
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            success(xhr.responseText);
-        } else {
-            writeOutput("Error: Normalise request failed with status: " + xhr.status + "\n", "errorMessage");
-        }
-    };
-    xhr.send(config);
-}
-
-var setConfig = function(value) {
-    var session = configSession;
-    var length = session.getLength();
-    var lastLineLength = session.getRowLength(length-1);
-    session.remove({start:{row: 0, column: 0},end:{row: length, column: lastLineLength}});
-    session.insert({row: 0, column: 0}, value);
-    openConfig();
-};
-
-var getConfig = function() {
-    return configSession.getValue()
-};
-
-var getInput = function() {
-    return inputSession.getValue()
-};
-
-var clearOutput = function() {
-    var outputDiv = document.getElementById("editorOutput");
-    outputDiv.innerText = "";
-};
-
-var populateInsertSelect = function(list, addFunc, selectId) {
-    let s = document.getElementById(selectId);
-    s.addEventListener("change", function() {
-        let newConfig = addFunc(this.value, getConfig())
-        if ( typeof(newConfig) === "string" ) {
-            setConfig(newConfig);
-        }
-        this.value = "";
-    });
-    list.forEach(function(v) {
-        let opt = document.createElement("option");
-        opt.text = v;
-        opt.value = v;
-        s.add(opt);
-    });
-};
-
-let initLabControls = function() {
-    document.getElementById("failedText").classList.add("hidden");
-    if (configTab == null || configTab.classList.contains("openTab")) {
-        document.getElementById("addComponentWindow").classList.remove("hidden");
-    }
-    document.getElementById("happyGroup").classList.remove("hidden");
-
-    populateInsertSelect(benthosLab.getInputs(), benthosLab.addInput, "inputSelect");
-    populateInsertSelect(benthosLab.getProcessors(), benthosLab.addProcessor, "procSelect");
-    populateInsertSelect(benthosLab.getConditions(), benthosLab.addCondition, "condSelect");
-    populateInsertSelect(benthosLab.getOutputs(), benthosLab.addOutput, "outputSelect");
-    populateInsertSelect(benthosLab.getCaches(), benthosLab.addCache, "cacheSelect");
-    populateInsertSelect(benthosLab.getRatelimits(), benthosLab.addRatelimit, "ratelimitSelect");
-
-    document.getElementById("normaliseBtn").onclick = function() {
-        benthosLab.normalise(getConfig(), function(result) {
-            setConfig(result);
-        });
-    };
-
-    var hasCompiled = false;
-    var compile = function(onSuccess) {
-        benthosLab.compile(getConfig(), function() {
-            hasCompiled = true;
-            compileBtn.classList.add("btn-disabled");
-            compileBtn.classList.remove("btn-primary");
-            compileBtn.disabled = true;
-            if ( typeof(onSuccess) === "function" ) {
-                onSuccess();
+    var share = function (input, config, success) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/share');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                let shareURL = new URL(window.location.href);
+                shareURL.pathname = "/l/" + xhr.responseText;
+                success(shareURL.href);
+            } else {
+                writeOutput("Error: Request failed with status: " + xhr.status + "\n", "errorMessage");
             }
+        };
+        xhr.send(JSON.stringify({
+            input: input,
+            config: config,
+            settings: sessionSettings
+        }));
+    };
+
+    var getNews = function (success) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/news');
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                success(xhr.responseText);
+            }
+        };
+        xhr.send();
+    };
+
+    var normaliseViaAPI = function (config, success) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/normalise');
+        xhr.setRequestHeader('Content-Type', 'text/yaml');
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                success(xhr.responseText);
+            } else {
+                writeOutput("Error: Normalise request failed with status: " + xhr.status + "\n", "errorMessage");
+            }
+        };
+        xhr.send(config);
+    }
+
+    var setConfig = function (value) {
+        var session = configSession;
+        var length = session.getLength();
+        var lastLineLength = session.getRowLength(length - 1);
+        session.remove({ start: { row: 0, column: 0 }, end: { row: length, column: lastLineLength } });
+        session.insert({ row: 0, column: 0 }, value);
+        openConfig();
+    };
+
+    var getConfig = function () {
+        return configSession.getValue()
+    };
+
+    var getInput = function () {
+        return inputSession.getValue()
+    };
+
+    var clearOutput = function () {
+        var outputDiv = document.getElementById("editorOutput");
+        outputDiv.innerText = "";
+    };
+
+    var populateInsertSelect = function (list, addFunc, selectId) {
+        let s = document.getElementById(selectId);
+        s.addEventListener("change", function () {
+            let newConfig = addFunc(this.value, getConfig())
+            if (typeof (newConfig) === "string") {
+                setConfig(newConfig);
+            }
+            this.value = "";
+        });
+        list.forEach(function (v) {
+            let opt = document.createElement("option");
+            opt.text = v;
+            opt.value = v;
+            s.add(opt);
         });
     };
 
-    let executeBtn = document.getElementById("executeBtn");
-    executeBtn.onclick = function() {
-        if (!hasCompiled) {
-            compile(function() {
-                benthosLab.execute(inputMethod, getInput());
-            });
-        } else {
-            benthosLab.execute(inputMethod, getInput());
+    let initLabControls = function () {
+        document.getElementById("failedText").classList.add("hidden");
+        if (configTab == null || configTab.classList.contains("openTab")) {
+            document.getElementById("addComponentWindow").classList.remove("hidden");
         }
+        document.getElementById("happyGroup").classList.remove("hidden");
+
+        populateInsertSelect(benthosLab.getInputs(), benthosLab.addInput, "inputSelect");
+        populateInsertSelect(benthosLab.getProcessors(), benthosLab.addProcessor, "procSelect");
+        populateInsertSelect(benthosLab.getConditions(), benthosLab.addCondition, "condSelect");
+        populateInsertSelect(benthosLab.getOutputs(), benthosLab.addOutput, "outputSelect");
+        populateInsertSelect(benthosLab.getCaches(), benthosLab.addCache, "cacheSelect");
+        populateInsertSelect(benthosLab.getRatelimits(), benthosLab.addRatelimit, "ratelimitSelect");
+
+        document.getElementById("normaliseBtn").onclick = function () {
+            benthosLab.normalise(getConfig(), function (result) {
+                setConfig(result);
+            });
+        };
+
+        var hasCompiled = false;
+        var compile = function (onSuccess) {
+            benthosLab.compile(getConfig(), function () {
+                hasCompiled = true;
+                compileBtn.classList.add("btn-disabled");
+                compileBtn.classList.remove("btn-primary");
+                compileBtn.disabled = true;
+                if (typeof (onSuccess) === "function") {
+                    onSuccess();
+                }
+            });
+        };
+
+        let executeBtn = document.getElementById("executeBtn");
+        executeBtn.onclick = function () {
+            if (!hasCompiled) {
+                compile(function () {
+                    benthosLab.execute(inputMethod, getInput());
+                });
+            } else {
+                benthosLab.execute(inputMethod, getInput());
+            }
+        };
+
+        let compileBtn = document.getElementById("compileBtn");
+        compileBtn.onclick = compile;
+
+        configSession.on("change", function () {
+            compileBtn.classList.remove("btn-disabled");
+            compileBtn.classList.add("btn-primary");
+            compileBtn.disabled = false;
+            hasCompiled = false;
+        })
+
+        writeOutput("Running Benthos version: " + benthosLab.version + "\n", "infoMessage");
     };
 
-    let compileBtn = document.getElementById("compileBtn");
-    compileBtn.onclick = compile;
+    getNews(function (news) {
+        var newsContent = document.createElement("div");
 
-    configSession.on("change", function() {
-		compileBtn.classList.remove("btn-disabled");
-		compileBtn.classList.add("btn-primary");
-        compileBtn.disabled = false;
-        hasCompiled = false;
-    })
+        var title = document.createElement("h2");
+        title.innerText = "News";
+        newsContent.appendChild(title);
 
-    writeOutput("Running Benthos version: " + benthosLab.version + "\n", "infoMessage");
-};
+        try {
+            var newsArray = JSON.parse(news);
+        } catch (e) {
+            console.error("Failed to parse news: " + e)
+            return
+        }
 
-benthosLab = {
-    onLoad: initLabControls,
-    print: writeOutput,
-    normalise: normaliseViaAPI,
-};
+        var nItems = newsArray.length;
+        for (var i = 0; i < nItems; i++) {
+            var p = document.createElement("p")
+            p.innerText = newsArray[i].content;
+            newsContent.appendChild(p)
+        }
+
+        writeOutputElement(newsContent);
+    });
+
+    benthosLab = {
+        onLoad: initLabControls,
+        print: writeOutput,
+        normalise: normaliseViaAPI,
+    };
 
 })();
 

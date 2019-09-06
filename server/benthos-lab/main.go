@@ -181,6 +181,9 @@ func main() {
 	wwwPath := flag.String(
 		"www", ".", "Path to the directory of client files to serve",
 	)
+	news := flag.String(
+		"news", "", `An optional JSON array of news items of the form [{"content":"this is news"}].`,
+	)
 	flag.StringVar(
 		&cacheConf.Redis.URL, "redis-url", "", "Optional: Redis URL to use for caching",
 	)
@@ -276,6 +279,14 @@ func main() {
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fileServe.ServeHTTP(hijackCode(http.StatusNotFound, w, r, notFoundHandler), r)
+	})
+
+	mux.HandleFunc("/news", func(w http.ResponseWriter, r *http.Request) {
+		if len(*news) == 0 {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		w.Write([]byte(*news))
 	})
 
 	mux.HandleFunc("/wasm/benthos-lab.wasm", func(w http.ResponseWriter, r *http.Request) {
