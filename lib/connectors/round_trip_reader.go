@@ -23,8 +23,8 @@ package connectors
 import (
 	"time"
 
-	"github.com/Jeffail/benthos/lib/message/roundtrip"
-	"github.com/Jeffail/benthos/lib/types"
+	"github.com/Jeffail/benthos/v3/lib/message/roundtrip"
+	"github.com/Jeffail/benthos/v3/lib/types"
 )
 
 //------------------------------------------------------------------------------

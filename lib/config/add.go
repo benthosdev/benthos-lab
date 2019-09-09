@@ -24,13 +24,13 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Jeffail/benthos/lib/cache"
-	"github.com/Jeffail/benthos/lib/condition"
-	"github.com/Jeffail/benthos/lib/config"
-	"github.com/Jeffail/benthos/lib/input"
-	"github.com/Jeffail/benthos/lib/output"
-	"github.com/Jeffail/benthos/lib/processor"
-	"github.com/Jeffail/benthos/lib/ratelimit"
+	"github.com/Jeffail/benthos/v3/lib/cache"
+	"github.com/Jeffail/benthos/v3/lib/condition"
+	"github.com/Jeffail/benthos/v3/lib/config"
+	"github.com/Jeffail/benthos/v3/lib/input"
+	"github.com/Jeffail/benthos/v3/lib/output"
+	"github.com/Jeffail/benthos/v3/lib/processor"
+	"github.com/Jeffail/benthos/v3/lib/ratelimit"
 )
 
 //------------------------------------------------------------------------------

@@ -356,6 +356,7 @@ For more information about Benthos check out the website at
 
     getNews(function (news) {
         var newsContent = document.createElement("div");
+        newsContent.style = "margin-bottom: 20px; border-bottom: 1px solid rgb(209, 252, 124); border-top: 1px solid rgb(209, 252, 124);"
 
         var title = document.createElement("h2");
         title.innerText = "News";
@@ -364,15 +365,15 @@ For more information about Benthos check out the website at
         try {
             var newsArray = JSON.parse(news);
         } catch (e) {
-            console.error("Failed to parse news: " + e)
-            return
+            console.error("Failed to parse news: " + e);
+            return;
         }
 
         var nItems = newsArray.length;
         for (var i = 0; i < nItems; i++) {
-            var p = document.createElement("p")
+            var p = document.createElement("p");
             p.innerText = newsArray[i].content;
-            newsContent.appendChild(p)
+            newsContent.appendChild(p);
         }
 
         writeOutputElement(newsContent);

@@ -24,35 +24,29 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"runtime/debug"
 	"sort"
 	"strings"
 	"sync"
 	"syscall/js"
 	"time"
 
-	"github.com/Jeffail/benthos/lib/cache"
-	"github.com/Jeffail/benthos/lib/condition"
-	"github.com/Jeffail/benthos/lib/config"
-	"github.com/Jeffail/benthos/lib/input"
-	"github.com/Jeffail/benthos/lib/log"
-	"github.com/Jeffail/benthos/lib/manager"
-	"github.com/Jeffail/benthos/lib/message"
-	"github.com/Jeffail/benthos/lib/message/roundtrip"
-	"github.com/Jeffail/benthos/lib/metrics"
-	"github.com/Jeffail/benthos/lib/output"
-	"github.com/Jeffail/benthos/lib/processor"
-	"github.com/Jeffail/benthos/lib/ratelimit"
-	"github.com/Jeffail/benthos/lib/stream"
-	"github.com/Jeffail/benthos/lib/types"
+	"github.com/Jeffail/benthos/v3/lib/cache"
+	"github.com/Jeffail/benthos/v3/lib/condition"
+	"github.com/Jeffail/benthos/v3/lib/config"
+	"github.com/Jeffail/benthos/v3/lib/input"
+	"github.com/Jeffail/benthos/v3/lib/log"
+	"github.com/Jeffail/benthos/v3/lib/manager"
+	"github.com/Jeffail/benthos/v3/lib/message"
+	"github.com/Jeffail/benthos/v3/lib/message/roundtrip"
+	"github.com/Jeffail/benthos/v3/lib/metrics"
+	"github.com/Jeffail/benthos/v3/lib/output"
+	"github.com/Jeffail/benthos/v3/lib/processor"
+	"github.com/Jeffail/benthos/v3/lib/ratelimit"
+	"github.com/Jeffail/benthos/v3/lib/stream"
+	"github.com/Jeffail/benthos/v3/lib/types"
 	labConfig "github.com/benthosdev/benthos-lab/lib/config"
 	"github.com/benthosdev/benthos-lab/lib/connectors"
-)
-
-//------------------------------------------------------------------------------
-
-// Build stamps.
-var (
-	Version string
 )
 
 //------------------------------------------------------------------------------
@@ -549,10 +543,16 @@ func registerFunctions() func() {
 		js.Global().Set("benthosLab", benthosLab)
 	}
 
-	if len(Version) == 0 {
-		Version = "Unknown"
+	version := "Unknown"
+	info, ok := debug.ReadBuildInfo()
+	if ok {
+		for _, mod := range info.Deps {
+			if mod.Path == "github.com/Jeffail/benthos/v3" {
+				version = mod.Version
+			}
+		}
 	}
-	benthosLab.Set("version", Version)
+	benthosLab.Set("version", version)
 
 	if print := benthosLab.Get("print"); print.Type() == js.TypeFunction {
 		writeFunc = print
@@ -611,18 +611,6 @@ func main() {
 
 	println("WASM Benthos Initialized")
 	onLoad()
-
-	/*
-		TODO: Add this when Benthos stops being naughty.
-		info, ok := debug.ReadBuildInfo()
-		if ok {
-			for _, mod := range info.Deps {
-				if mod.Path == "github.com/Jeffail/benthos" {
-					writeOutput(fmt.Sprintf("Benthos version: %v\n", mod.Version), "infoMessage")
-				}
-			}
-		}
-	*/
 
 	js.Global().Call("addEventListener", "beforeunload", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		c <- struct{}{}

@@ -21,8 +21,8 @@
 package config
 
 import (
-	"github.com/Jeffail/benthos/lib/config"
-	uconf "github.com/Jeffail/benthos/lib/util/config"
+	"github.com/Jeffail/benthos/v3/lib/config"
+	uconf "github.com/Jeffail/benthos/v3/lib/util/config"
 	"gopkg.in/yaml.v3"
 )
 
