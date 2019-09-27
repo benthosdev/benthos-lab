@@ -15,7 +15,6 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 2,
   "links": [],
   "panels": [
     {
@@ -24,7 +23,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
-      "fill": 1,
+      "fill": 10,
       "gridPos": {
         "h": 9,
         "w": 12,
@@ -44,35 +43,182 @@
       "lines": true,
       "linewidth": 1,
       "links": [],
-      "nullPointMode": "null",
+      "nullPointMode": "null as zero",
       "percentage": false,
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
       "seriesOverrides": [],
       "spaceLength": 10,
-      "stack": false,
+      "stack": true,
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(benthoslab_cache_set_success[30s])",
+          "expr": "sum(delta(benthoslab_http_wasm_get_200[1h]))",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "Set Success",
+          "legendFormat": "WASM 200",
           "refId": "A"
         },
         {
-          "expr": "rate(benthoslab_cache_set_failed_error[30s])",
+          "expr": "sum(delta(benthoslab_http_wasm_get_304[1h]))",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "Set Failed",
+          "legendFormat": "WASM 304",
           "refId": "B"
+        },
+        {
+          "expr": "sum(delta(benthoslab_http_wasm_no__gzip[1h]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "WASM No GZIP",
+          "refId": "C"
+        },
+        {
+          "expr": "sum(delta(benthoslab_cache_add_success[1h]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Share",
+          "refId": "D"
+        },
+        {
+          "expr": "sum(delta(benthoslab_cache_get_success[1h]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Get",
+          "refId": "E"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Cache Size",
+      "title": "Requests",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "fill": 10,
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 3,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null as zero",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": true,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "sum(delta(benthoslab_usage_activity[1h]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Total",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(delta(benthoslab_usage_compile_success[1h]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Compile Success",
+          "refId": "B"
+        },
+        {
+          "expr": "sum(delta(benthoslab_usage_compile_failed[1h]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Compile Failed",
+          "refId": "C"
+        },
+        {
+          "expr": "sum(delta(benthoslab_usage_normalise_success[1h]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Normalise Success",
+          "refId": "D"
+        },
+        {
+          "expr": "sum(delta(benthoslab_usage_normalise_failed[1h]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Normalise Failed",
+          "refId": "E"
+        },
+        {
+          "expr": "sum(delta(benthoslab_usage_execute_success[1h]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Execute Success",
+          "refId": "F"
+        },
+        {
+          "expr": "sum(delta(benthoslab_usage_execute_failed[1h]))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Execute Failed",
+          "refId": "G"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Usage",
       "tooltip": {
         "shared": true,
         "sort": 0,

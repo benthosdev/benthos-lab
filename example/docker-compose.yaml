@@ -31,16 +31,21 @@ services:
       - ./grafana/config.monitoring
 
   redis:
-    image: redis
+    image: redis:5
     ports:
       - "6379:6379"
+    command:
+      - '--save 900 1'
+      - '--save 30 2'
+    volumes:
+      - ./data:/data
 
   benthos-lab:
     image: jeffail/benthos-lab
     command:
       - '--www=/var/www'
       - '--redis-url=tcp://redis:6379'
-      - '--redis-ttl=72h'
+      - '--redis-ttl=0s'
     ports:
       - 8080:8080
       - 8081:8081
