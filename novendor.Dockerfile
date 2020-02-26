@@ -1,4 +1,4 @@
-FROM golang:1.12 AS build
+FROM golang:1.14 AS build
 
 WORKDIR /go/src/github.com/benthosdev/benthos-lab/
 COPY . /go/src/github.com/benthosdev/benthos-lab/
