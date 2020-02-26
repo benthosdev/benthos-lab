@@ -1,4 +1,4 @@
-FROM golang:1.12 AS build
+FROM golang:1.14 AS build
 
 RUN useradd -u 10001 benthos
 
@@ -6,8 +6,8 @@ WORKDIR /go/src/github.com/benthosdev/benthos-lab/
 COPY . /go/src/github.com/benthosdev/benthos-lab/
 
 ENV GO111MODULE on
-RUN CGO_ENABLED=0 GOOS=linux go build -mod=vendor -o ./benthos-lab ./server/benthos-lab
-RUN GOOS=js GOARCH=wasm go build -ldflags="-s -w" -mod=vendor -o ./client/wasm/benthos-lab.wasm ./client/wasm/benthos-lab.go
+RUN CGO_ENABLED=0 GOOS=linux go build -mod=mod -o ./benthos-lab ./server/benthos-lab
+RUN GOOS=js GOARCH=wasm go build -ldflags="-s -w" -mod=mod -o ./client/wasm/benthos-lab.wasm ./client/wasm/benthos-lab.go
 
 FROM busybox AS package
 
