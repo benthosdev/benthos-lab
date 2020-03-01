@@ -15,6 +15,7 @@ LABEL maintainer="Ashley Jeffs <ash@jeffail.uk>"
 
 WORKDIR /
 
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=build /etc/passwd /etc/passwd
 COPY --from=build /go/src/github.com/benthosdev/benthos-lab/benthos-lab .
 COPY --from=build /go/src/github.com/benthosdev/benthos-lab/client /var/www
