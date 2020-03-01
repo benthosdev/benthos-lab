@@ -24,8 +24,7 @@ function useSetting(id, onchange) {
     var aboutContent = document.createElement("div");
     aboutContent.innerHTML = `<p>
 Welcome to the Benthos Lab, a place where you can experiment with Benthos
-pipeline configurations and share them with others. This site is graciously
-hosted by <a href="https://underthehood.meltwater.com/">Meltwater</a>.
+pipeline configurations and share them with others.
 </p>`;
 
     var aboutContent2 = document.createElement("div");

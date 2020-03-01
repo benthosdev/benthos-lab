@@ -1,23 +1,3 @@
-// Copyright (c) 2019 Ashley Jeffs
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 package main
 
 import (
@@ -190,6 +170,18 @@ func main() {
 	flag.StringVar(
 		&cacheConf.Redis.Expiration, "redis-ttl", cacheConf.Redis.Expiration, "Optional: Redis TTL to use for caching",
 	)
+	flag.StringVar(
+		&cacheConf.DynamoDB.Table, "dynamodb-table", "", "Optional: A DynamoDB table to use for caching",
+	)
+	flag.StringVar(
+		&cacheConf.DynamoDB.TTL, "dynamodb-ttl", "", "Optional: TTL to use for caching",
+	)
+	flag.StringVar(
+		&cacheConf.DynamoDB.Region, "dynamodb-region", "eu-west-1", "The AWS region to use when caching with DynamoDB",
+	)
+	metricsTarget := flag.String(
+		"metrics-target", metrics.TypePrometheus, "How metrics should be exported",
+	)
 	flag.IntVar(
 		&ratelimitConf.Local.Count, "rate-limit-count",
 		ratelimitConf.Local.Count, "The count for session access rate limiting",
@@ -200,8 +192,13 @@ func main() {
 	)
 	flag.Parse()
 
-	if len(cacheConf.Redis.URL) > 0 {
-		cacheConf.Type = "redis"
+	if len(cacheConf.DynamoDB.Table) > 0 {
+		cacheConf.Type = cache.TypeDynamoDB
+		cacheConf.DynamoDB.HashKey = "Id"
+		cacheConf.DynamoDB.DataKey = "Content"
+		cacheConf.DynamoDB.TTLKey = "TTL"
+	} else if len(cacheConf.Redis.URL) > 0 {
+		cacheConf.Type = cache.TypeRedis
 	}
 
 	logConf := log.NewConfig()
@@ -210,7 +207,10 @@ func main() {
 
 	metricsConf := metrics.NewConfig()
 	metricsConf.Prometheus.Prefix = "benthoslab"
-	metricsConf.Type = "prometheus"
+	metricsConf.CloudWatch.Region = cacheConf.DynamoDB.Region
+	metricsConf.CloudWatch.Namespace = "benthoslab"
+	metricsConf.CloudWatch.FlushPeriod = "30s"
+	metricsConf.Type = *metricsTarget
 	stats, err := metrics.New(metricsConf)
 	if err != nil {
 		panic(err)
@@ -218,12 +218,18 @@ func main() {
 	defer stats.Close()
 
 	cacheConf.Memory.TTL = 259200
-	cache, err := cache.New(cacheConf, types.DudMgr{}, log.NewModule(".cache"), metrics.Namespaced(stats, "cache"))
+
+	var componentMetrics metrics.Type = metrics.Noop()
+	if *metricsTarget != metrics.TypeCloudWatch {
+		// Avoid flooding CW with metrics.
+		componentMetrics = stats
+	}
+	cache, err := cache.New(cacheConf, types.DudMgr{}, log.NewModule(".cache"), metrics.Namespaced(componentMetrics, "cache"))
 	if err != nil {
 		panic(err)
 	}
 
-	rlimit, err := ratelimit.New(ratelimitConf, types.DudMgr{}, log.NewModule(".ratelimit"), metrics.Namespaced(stats, "ratelimit"))
+	rlimit, err := ratelimit.New(ratelimitConf, types.DudMgr{}, log.NewModule(".ratelimit"), metrics.Namespaced(componentMetrics, "ratelimit"))
 	if err != nil {
 		panic(err)
 	}
@@ -237,8 +243,6 @@ func main() {
 	mWASMGet200 := httpStats.GetCounter("wasm.get.200")
 	mWASMGet304 := httpStats.GetCounter("wasm.get.304")
 	mWASMGetNoGZIP := httpStats.GetCounter("wasm.no_gzip")
-	mNormaliseReq := httpStats.GetCounter("normalise")
-	mShareReq := httpStats.GetCounter("share")
 	mHTTPNormaliseSucc := stats.GetCounter("usage.normalise_http.success")
 	mHTTPNormaliseFail := stats.GetCounter("usage.normalise_http.failed")
 	mShareSucc := stats.GetCounter("usage.share.success")
@@ -367,7 +371,6 @@ func main() {
 	})
 
 	mux.HandleFunc("/normalise", func(w http.ResponseWriter, r *http.Request) {
-		mNormaliseReq.Incr(1)
 		mActivity.Incr(1)
 		if r.Method != "POST" {
 			http.Error(w, "Method not supported", http.StatusBadRequest)
@@ -405,7 +408,6 @@ func main() {
 	})
 
 	mux.HandleFunc("/share", func(w http.ResponseWriter, r *http.Request) {
-		mShareReq.Incr(1)
 		mActivity.Incr(1)
 		if r.Method != "POST" {
 			http.Error(w, "Method not supported", http.StatusBadRequest)
