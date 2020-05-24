@@ -26,8 +26,10 @@
     {
       config: `pipeline:
   processors:
-  - jmespath:
-      query: '{ message: @, meta: { link_count: length(links) } }'`,
+  - bloblang: |
+      message = this
+      meta.link_count = links.length()
+`,
       input: '{"id":"foo","links":["https://github.com/Jeffail/benthos","https://docs.benthos.dev","https://www.benthos.dev"]}'
     }
       // BENTHOS LAB END
