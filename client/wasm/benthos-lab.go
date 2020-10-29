@@ -434,10 +434,12 @@ func addRatelimit(this js.Value, args []js.Value) interface{} {
 
 //------------------------------------------------------------------------------
 
+var statusDeprecated = "deprecated"
+
 func getInputs(this js.Value, args []js.Value) interface{} {
 	inputs := []string{"benthos_lab"}
 	for k, v := range input.Constructors {
-		if !v.Deprecated {
+		if string(v.Status) != statusDeprecated {
 			inputs = append(inputs, k)
 		}
 	}
@@ -452,7 +454,7 @@ func getInputs(this js.Value, args []js.Value) interface{} {
 func getProcessors(this js.Value, args []js.Value) interface{} {
 	procs := []string{}
 	for k, v := range processor.Constructors {
-		if !v.Deprecated {
+		if string(v.Status) != statusDeprecated {
 			procs = append(procs, k)
 		}
 	}
@@ -480,7 +482,7 @@ func getConditions(this js.Value, args []js.Value) interface{} {
 func getOutputs(this js.Value, args []js.Value) interface{} {
 	outputs := []string{"benthos_lab"}
 	for k, v := range output.Constructors {
-		if !v.Deprecated {
+		if string(v.Status) != statusDeprecated {
 			outputs = append(outputs, k)
 		}
 	}
