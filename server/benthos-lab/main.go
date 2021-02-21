@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"crypto/sha256"
+	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
 	"flag"
@@ -24,6 +25,7 @@ import (
 	"github.com/Jeffail/benthos/v3/lib/ratelimit"
 	"github.com/Jeffail/benthos/v3/lib/types"
 	labConfig "github.com/benthosdev/benthos-lab/lib/config"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 //------------------------------------------------------------------------------
@@ -158,6 +160,12 @@ func main() {
 	ratelimitConf.Local.Count = 100
 	ratelimitConf.Local.Interval = "1s"
 
+	tlsHost := flag.String(
+		"auto-tls", "", "Enable automatic HTTPS for a specified host using ACME.",
+	)
+	tlsCache := flag.String(
+		"cert-dir", "", "An optional directory to cache tls certificates.",
+	)
 	wwwPath := flag.String(
 		"www", ".", "Path to the directory of client files to serve",
 	)
@@ -488,14 +496,44 @@ func main() {
 		adminMux.HandleFunc("/stats", wHandlerFunc.HandlerFunc())
 	}
 
-	log.Infoln("Listening for requests at :8080")
 	go func() {
-		log.Infoln("Listening for admin requests at :8081")
+		log.Infoln("Listening for admin HTTP requests at :8081")
 		if herr := http.ListenAndServe(":8081", adminMux); herr != nil {
 			panic(herr)
 		}
 	}()
-	if herr := http.ListenAndServe(":8080", mux); herr != nil {
+
+	if len(*tlsHost) == 0 {
+		log.Infoln("Listening for HTTP requests at :8080")
+		if herr := http.ListenAndServe(":8080", mux); herr != nil {
+			panic(herr)
+		}
+		return
+	}
+
+	log.Infoln("Listening for HTTPS requests at :8443")
+
+	var certCache autocert.Cache
+	if len(*tlsCache) > 0 {
+		certCache = autocert.DirCache(*tlsCache)
+	}
+	certManager := autocert.Manager{
+		Prompt:     autocert.AcceptTOS,
+		HostPolicy: autocert.HostWhitelist(*tlsHost),
+		Cache:      certCache,
+	}
+
+	server := &http.Server{
+		Addr:    ":8443",
+		Handler: mux,
+		TLSConfig: &tls.Config{
+			GetCertificate: certManager.GetCertificate,
+		},
+	}
+
+	go http.ListenAndServe(":8080", certManager.HTTPHandler(nil))
+
+	if herr := server.ListenAndServeTLS("", ""); herr != nil {
 		panic(herr)
 	}
 }
