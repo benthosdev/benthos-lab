@@ -27,7 +27,7 @@ jobs:
           ${{ runner.os }}-go-
 
     - name: Test
-      run: go test ./...
+      run: go test ./lib/... ./server/...
 
   # lint:
   #   runs-on: ubuntu-latest
