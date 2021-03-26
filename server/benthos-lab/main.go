@@ -25,6 +25,7 @@ import (
 	"github.com/Jeffail/benthos/v3/lib/ratelimit"
 	"github.com/Jeffail/benthos/v3/lib/types"
 	labConfig "github.com/benthosdev/benthos-lab/lib/config"
+	"golang.org/x/crypto/acme"
 	"golang.org/x/crypto/acme/autocert"
 )
 
@@ -165,6 +166,9 @@ func main() {
 	)
 	tlsCache := flag.String(
 		"cert-dir", "", "An optional directory to cache tls certificates.",
+	)
+	tlsStaging := flag.Bool(
+		"cert-staging", false, "Whether to use a staging ACME URL instead of a production one when obtaining TLS certificates.",
 	)
 	wwwPath := flag.String(
 		"www", ".", "Path to the directory of client files to serve",
@@ -517,7 +521,14 @@ func main() {
 	if len(*tlsCache) > 0 {
 		certCache = autocert.DirCache(*tlsCache)
 	}
+
+	var acmeClient *acme.Client
+	if *tlsStaging {
+		acmeClient = &acme.Client{DirectoryURL: "https://acme-staging-v02.api.letsencrypt.org/directory"}
+	}
+
 	certManager := autocert.Manager{
+		Client:     acmeClient,
 		Prompt:     autocert.AcceptTOS,
 		HostPolicy: autocert.HostWhitelist(*tlsHost),
 		Cache:      certCache,
