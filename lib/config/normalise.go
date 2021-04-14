@@ -48,28 +48,28 @@ func Unmarshal(confStr string) (config.Type, error) {
 }
 
 type normalisedLabConfig struct {
-	Input     interface{} `yaml:"input"`
-	Buffer    interface{} `yaml:"buffer"`
-	Pipeline  interface{} `yaml:"pipeline"`
-	Output    interface{} `yaml:"output"`
-	Resources interface{} `yaml:"resources"`
+	Input     yaml.Node `yaml:"input"`
+	Buffer    yaml.Node `yaml:"buffer"`
+	Pipeline  yaml.Node `yaml:"pipeline"`
+	Output    yaml.Node `yaml:"output"`
+	Resources yaml.Node `yaml:"resources,omitempty"`
 }
 
 // Marshal a config struct into a subset of fields relevant to the lab
 // environment.
 func Marshal(conf config.Type) ([]byte, error) {
-	sanit, err := conf.Sanitised()
+	node, err := conf.SanitisedV2(config.SanitisedV2Config{
+		RemoveTypeField:        false,
+		RemoveDeprecatedFields: false,
+	})
 	if err != nil {
 		return nil, err
 	}
-
-	return uconf.MarshalYAML(normalisedLabConfig{
-		Input:     sanit.Input,
-		Buffer:    sanit.Buffer,
-		Pipeline:  sanit.Pipeline,
-		Output:    sanit.Output,
-		Resources: sanit.Manager,
-	})
+	nConf := normalisedLabConfig{}
+	if err := node.Decode(&nConf); err != nil {
+		return nil, err
+	}
+	return uconf.MarshalYAML(nConf)
 }
 
 //------------------------------------------------------------------------------
