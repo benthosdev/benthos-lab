@@ -21,7 +21,6 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/Jeffail/benthos/v3/lib/cache"
@@ -120,24 +119,10 @@ func AddCache(cType string, conf *config.Type) error {
 	cacheConf := cache.NewConfig()
 	cacheConf.Type = cType
 
-	var cacheID string
-	for i := 0; i < 10000; i++ {
-		var candidate string
-		if i == 0 {
-			candidate = "example"
-		} else {
-			candidate = fmt.Sprintf("example%v", i)
-		}
-		if _, exists := conf.Manager.Caches[candidate]; !exists {
-			cacheID = candidate
-			break
-		}
-	}
-	if len(cacheID) == 0 {
-		return errors.New("what the hell are you doing?")
-	}
+	cacheNum := len(conf.Manager.Caches) + len(conf.ResourceCaches)
+	cacheConf.Label = fmt.Sprintf("example%v", cacheNum)
 
-	conf.Manager.Caches[cacheID] = cacheConf
+	conf.ResourceCaches = append(conf.ResourceCaches, cacheConf)
 	return nil
 }
 
@@ -149,24 +134,10 @@ func AddRatelimit(cType string, conf *config.Type) error {
 	ratelimitConf := ratelimit.NewConfig()
 	ratelimitConf.Type = cType
 
-	var ratelimitID string
-	for i := 0; i < 10000; i++ {
-		var candidate string
-		if i == 0 {
-			candidate = "example"
-		} else {
-			candidate = fmt.Sprintf("example%v", i)
-		}
-		if _, exists := conf.Manager.RateLimits[candidate]; !exists {
-			ratelimitID = candidate
-			break
-		}
-	}
-	if len(ratelimitID) == 0 {
-		return errors.New("what the hell are you doing?")
-	}
+	ratelimitNum := len(conf.Manager.RateLimits) + len(conf.ResourceRateLimits)
+	ratelimitConf.Label = fmt.Sprintf("example%v", ratelimitNum)
 
-	conf.Manager.RateLimits[ratelimitID] = ratelimitConf
+	conf.ResourceRateLimits = append(conf.ResourceRateLimits, ratelimitConf)
 	return nil
 }
 

@@ -48,18 +48,23 @@ func Unmarshal(confStr string) (config.Type, error) {
 }
 
 type normalisedLabConfig struct {
-	Input     yaml.Node `yaml:"input"`
-	Buffer    yaml.Node `yaml:"buffer"`
-	Pipeline  yaml.Node `yaml:"pipeline"`
-	Output    yaml.Node `yaml:"output"`
-	Resources yaml.Node `yaml:"resources,omitempty"`
+	Input              yaml.Node `yaml:"input,omitempty"`
+	Buffer             yaml.Node `yaml:"buffer,omitempty"`
+	Pipeline           yaml.Node `yaml:"pipeline"`
+	Output             yaml.Node `yaml:"output,omitempty"`
+	Resources          yaml.Node `yaml:"resources,omitempty"`
+	CacheResources     yaml.Node `yaml:"cache_resources,omitempty"`
+	InputResources     yaml.Node `yaml:"input_resources,omitempty"`
+	OutputResources    yaml.Node `yaml:"output_resources,omitempty"`
+	ProcessorResources yaml.Node `yaml:"processor_resources,omitempty"`
+	RateLimitResources yaml.Node `yaml:"rate_limit_resources,omitempty"`
 }
 
 // Marshal a config struct into a subset of fields relevant to the lab
 // environment.
 func Marshal(conf config.Type) ([]byte, error) {
 	node, err := conf.SanitisedV2(config.SanitisedV2Config{
-		RemoveTypeField:        false,
+		RemoveTypeField:        true,
 		RemoveDeprecatedFields: false,
 	})
 	if err != nil {
@@ -68,6 +73,15 @@ func Marshal(conf config.Type) ([]byte, error) {
 	nConf := normalisedLabConfig{}
 	if err := node.Decode(&nConf); err != nil {
 		return nil, err
+	}
+	if conf.Input.Type == "benthos_lab" {
+		nConf.Input = yaml.Node{}
+	}
+	if conf.Output.Type == "benthos_lab" {
+		nConf.Output = yaml.Node{}
+	}
+	if conf.Buffer.Type == "none" {
+		nConf.Buffer = yaml.Node{}
 	}
 	return uconf.MarshalYAML(nConf)
 }

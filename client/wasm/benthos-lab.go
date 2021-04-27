@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/Jeffail/benthos/v3/lib/cache"
-	"github.com/Jeffail/benthos/v3/lib/condition"
 	"github.com/Jeffail/benthos/v3/lib/config"
 	"github.com/Jeffail/benthos/v3/lib/input"
 	"github.com/Jeffail/benthos/v3/lib/log"
@@ -190,7 +189,7 @@ func compile(this js.Value, args []js.Value) interface{} {
 		state.Clear()
 
 		logger := log.WrapAtLevel(logWriter{}, log.LogInfo)
-		mgr, err := manager.New(conf.Manager, types.NoopMgr(), logger, metrics.Noop())
+		mgr, err := manager.NewV2(conf.ResourceConfig, types.NoopMgr(), logger, metrics.Noop())
 		if err != nil {
 			reportErr("failed to create pipeline resources: %v\n", err)
 			go reportUsage("compile/failed")
@@ -346,27 +345,6 @@ func addProcessor(this js.Value, args []js.Value) interface{} {
 	return string(resultBytes)
 }
 
-func addCondition(this js.Value, args []js.Value) interface{} {
-	condType, contents := args[0].String(), args[1].String()
-	conf, err := labConfig.Unmarshal(contents)
-	if err != nil {
-		reportErr("Failed to unmarshal current config: %v\n", err)
-		return nil
-	}
-
-	if err := labConfig.AddCondition(condType, &conf); err != nil {
-		reportErr("Failed to add condition: %v\n", err)
-		return nil
-	}
-
-	resultBytes, err := labConfig.Marshal(conf)
-	if err != nil {
-		reportErr("failed to normalise config: %v\n", err)
-		return nil
-	}
-	return string(resultBytes)
-}
-
 func addOutput(this js.Value, args []js.Value) interface{} {
 	outputType, contents := args[0].String(), args[1].String()
 	conf, err := labConfig.Unmarshal(contents)
@@ -466,19 +444,6 @@ func getProcessors(this js.Value, args []js.Value) interface{} {
 	return generic
 }
 
-func getConditions(this js.Value, args []js.Value) interface{} {
-	conds := []string{}
-	for k := range condition.Constructors {
-		conds = append(conds, k)
-	}
-	sort.Strings(conds)
-	generic := make([]interface{}, len(conds))
-	for i, v := range conds {
-		generic[i] = v
-	}
-	return generic
-}
-
 func getOutputs(this js.Value, args []js.Value) interface{} {
 	outputs := []string{"benthos_lab"}
 	for k, v := range output.Constructors {
@@ -567,13 +532,11 @@ func registerFunctions() func() {
 
 	addLabFunction("getInputs", js.FuncOf(getInputs))
 	addLabFunction("getProcessors", js.FuncOf(getProcessors))
-	addLabFunction("getConditions", js.FuncOf(getConditions))
 	addLabFunction("getOutputs", js.FuncOf(getOutputs))
 	addLabFunction("getCaches", js.FuncOf(getCaches))
 	addLabFunction("getRatelimits", js.FuncOf(getRatelimits))
 	addLabFunction("addInput", js.FuncOf(addInput))
 	addLabFunction("addProcessor", js.FuncOf(addProcessor))
-	addLabFunction("addCondition", js.FuncOf(addCondition))
 	addLabFunction("addOutput", js.FuncOf(addOutput))
 	addLabFunction("addCache", js.FuncOf(addCache))
 	addLabFunction("addRatelimit", js.FuncOf(addRatelimit))
